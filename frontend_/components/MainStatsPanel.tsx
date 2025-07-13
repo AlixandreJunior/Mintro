@@ -4,6 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { ProgressCircle } from "./Icons/ProgressCircle"
 import ShoeIcon from "./Icons/ShoeIcon"
 import React from "react"
+import { TouchableOpacity } from "react-native"
+import { router } from "expo-router"
 
 const { width, height } = Dimensions.get("window");
 
@@ -19,7 +21,7 @@ export const MainStatsPanel: React.FC<MainStatsPanelProps> = ({
     currentDayStats
 }) => {
     return(
-        <SafeAreaView style={styles.mainStats}>
+        <TouchableOpacity style={styles.mainStats} onPress={() => router.push('/steps')}>
             <View style={styles.sideStatItem}>
             <View style={[styles.progressContainer, styles.sideStatProgressContainer]}> 
                 <ProgressCircle progress={Math.min(parseFloat(currentDayStats.distance) / 10 * 100, 100)} size={width * 0.18} color="#9CC9FF" strokeWidth={5}/>
@@ -52,7 +54,7 @@ export const MainStatsPanel: React.FC<MainStatsPanelProps> = ({
             <Text style={styles.sideStatValue}>{currentDayStats.kcal}</Text>
             <Text style={styles.sideStatLabel}>kcal</Text>
             </View>
-        </SafeAreaView>
+        </TouchableOpacity>
     )
 }
 
