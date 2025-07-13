@@ -1,65 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import {
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native';
-
+import React from 'react';
+import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import Header from '@/components/Layout/Header';
-import { Goal } from '@/types/user/goal';
-import { getGoals } from '@/services/goals/getGoals';
-import { User } from '@/types/user/user';
-import { getUser } from '@/services/user/getUser';
 import { UserInfoSection } from '@/components/UserInfoSection';
 import { StatsSection } from '@/components/StatsSection';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 const screenContentPaddingHorizontal = 20;
 
 export default function ProfileScreen() {
-  const [fetchedUser, setFetchedUser] = useState<User | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
-  const [errorUser, setErrorUser] = useState<string | null>(null);
+  const {
+    user,
+    goals,
+    loadingUser,
+    loadingGoals,
+    errorUser,
+    errorGoals,
+  } = useUserProfile();
 
-  const [userGoals, setUserGoals] = useState<Goal | null>(null);
-  const [loadingGoals, setLoadingGoals] = useState(true);
-  const [errorGoals, setErrorGoals] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      setLoadingUser(true);
-      setErrorUser(null);
-      try {
-        const data = await getUser();
-        setFetchedUser(data);
-      } catch (err: any) {
-        setErrorUser(err.message || 'Falha ao carregar dados do usuário.');
-        console.error('Erro ao buscar usuário:', err);
-      } finally {
-        setLoadingUser(false);
-      }
-    };
-
-    const fetchUserGoals = async () => {
-      setLoadingGoals(true);
-      setErrorGoals(null);
-      try {
-        const data = await getGoals();
-        setUserGoals(data);
-      } catch (err: any) {
-        setErrorGoals(err.message || 'Falha ao carregar metas.');
-        console.error('Erro ao buscar metas:', err);
-      } finally {
-        setLoadingGoals(false);
-      }
-    };
-
-    fetchUserData();
-    fetchUserGoals();
-  }, []);
-
-  const displayName = fetchedUser?.username || 'Carregando...';
-  const joinYear = fetchedUser?.created_at ? new Date(fetchedUser.created_at).getFullYear() : 'N/A';
-  const avatarChar = fetchedUser?.username ? fetchedUser.username.charAt(0).toUpperCase() : 'A';
+  const displayName = user?.username || 'Carregando...';
+  const joinYear = user?.created_at
+    ? new Date(user.created_at).getFullYear()
+    : 'N/A';
+  const avatarChar = user?.username
+    ? user.username.charAt(0).toUpperCase()
+    : 'A';
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -71,8 +35,8 @@ export default function ProfileScreen() {
           joinYear={joinYear}
         />
         <StatsSection
-          fetchedUser={fetchedUser}
-          userGoals={userGoals}
+          fetchedUser={user}
+          userGoals={goals}
           loadingGoals={loadingGoals}
           loadingUser={loadingUser}
           errorGoals={errorGoals}

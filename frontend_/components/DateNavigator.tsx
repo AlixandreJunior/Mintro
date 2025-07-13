@@ -9,6 +9,8 @@ import {
   subWeeks,
   addMonths,
   subMonths,
+  addYears,
+  subYears,
   startOfWeek,
   endOfWeek,
   isToday,
@@ -16,6 +18,7 @@ import {
   isYesterday,
   isSameWeek,
   isSameMonth,
+  isSameYear,
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -23,7 +26,7 @@ const { width, height } = Dimensions.get('window');
 
 interface DateNavigatorProps {
   currentDate: Date;
-  mode: 'day' | 'week' | 'month';
+  mode: 'day' | 'week' | 'month' | 'year';
   onDateChange: (newDate: Date) => void;
 }
 
@@ -44,6 +47,9 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
       case 'month':
         newDate = subMonths(currentDate, 1);
         break;
+      case 'year':
+        newDate = subYears(currentDate, 1);
+        break;
       default:
         newDate = currentDate;
     }
@@ -62,13 +68,16 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
       case 'month':
         newDate = addMonths(currentDate, 1);
         break;
+      case 'year':
+        newDate = addYears(currentDate, 1);
+        break;
       default:
         newDate = currentDate;
     }
     onDateChange(newDate);
   };
 
-  const getSpecialLabel = (date: Date, mode: 'day' | 'week' | 'month') => {
+  const getSpecialLabel = (date: Date, mode: 'day' | 'week' | 'month' | 'year') => {
     const today = new Date();
 
     switch (mode) {
@@ -89,6 +98,12 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
         if (isSameMonth(date, subMonths(today, 1))) return 'Mês passado';
         if (isSameMonth(date, addMonths(today, 1))) return 'Próximo mês';
         break;
+
+      case 'year':
+        if (isSameYear(date, today)) return 'Este ano';
+        if (isSameYear(date, subYears(today, 1))) return 'Ano passado';
+        if (isSameYear(date, addYears(today, 1))) return 'Próximo ano';
+        break;
     }
 
     return null;
@@ -108,6 +123,8 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
       }
       case 'month':
         return format(currentDate, "MMMM 'de' yyyy", { locale: ptBR });
+      case 'year':
+        return format(currentDate, 'yyyy', { locale: ptBR });
     }
   };
 

@@ -1,4 +1,3 @@
-import BackspaceIcon from '@/components/Icons/Backspace';
 import KeypadSection from '@/components/KeypadSection';
 import MintroLogo from '@/components/Layout/MintroLogo';
 import PinSection from '@/components/PinSection';
@@ -31,13 +30,10 @@ export default function App(): React.JSX.Element {
 
   return (
     <View style={styles.container}>
-
       <MintroLogo />
-
       <PinSection
         pin={pin}
       />
-
       <KeypadSection
         handleKeyPress={handleKeyPress}
       />

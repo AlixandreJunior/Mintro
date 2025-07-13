@@ -1,98 +1,68 @@
-import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  Alert,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { createAccount } from '@/services/user/createAccount';
+import React from 'react';
+import { View, StyleSheet, Dimensions, ScrollView, SafeAreaView, } from 'react-native';
+import { Lock, Mail } from 'lucide-react-native';
+
 import MintroLogo from '@/components/Layout/MintroLogo';
 import { EntryFormCard } from '@/components/Cards/EntryFormCard';
 import { EntryInput } from '@/components/Inputs/EntryInput';
-import { Lock, Mail } from 'lucide-react-native';
+import { useSignUpForm } from '@/hooks/forms/useSignUpForm';
 
 const { width, height } = Dimensions.get('window');
 
 export default function SignUpScreen() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const router = useRouter();
-
-  const handleSubmit = async () => {
-    setError('');
-
-    if (!name.trim()) {
-      setError('Nome é obrigatório');
-      return;
-    }
-    if (!email.trim()) {
-      setError('Email é obrigatório');
-      return;
-    }
-    if (password.length < 6) {
-      setError('Senha deve ter pelo menos 6 caracteres');
-      return;
-    }
-    try {
-      await createAccount(name, email, password);
-      router.push("/(tabs)/mental");
-    } catch (error: any) {
-      Alert.alert("Erro", error.message || "Erro inesperado ao fazer login.");
-    }
-  };
-
-  const handleBackToLogin = () => {
-    router.push('/auth/login');
-  };
+  const {
+    name,
+    setName,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    showPassword,
+    togglePasswordVisibility,
+    error,
+    handleSubmit,
+    handleBackToLogin,
+  } = useSignUpForm();
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <MintroLogo />
-
         <View style={styles.content}>
           <EntryFormCard
-            welcomeText='Criar nova conta!'
-            subtitleText='Preencha os dados para começar'
+            welcomeText="Criar nova conta!"
+            subtitleText="Preencha os dados para começar"
             error={error}
             handleSubmit={handleSubmit}
-            textSubmit='Criar conta'
+            textSubmit="Criar conta"
             handleBack={handleBackToLogin}
-            backText='Já tem uma conta?'
-            backLink='Entrar'
+            backText="Já tem uma conta?"
+            backLink="Entrar"
           >
             <EntryInput
-              labelText='Nome de Usuário'
-              keyboardType='default'
+              labelText="Nome de Usuário"
+              keyboardType="default"
               onChange={setName}
               value={name}
-              placeholder='Digite seu nome completo'
+              placeholder="Digite seu nome completo"
             />
-
             <EntryInput
-              labelText='Email'
-              keyboardType='email-address'
+              labelText="Email"
+              keyboardType="email-address"
               onChange={setEmail}
               value={email}
-              placeholder='Digite seu email'
+              placeholder="Digite seu email"
               icon={<Mail size={20} color="#9CA3AF" style={styles.inputIcon} />}
             />
-
             <EntryInput
-              labelText='Senha'
-              keyboardType='default'
+              labelText="Senha"
+              keyboardType="default"
               onChange={setPassword}
               value={password}
-              placeholder='Digite sua senha'
+              placeholder="Digite sua senha"
               secureText={{
                 showSecureText: showPassword,
-                setShowSecureText: () => setShowPassword(!showPassword),
+                setShowSecureText: togglePasswordVisibility,
               }}
               icon={<Lock size={20} color="#9CA3AF" style={styles.inputIcon} />}
             />
