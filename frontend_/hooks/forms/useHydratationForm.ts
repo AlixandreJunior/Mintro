@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Alert, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { registerHydratationLog } from '@/services/hydratation/registerHydratation';
-import { formatDatetimeToISO } from '@/utils/formatDatetimeToISO';
+import { formatDateToISO } from '@/utils/formatDatetimeToISO';
 
 export const VOLUMES = [250, 500, 750, 1000] as const;
 
@@ -20,7 +20,10 @@ export function useHydrationForm() {
 
   const handleDateChange = (event: any, date?: Date) => {
     setShowDatePicker(false);
-    if ((Platform.OS === 'android' && event.type === 'set' && date) || (date && Platform.OS !== 'android')) {
+    if (
+      (Platform.OS === 'android' && event.type === 'set' && date) ||
+      (date && Platform.OS !== 'android')
+    ) {
       setSelectedDate(date);
     }
   };
@@ -34,7 +37,10 @@ export function useHydrationForm() {
     const totalHydration = totalFromQuantities + custom;
 
     if (totalHydration <= 0) {
-      Alert.alert('Erro', 'A quantidade total de hidratação deve ser maior que zero.');
+      Alert.alert(
+        'Erro',
+        'A quantidade total de hidratação deve ser maior que zero.'
+      );
       return;
     }
 
@@ -42,7 +48,7 @@ export function useHydrationForm() {
     try {
       await registerHydratationLog({
         quantity: totalHydration,
-        date: formatDatetimeToISO(selectedDate),
+        date: formatDateToISO(selectedDate),
       });
       Alert.alert('Sucesso', 'Hidratação registrada com sucesso!');
       router.back();

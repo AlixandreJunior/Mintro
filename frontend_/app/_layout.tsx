@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Slot, Stack } from 'expo-router';
-import { useFonts, 
+import { useFonts,
+  Poppins_300Light, 
   Poppins_400Regular, 
   Poppins_500Medium, 
   Poppins_600SemiBold, 
@@ -10,10 +11,13 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import AppProviders from '@/components/AppProviders';
 import AuthGuard from '@/components/AuthGuard';
 import * as NavigationBar from "expo-navigation-bar";
+import { Provider as PaperProvider } from 'react-native-paper';
+
 
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
+    Poppins_300Light,
     Poppins_400Regular,
     Poppins_500Medium,
     Poppins_600SemiBold,
@@ -40,7 +44,9 @@ export default function RootLayout() {
   return (
     <AppProviders>
       <AuthGuard>
+          <PaperProvider>
             <Slot/>
+          </PaperProvider>
       </AuthGuard>
     </AppProviders>
   );

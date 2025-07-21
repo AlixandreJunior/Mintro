@@ -4,200 +4,132 @@ import { Dimensions, SafeAreaView, StyleSheet, Text, View } from "react-native";
 
 const { width, height } = Dimensions.get('window');
 
-interface ObjectiveProgressCardProps{
+interface ObjectiveProgressCardProps {}
 
-}
+const ObjectiveProgressCard: React.FC<ObjectiveProgressCardProps> = () => {
+  const objectiveProgress = {
+    current: 1,
+    total: 5, // altere para testar com diferentes números de bolinhas
+    description: 'para alcançar a meta',
+    periodStart: '6 de jul.',
+    periodEnd: '12 de jul.',
+    daysRemaining: 4,
+  };
 
-const ObjectiveProgressCard: React.FC<ObjectiveProgressCardProps> = ({
+  // Cálculo dinâmico do marginHorizontal para os ícones
+  const cardWidth = 220;
+  const paddingHorizontal = 20 * 2; // paddingLeft + paddingRight
+  const iconSize = 20;
+  const availableWidth = cardWidth - paddingHorizontal;
+  const iconsTotalWidth = objectiveProgress.total * iconSize;
+  const spacesCount = objectiveProgress.total - 1;
+  const gap = spacesCount > 0 ? (availableWidth - iconsTotalWidth) / spacesCount : 0;
 
-}) => {
-    const objectiveProgress = {
-        current: 1,
-        total: 3,
-        description: 'para alcançar a meta',
-        periodStart: '6 de jul.',
-        periodEnd: '12 de jul.',
-        daysRemaining: 4,
-    };
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.card}>
+        <Text style={styles.progressTitle}>
+          {objectiveProgress.current} de {objectiveProgress.total}
+        </Text>
 
-    return(
-        <SafeAreaView>
-            <View style={styles.card}>
-                <View style={styles.objectiveHeader}>
-                    <MaterialCommunityIcons name="check-circle-outline" size={width * 0.06} color="#4CAF50" />
-                    <View style={styles.objectiveTitleWrapper}>
-                    <MaterialCommunityIcons name="clipboard-text-outline" size={width * 0.05} color="#666" />
-                    <Text style={styles.objectiveDate}>Hoje, 3 de jul.</Text>
-                    </View>
-                </View>
-                <View style={styles.progressCirclesContainer}>
-                    <Text style={styles.currentProgressText}>{objectiveProgress.current}</Text>
-                    <Text style={styles.totalProgressText}> de {objectiveProgress.total}</Text>
-                    <View style={styles.progressIcons}>
-                    {[...Array(objectiveProgress.total)].map((_, index) => (
-                        <MaterialCommunityIcons
-                        key={index}
-                        name={index < objectiveProgress.current ? 'checkbox-marked-circle' : 'circle-outline'}
-                        size={width * 0.045}
-                        color={index < objectiveProgress.current ? '#4CAF50' : '#E0E0E0'}
-                        style={styles.progressIcon}
-                        />
-                    ))}
-                    </View>
-                </View>
+        <View style={styles.iconsRow}>
+          {[...Array(objectiveProgress.total)].map((_, index) => (
+            <MaterialCommunityIcons
+              key={index}
+              name={index < objectiveProgress.current ? 'check-circle' : 'circle'}
+              size={iconSize}
+              color={index < objectiveProgress.current ? '#57E571' : '#D9D9D9'}
+              style={{ marginHorizontal: gap / 2 }} // metade da margem para cada lado, assim o gap total entre os ícones fica gap
+            />
+          ))}
+        </View>
 
-                <Text style={styles.progressDescription}>{objectiveProgress.description}</Text>
-                <View style={styles.objectiveFooter}>
-                    <Text style={styles.objectivePeriod}>{objectiveProgress.periodStart} - {objectiveProgress.periodEnd}</Text>
-                    <Text style={styles.objectiveDaysRemaining}>{objectiveProgress.daysRemaining} dias restantes</Text>
-                </View>
-            </View>
-        </SafeAreaView>
-    )
-}
+        <Text style={styles.progressDescription}>
+          {objectiveProgress.total - objectiveProgress.current} {objectiveProgress.description}
+        </Text>
+
+        <View style={styles.separator} />
+
+        <View style={styles.footer}>
+          <Text style={styles.periodText}>
+            {objectiveProgress.periodStart} - {objectiveProgress.periodEnd}
+          </Text>
+          <Text style={styles.daysRemainingText}>
+            {objectiveProgress.daysRemaining} dias restantes
+          </Text>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
-    
+  safeArea: {
+    marginVertical: height * 0.01,
+  },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
     marginHorizontal: width * 0.05,
-    marginBottom: height * 0.02,
-    padding: width * 0.04,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+    shadowColor: 'rgba(0, 0, 0, 0.05)',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 2,
     elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
   },
-  objectiveHeader: {
+  progressTitle: {
+    fontFamily: 'Poppins_500Medium',
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#000000',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  iconsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: height * 0.015,
-  },
-  objectiveTitleWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: width * 0.02,
-  },
-  objectiveDate: {
-    fontSize: width * 0.038,
-    color: '#666',
-    marginLeft: width * 0.01,
-  },
-  progressCirclesContainer: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    marginBottom: height * 0.01,
-  },
-  currentProgressText: {
-    fontSize: width * 0.08,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  totalProgressText: {
-    fontSize: width * 0.05,
-    color: '#666',
-  },
-  progressIcons: {
-    flexDirection: 'row',
-    marginLeft: width * 0.03,
+    width: '50%',
+    marginHorizontal: 'auto',
+    justifyContent: 'center',
+    marginBottom: 10,
   },
   progressIcon: {
-    marginHorizontal: 2,
+    marginHorizontal: 4,    // diminua a margem entre os ícones para 4 (ou menos)
   },
   progressDescription: {
-    fontSize: width * 0.04,
-    color: '#666',
-    marginBottom: height * 0.02,
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 14,
+    lineHeight: 24,
+    color: '#0C0C0C',
+    textAlign: 'center',
+    marginBottom: 10,
   },
-  objectiveFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: height * 0.01,
+  separator: {
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: 'rgba(0, 0, 0, 0.15)',
+    width: '100%',
+    marginBottom: 10,
   },
-  objectivePeriod: {
-    fontSize: width * 0.035,
-    color: '#666',
-  },
-  objectiveDaysRemaining: {
-    fontSize: width * 0.035,
-    color: '#666',
-  },
-  sectionTitle: {
-    fontSize: width * 0.05,
-    fontWeight: 'bold',
-    color: '#333',
-    paddingHorizontal: width * 0.05,
-    marginBottom: height * 0.015,
-  },
-  streakContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginHorizontal: width * 0.05,
-    marginBottom: height * 0.02,
-  },
-  streakCard: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    alignItems: 'center',
-    paddingVertical: height * 0.02,
-    width: width * 0.42,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-  },
-  streakIconCircle: {
-    width: width * 0.15,
-    height: width * 0.15,
-    borderRadius: (width * 0.15) / 2,
-    backgroundColor: '#FFEBEE',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  streakNumber: {
-    fontSize: width * 0.06,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  streakLabel: {
-    fontSize: width * 0.035,
-    color: '#666',
-    textAlign: 'center',
-  },
-  calendarHeader: {
+  footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: height * 0.02,
+    paddingHorizontal: 5,
   },
-  calendarMonth: {
-    fontSize: width * 0.05,
-    fontWeight: 'bold',
-    color: '#333',
-    textTransform: 'capitalize',
+  periodText: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 12,
+    lineHeight: 24,
+    color: '#0C0C0C',
   },
-  weekDaysContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: height * 0.01,
+  daysRemainingText: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 12,
+    lineHeight: 24,
+    color: '#0C0C0C',
   },
-  weekDayText: {
-    fontSize: width * 0.035,
-    color: '#999',
-    width: (width * 0.9 / 7) - 10,
-    textAlign: 'center',
-  },
-  daysGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-})
+});
 
-export default ObjectiveProgressCard
+export default ObjectiveProgressCard;

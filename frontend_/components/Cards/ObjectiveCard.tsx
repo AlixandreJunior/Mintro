@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import CompletionIcon from '../Icons/CompletionIon';
 
 interface ObjectiveDisplayCardProps {
   objectiveTitle: string;
   objectiveSubtitle: string;
   renderIcon: React.ReactNode;
+  onPress?: ((event_:any) => void)
 }
 
 const { width } = Dimensions.get('window');
@@ -13,10 +14,11 @@ const { width } = Dimensions.get('window');
 const ObjectiveDisplayCard: React.FC<ObjectiveDisplayCardProps> = ({
   objectiveTitle,
   objectiveSubtitle,
-  renderIcon
+  renderIcon,
+  onPress
 }) => {
   return (
-    <View style={styles.objectiveCard}>
+    <TouchableOpacity style={styles.objectiveCard} onPress={onPress}>
       <View style={styles.objectiveLeft}>
         <View style={styles.checkboxContainer}>
           <CompletionIcon />
@@ -29,18 +31,20 @@ const ObjectiveDisplayCard: React.FC<ObjectiveDisplayCardProps> = ({
         <Text style={styles.objectiveTitle}>{objectiveTitle}</Text>
         <Text style={styles.objectiveSubtitle}>{objectiveSubtitle}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   objectiveCard: {
+    flex: 1,
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderColor: '#E5E7EB',
     borderWidth: 1,
     paddingVertical: 10,
     paddingHorizontal: 10,
+    marginHorizontal: width * 0.05, // Margem lateral responsiva
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: 'rgba(0,0,0,0.05)',

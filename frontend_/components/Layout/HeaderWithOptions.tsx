@@ -1,21 +1,33 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
-import { Appbar } from 'react-native-paper'; // Certifique-se de ter react-native-paper instalado
-import { router } from 'expo-router'; // Para a ação de voltar, se usar Expo Router
+import React, { useState } from 'react';
+import { View, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
+import { Appbar, Menu } from 'react-native-paper';
+import { router } from 'expo-router';
 import VerticalDotsIcon from '../Icons/VerticalDotsIcon';
+
+const { width, height } = Dimensions.get('window');
+
+interface OptionItem {
+  label: string;
+  onPress: () => void;
+}
 
 interface HeaderWithOptionsProps {
   title: string;
   onBackPress?: () => void;
-  onOptionPress?: () => void;
+  options?: OptionItem[]; // Array de opções do menu
 }
 
-const HeaderWithOptions: React.FC<HeaderWithOptionsProps> = ({ title, onBackPress, onOptionPress }) => {
+const HeaderWithOptions: React.FC<HeaderWithOptionsProps> = ({ title, onBackPress, options = [] }) => {
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const openMenu = () => setMenuVisible(true);
+  const closeMenu = () => setMenuVisible(false);
+
   const handleBack = () => {
     if (onBackPress) {
       onBackPress();
     } else {
-      router.back(); 
+      router.back();
     }
   };
 
@@ -24,38 +36,48 @@ const HeaderWithOptions: React.FC<HeaderWithOptionsProps> = ({ title, onBackPres
       <View style={styles.appbar}>
         <Appbar.BackAction onPress={handleBack} />
         <Appbar.Content title={title} titleStyle={styles.appbarTitle} />
-        <TouchableOpacity onPress={onOptionPress}>
-          <VerticalDotsIcon/>
-        </TouchableOpacity>
+        
+        <Menu
+          visible={menuVisible}
+          onDismiss={closeMenu}
+          anchor={
+            <Appbar.Action
+              icon={() => <VerticalDotsIcon size={width * 0.045} />}
+              onPress={openMenu}
+            />
+          }
+        >
+          {options.map((option, index) => (
+            <Menu.Item
+              key={index}
+              title={option.label}
+              onPress={() => {
+                closeMenu();
+                option.onPress();
+              }}
+            />
+          ))}
+        </Menu>
       </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-        backgroundColor: '#FFFF',
-  },
+  container: {},
   appbar: {
     backgroundColor: '#FFFF',
-    marginHorizontal: 6,
-    marginVertical: 2,
+    marginHorizontal: width * 0.01,
+    marginVertical: height * 0.002,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    elevation: 0, 
-    shadowOpacity: 0, 
+    elevation: 0,
+    shadowOpacity: 0,
   },
   appbarTitle: {
-    fontSize: 18,
-    fontWeight: 'regular',
-    color: '#00000', // Cor do título
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#00FF00', // Cor verde vibrante para "Salvar"
-    marginRight: 10, // Espaçamento à direita
+    fontSize: width * 0.045,
+    fontFamily: 'Poppins_400Regular',
   },
 });
 

@@ -7,7 +7,7 @@ interface WaterDropIconProps {
 }
 
 const WaterDropIcon: React.FC<WaterDropIconProps> = ({ size = 26, color = "#0022FF" }) => {
-  const scale = size / 26 // Scale based on original size
+  const scale = size / 26 
 
   return (
     <Svg width={size} height={size * 1.27} viewBox="0 0 26 33" fill="none">

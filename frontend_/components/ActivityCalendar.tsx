@@ -1,5 +1,4 @@
-// components/ObjectiveCalendarSection.tsx
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+// components/ActivityCalendar.tsx
 import React, { useState } from 'react';
 import { Dimensions, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import DateNavigator from './DateNavigator';
@@ -10,11 +9,26 @@ const { width, height } = Dimensions.get('window');
 interface CalendarDay {
   day: number;
   type: 'prev' | 'current' | 'next';
-  isChecked: boolean;
+  isChecked: boolean; // antigo, talvez usar para outros fins
   isCurrentDay: boolean;
+  isMarked: boolean; // novo: indica se dia está marcado (exercício feito)
 }
 
-const getMonthDays = (year: number, month: number): CalendarDay[] => {
+interface ActivityCalendarProps {
+  markedDates?: Date[];
+  currentDate: Date; // dias marcados para exercicios
+}
+
+const isSameDate = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate();
+
+const getMonthDays = (
+  year: number,
+  month: number,
+  markedDates: Date[] = []
+): CalendarDay[] => {
   const days: CalendarDay[] = [];
 
   const firstDayOfMonth = new Date(year, month, 1);
@@ -25,47 +39,60 @@ const getMonthDays = (year: number, month: number): CalendarDay[] => {
     days.unshift({
       day: prevMonthLastDay - i + 1,
       type: 'prev',
-      isChecked: true,
+      isChecked: false,
       isCurrentDay: false,
+      isMarked: false,
     });
   }
 
   const currentMonthLastDay = new Date(year, month + 1, 0).getDate();
   const today = new Date();
+
   for (let i = 1; i <= currentMonthLastDay; i++) {
-    const isChecked = true;
+    const currentDate = new Date(year, month, i);
     const isCurrentDay =
       i === today.getDate() &&
       month === today.getMonth() &&
       year === today.getFullYear();
-    days.push({ day: i, type: 'current', isChecked, isCurrentDay });
+    // verifica se essa data está na lista de marcados
+    const isMarked = markedDates.some((d) => isSameDate(d, currentDate));
+
+    days.push({
+      day: i,
+      type: 'current',
+      isChecked: false, // pode usar isChecked para outra coisa se quiser
+      isCurrentDay,
+      isMarked,
+    });
   }
 
   const remainingCellsInLastWeek = 7 - (days.length % 7);
   if (remainingCellsInLastWeek < 7) {
     for (let i = 1; i <= remainingCellsInLastWeek; i++) {
-      days.push({ day: i, type: 'next', isChecked: true, isCurrentDay: false });
+      days.push({
+        day: i,
+        type: 'next',
+        isChecked: false,
+        isCurrentDay: false,
+        isMarked: false,
+      });
     }
   }
 
   return days;
 };
 
-const ObjectiveCalendarSection = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
+  markedDates = [],
+  currentDate,
+}) => {
   const currentMonth = currentDate.getMonth();
   const currentYear = currentDate.getFullYear();
-  const daysInMonth = getMonthDays(currentYear, currentMonth);
+  const daysInMonth = getMonthDays(currentYear, currentMonth, markedDates);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.card}>
-        <DateNavigator
-          currentDate={currentDate}
-          mode="month"
-          onDateChange={setCurrentDate}
-        />
-
         <View style={styles.weekDaysContainer}>
           {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(
             (day, index) => (
@@ -88,10 +115,11 @@ const ObjectiveCalendarSection = () => {
               <View
                 style={[
                   styles.dayCircle,
-                  dayObj.isChecked && styles.dayCircleChecked,
+                  dayObj.isMarked && styles.dayCircleMarked, // marcação aqui
+                  dayObj.isCurrentDay && styles.dayCircleToday, // destaque para hoje
                 ]}
               >
-                {dayObj.isChecked ? (
+                {dayObj.isMarked ? (
                   <CheckmarkIcon size={width * 0.035} color="#fff" />
                 ) : (
                   <Text
@@ -177,9 +205,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#D9D9D3',
     marginBottom: height * 0.005,
   },
-  dayCircleChecked: {
-    backgroundColor: '#C8C8C8',
-    borderColor: '#C8C8C8',
+  dayCircleMarked: {
+    backgroundColor: '#4CAF50', // verde para dias marcados
+    borderColor: '#4CAF50',
+  },
+  dayCircleToday: {
+    borderColor: '#2196F3', // azul para dia atual
+    borderWidth: 2,
   },
 
   dayNumber: {
@@ -201,4 +233,4 @@ const styles = StyleSheet.create({
   dayNumberTodayBellowCircle: {},
 });
 
-export default ObjectiveCalendarSection;
+export default ActivityCalendar;

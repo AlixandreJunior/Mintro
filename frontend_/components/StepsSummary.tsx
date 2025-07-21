@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import ProgressCircle from "@/components/ProgressCircle";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import ShoeIcon from "./Icons/ShoeIcon";
 
 interface StepsSummaryProps {
   totalSteps: number;
@@ -27,7 +28,7 @@ export const StepsSummary: React.FC<StepsSummaryProps> = ({
       <View style={styles.progressContainer}>
         <ProgressCircle progress={progress} size={100} color="#A5D6A7" strokeWidth={8} />
         <View style={styles.progressIcon}>
-          <MaterialCommunityIcons name="walk" size={24} color="#2E7D32" />
+          <ShoeIcon/>
         </View>
       </View>
     </View>

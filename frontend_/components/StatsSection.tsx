@@ -1,4 +1,4 @@
-import { ActivityIndicator, Dimensions, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import StatCard from "./StatCard";
 import ExerciseIcon from "./Icons/ExerciseIcon";
 import MeditationIcon from "./Icons/MeditationIcon";
@@ -6,6 +6,7 @@ import WaterDropIcon from "./Icons/WaterDropIcon";
 import NotebookIcon from "./Icons/NotebookIcon";
 import { Goal } from "@/types/user/goal";
 import { User } from "@/types/user/user";
+import { router } from "expo-router";
 
 interface StatsSectionProps {
   fetchedUser: User | null;
@@ -16,7 +17,8 @@ interface StatsSectionProps {
   errorGoals: string | null;
 }
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+
 const cardGap = 10;
 const screenContentPaddingHorizontal = 20;
 const threeColumnCardWidth = (width - (screenContentPaddingHorizontal * 2) - (cardGap * (3 - 1))) / 3;
@@ -36,7 +38,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
   ] : [];
 
   const transformedGoals = userGoals ? [
-    { icon: <WaterDropIcon size={13} color='#525252' />, value: userGoals.hydration_goal, label: 'ml por dia' },
+    { icon: <WaterDropIcon size={13} color='#525252' />, value: userGoals.hydration_goal, label: 'ml                    por dia' },
     { icon: <MeditationIcon size={18} />, value: userGoals.exercise_goal, label: 'Minutos por dia' },
     { icon: <ExerciseIcon size={25} />, value: userGoals.mindfulness_goal, label: 'Minutos por dia' },
   ] : [];
@@ -45,6 +47,9 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
     <>
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Estatísticas</Text>
+        <TouchableOpacity style={styles.seeMoreButton} onPress={() => router.push('/stats')}>
+            <Text style={styles.textLink}>Ver Mais</Text>
+        </TouchableOpacity>
       </View>
       {loadingUser ? (
         <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />
@@ -97,13 +102,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: height * 0.01,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: width * 0.04,
     fontFamily: 'Poppins_400Regular',
     color: '#2C3E50',
-    marginBottom: 5,
+    marginBottom: height * 0.005
   },
   metricCardGrid: {
     flexDirection: 'row',
@@ -112,21 +117,32 @@ const styles = StyleSheet.create({
     gap: cardGap,
   },
   loadingIndicator: {
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: height * 0.01,
+    marginBottom: height * 0.02,
   },
   errorText: {
     color: 'red',
     textAlign: 'center',
-    marginHorizontal: 20,
-    marginTop: 20,
+    marginHorizontal: width * 0.02,
+    marginTop: height * 0.02,
     fontFamily: 'Poppins_400Regular',
   },
   noDataText: {
     color: 'gray',
     textAlign: 'center',
-    marginHorizontal: 20,
-    marginTop: 20,
+    marginHorizontal: width * 0.02,
+    marginTop: height * 0.02,
     fontFamily: 'Poppins_400Regular',
+  },
+  seeMoreButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textLink: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: width * 0.038,
+    lineHeight: 21,
+    textAlign: 'center',
+    color: '#1FB6FF',
   },
 });
