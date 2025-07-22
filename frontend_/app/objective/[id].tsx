@@ -26,7 +26,7 @@ export default function ObjectiveDetailScreen(): React.JSX.Element {
         title="Detalhes de Objetivo"
         options={[
           { label: 'Repetir', onPress: () => console.log('Editar') },
-          { label: 'Lembretes', onPress: () => console.log('Editar') },
+          { label: 'Lembretes', onPress: () => console.log('Lembretes') },
           { label: 'Excluir', onPress: () => console.log('Excluir') },
         ]}
       />

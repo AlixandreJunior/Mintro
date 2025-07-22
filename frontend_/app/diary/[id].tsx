@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import Header from '@/components/Layout/Header';
 import FormHeader from '@/components/Layout/FormHeader';
 import { useDiaryForm } from '@/hooks/forms/useDiaryForm';
 import DiaryForm from '@/components/DiaryFormTemplate';
 
-const CreateDiaryScreen = () => {
+const UpdateDiaryScreen = () => {
+  const { id } = useLocalSearchParams();
+
   const {
     title,
     setTitle,
@@ -26,16 +28,23 @@ const CreateDiaryScreen = () => {
     setSelectedImageUri,
     selectedMoodId,
     setSelectedMoodId,
-    handleSave,
+    loadDiaryById,
+    handleUpdate,
   } = useDiaryForm();
+
+  useEffect(() => {
+    if (id) {
+      loadDiaryById(Number(id));
+    }
+  }, [id]);
 
   return (
     <View style={styles.container}>
       <Header avatarChar="A" />
       <FormHeader
-        title="Novo Diário"
-        onBackPress={() => router.replace('/(tabs)/mental')}
-        onSavePress={handleSave}
+        title="Editar Diário"
+        onBackPress={() => router.back()}
+        onSavePress={() => handleUpdate(Number(id))}
       />
 
       <DiaryForm
@@ -69,4 +78,4 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
 });
 
-export default CreateDiaryScreen;
+export default UpdateDiaryScreen;

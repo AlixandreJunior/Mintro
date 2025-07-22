@@ -1,66 +1,129 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Dimensions,
+} from 'react-native';
 import { MoodType } from '@/types/mental/diary';
 import { getActivityIconName } from '@/utils/activityIconMapper';
+import { router } from 'expo-router';
 
+// Ícone simples dots vertical com 3 círculos
+const VerticalDotsIcon = () => (
+  <View style={styles.dotsIconContainer}>
+    <View style={styles.dot} />
+    <View style={styles.dot} />
+    <View style={styles.dot} />
+  </View>
+);
 
-// NOVO: Interface para uma atividade transformada (nome e ícone)
 interface TransformedActivity {
   name: string;
 }
 
 interface DiaryEntryCardProps {
+  id: number;
   time: string;
   mood: MoodType;
-  iconSource: any; // Mood icon source
-  moodColor: string;
-  activities: TransformedActivity[]; // NOVO: Agora é um array de atividades transformadas
+  iconSource: any;
+  activities: TransformedActivity[];
   title: string;
   content: string;
   photoUrl?: string;
 }
 
 const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
+  id,
   time,
   mood,
   iconSource,
-  moodColor,
-  activities, 
+  activities,
   title,
   content,
   photoUrl,
 }) => {
-  return (
-    <View style={styles.timelineRow}>
-      <View style={styles.timelineIconContainer}>
-        <Image source={iconSource} style={styles.timelineIcon} />
-      </View>
+  const [dropdownVisible, setDropdownVisible] = useState(false);
 
-      <View style={styles.entryCard}>
-        <View style={styles.entryHeader}>
-          <View style={styles.entryInfo}>
-            <Text style={[styles.moodText, { color: moodColor }]}>{mood}</Text>
-            <View style={styles.activitiesContainer}>
-              {activities.map((activity, index) => (
-                <View key={index} style={styles.activityChip}>
-                  {getActivityIconName(activity.name, 12)}
-                  <Text style={styles.activityChipText}>{activity.name}</Text>
+  // Fecha o dropdown ao clicar fora
+  const handleOutsidePress = () => setDropdownVisible(false);
+
+  const onEdit = () => {
+    //@ts-ignore
+    router.push(`/diary/${id}`);
+    setDropdownVisible(false);
+    console.log('Editar diário');
+  };
+
+  const onDelete = () => {
+    setDropdownVisible(false);
+    console.log('Excluir diário');
+  };
+
+  return (
+    <TouchableWithoutFeedback onPress={handleOutsidePress}>
+      <View style={styles.timelineRow}>
+        <View style={styles.timelineIconContainer}>{iconSource}</View>
+
+        <View style={styles.entryCard}>
+          <View style={styles.entryHeader}>
+            <View style={styles.entryInfo}>
+              <Text style={styles.moodText}>{mood}</Text>
+              <View style={styles.activitiesContainer}>
+                {activities.map((activity, index) => (
+                  <View key={index} style={styles.activityChip}>
+                    {getActivityIconName(activity.name, 12)}
+                    <Text style={styles.activityChipText}>{activity.name}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            {/* Dots + Dropdown + Time */}
+            <View style={styles.dotsContainer}>
+              <TouchableOpacity
+                onPress={() => setDropdownVisible(!dropdownVisible)}
+                activeOpacity={0.7}
+                style={styles.dotsButton}
+              >
+                <VerticalDotsIcon />
+              </TouchableOpacity>
+
+              <Text style={styles.timeText}>{time}</Text>
+
+              {dropdownVisible && (
+                <View style={styles.dropdownMenu}>
+                  <TouchableOpacity
+                    onPress={onEdit}
+                    style={styles.dropdownItem}
+                  >
+                    <Text style={styles.dropdownText}>Editar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={onDelete}
+                    style={styles.dropdownItem}
+                  >
+                    <Text style={[styles.dropdownText, { color: 'red' }]}>
+                      Excluir
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-              ))}
+              )}
             </View>
           </View>
-          <Text style={styles.timeText}>{time}</Text>
+
+          <Text style={styles.entryTitle}>{title}</Text>
+          <Text style={styles.entryContent}>{content}</Text>
+
+          {photoUrl && (
+            <Image source={{ uri: photoUrl }} style={styles.diaryPhoto} />
+          )}
         </View>
-
-        <Text style={styles.entryTitle}>{title}</Text>
-        <Text style={styles.entryContent}>{content}</Text>
-
-        {photoUrl && (
-          <Image source={{ uri: photoUrl }} style={styles.diaryPhoto} />
-        )}
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -81,11 +144,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 2,
   },
-  timelineIcon: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
-  },
   entryCard: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -93,18 +151,15 @@ const styles = StyleSheet.create({
     padding: 16,
     marginLeft: 40,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
   },
   entryHeader: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   entryInfo: {
     flex: 1,
@@ -114,13 +169,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 4,
   },
-  // NOVO: Container para as atividades em linha
   activitiesContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap', // Permite que os chips quebrem a linha
+    flexWrap: 'wrap',
     marginTop: 5,
   },
-  // NOVO: Estilo para cada "chip" de atividade
   activityChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -128,21 +181,66 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 4,
     marginBottom: 6,
+    marginRight: 6,
   },
   activityChipText: {
     fontSize: 12,
     color: '#6B7280',
     marginLeft: 4,
   },
+  dotsContainer: {
+    alignItems: 'center',
+    position: 'relative',
+  },
+  dotsButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  dotsIconContainer: {
+    width: 4,
+    justifyContent: 'space-between',
+    height: 20,
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#6B7280',
+  },
   timeText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#6B7280',
+    marginTop: 4,
+  },
+  dropdownMenu: {
+    position: 'absolute',
+    top: 28,
+    right: 0,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    minWidth: 100,
+    zIndex: 1000,
+  },
+  dropdownItem: {
+    paddingVertical: 8,
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: '#111827',
   },
   entryTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#374151',
     marginBottom: 4,
+    marginTop: 12,
   },
   entryContent: {
     fontSize: 14,
