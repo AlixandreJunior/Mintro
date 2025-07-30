@@ -1,6 +1,8 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { Dimensions, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import MainCard from './MainCard';
+import CompletionIcon from './Icons/CompletionIon';
 
 const { width, height } = Dimensions.get('window');
 
@@ -60,21 +62,20 @@ const ObjectiveProgressCard: React.FC<ProgressCardProps> = ({
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.card}>
+      <MainCard>
         <Text style={styles.progressTitle}>
           {objectiveProgress.current} de {objectiveProgress.total}
         </Text>
 
         <View style={styles.iconsRow}>
           {[...Array(objectiveProgress.total)].map((_, index) => (
-            <MaterialCommunityIcons
+            <CompletionIcon
               key={index}
-              name={
-                index < objectiveProgress.current ? 'check-circle' : 'circle'
-              }
               size={iconSize}
-              color={index < objectiveProgress.current ? '#57E571' : '#D9D9D9'}
-              style={{ marginHorizontal: gap / 2 }}
+              checkmarkColor={'#ffffffff'}
+              circleFill="#56f72eff"
+              circleStroke={'0000'}
+              circleStrokeWidth={1.5}
             />
           ))}
         </View>
@@ -97,72 +98,58 @@ const ObjectiveProgressCard: React.FC<ProgressCardProps> = ({
             {objectiveProgress.daysRemaining} dias restantes
           </Text>
         </View>
-      </View>
+      </MainCard>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
-    marginVertical: height * 0.01,
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: width * 0.05,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-    shadowColor: 'rgba(0, 0, 0, 0.05)',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 2,
-    elevation: 2,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    marginVertical: height * 0.0015,
   },
   progressTitle: {
     fontFamily: 'Poppins_500Medium',
-    fontSize: 16,
+    fontSize: width * 0.045,
     lineHeight: 24,
     color: '#000000',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: height * 0.01,
   },
   iconsRow: {
     flexDirection: 'row',
     width: '50%',
     marginHorizontal: 'auto',
     justifyContent: 'center',
-    marginBottom: 10,
+    marginBottom: height * 0.01,
   },
   progressDescription: {
     fontFamily: 'Poppins_400Regular',
-    fontSize: 14,
+    fontSize: width * 0.035,
     lineHeight: 24,
     color: '#0C0C0C',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: height * 0.01,
   },
   separator: {
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 0, 0, 0.15)',
+    borderTopColor: 'rgba(0, 0, 0, 0.1)',
     width: '100%',
-    marginBottom: 10,
+    marginBottom: height * 0.005,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 5,
+    paddingHorizontal: width * 0.005,
   },
   periodText: {
     fontFamily: 'Poppins_400Regular',
-    fontSize: 12,
+    fontSize: width * 0.03,
     lineHeight: 24,
     color: '#0C0C0C',
   },
   daysRemainingText: {
     fontFamily: 'Poppins_400Regular',
-    fontSize: 12,
+    fontSize: width * 0.03,
     lineHeight: 24,
     color: '#0C0C0C',
   },

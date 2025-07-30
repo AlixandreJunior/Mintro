@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Dimensions, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import DateNavigator from './DateNavigator';
 import CheckmarkIcon from './Icons/CheckMarkIcon';
+import MainCard from './MainCard';
 
 const { width, height } = Dimensions.get('window');
 
@@ -14,18 +15,24 @@ interface CalendarDay {
   isCurrentDay: boolean;
 }
 
-const getMonthDays = (year: number, month: number): CalendarDay[] => {
-  const days: CalendarDay[] = [];
+const cellSize = width * 0.115;
 
+const getMonthDays = (
+  year: number,
+  month: number,
+  diary_dates: string[]
+): CalendarDay[] => {
+  const days: CalendarDay[] = [];
   const firstDayOfMonth = new Date(year, month, 1);
   const firstDayOfWeekIndex = firstDayOfMonth.getDay();
 
   const prevMonthLastDay = new Date(year, month, 0).getDate();
   for (let i = firstDayOfWeekIndex; i > 0; i--) {
+    const date = new Date(year, month - 1, prevMonthLastDay - i + 1);
     days.unshift({
-      day: prevMonthLastDay - i + 1,
+      day: date.getDate(),
       type: 'prev',
-      isChecked: true,
+      isChecked: diary_dates.includes(date.toISOString().slice(0, 10)),
       isCurrentDay: false,
     });
   }
@@ -33,7 +40,8 @@ const getMonthDays = (year: number, month: number): CalendarDay[] => {
   const currentMonthLastDay = new Date(year, month + 1, 0).getDate();
   const today = new Date();
   for (let i = 1; i <= currentMonthLastDay; i++) {
-    const isChecked = true;
+    const date = new Date(year, month, i);
+    const isChecked = diary_dates.includes(date.toISOString().slice(0, 10));
     const isCurrentDay =
       i === today.getDate() &&
       month === today.getMonth() &&
@@ -44,99 +52,85 @@ const getMonthDays = (year: number, month: number): CalendarDay[] => {
   const remainingCellsInLastWeek = 7 - (days.length % 7);
   if (remainingCellsInLastWeek < 7) {
     for (let i = 1; i <= remainingCellsInLastWeek; i++) {
-      days.push({ day: i, type: 'next', isChecked: true, isCurrentDay: false });
+      const date = new Date(year, month + 1, i);
+      days.push({
+        day: i,
+        type: 'next',
+        isChecked: diary_dates.includes(date.toISOString().slice(0, 10)),
+        isCurrentDay: false,
+      });
     }
   }
 
   return days;
 };
 
-const ObjectiveCalendarSection = () => {
+interface ObjectiveCalendarSectionProps {
+  diary_dates: string[];
+}
+
+const ObjectiveCalendarSection: React.FC<ObjectiveCalendarSectionProps> = ({
+  diary_dates,
+}) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const currentMonth = currentDate.getMonth();
   const currentYear = currentDate.getFullYear();
-  const daysInMonth = getMonthDays(currentYear, currentMonth);
+  const daysInMonth = getMonthDays(currentYear, currentMonth, diary_dates);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.card}>
-        <DateNavigator
-          currentDate={currentDate}
-          mode="month"
-          onDateChange={setCurrentDate}
-        />
+    <MainCard>
+      <DateNavigator
+        currentDate={currentDate}
+        mode="month"
+        onDateChange={setCurrentDate}
+      />
 
-        <View style={styles.weekDaysContainer}>
-          {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(
-            (day, index) => (
-              <Text key={index} style={styles.weekDayText}>
-                {day}
-              </Text>
-            )
-          )}
-        </View>
+      <View style={styles.weekDaysContainer}>
+        {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day, index) => (
+          <Text key={index} style={styles.weekDayText}>
+            {day}
+          </Text>
+        ))}
+      </View>
 
-        <View style={styles.daysGrid}>
-          {daysInMonth.map((dayObj, index) => (
+      <View style={styles.daysGrid}>
+        {daysInMonth.map((dayObj, index) => (
+          <View
+            key={index}
+            style={[
+              styles.calendarDayCell,
+              dayObj.type !== 'current' && styles.calendarDayCellInactive,
+            ]}
+          >
             <View
-              key={index}
               style={[
-                styles.calendarDayCell,
-                dayObj.type !== 'current' && styles.calendarDayCellInactive,
+                styles.dayCircle,
+                dayObj.isChecked && styles.dayCircleChecked,
               ]}
             >
-              <View
-                style={[
-                  styles.dayCircle,
-                  dayObj.isChecked && styles.dayCircleChecked,
-                ]}
-              >
-                {dayObj.isChecked ? (
-                  <CheckmarkIcon size={width * 0.035} color="#fff" />
-                ) : (
-                  <Text
-                    style={[
-                      styles.dayNumber,
-                      dayObj.type !== 'current' && styles.dayNumberInactive,
-                    ]}
-                  >
-                    {dayObj.day}
-                  </Text>
-                )}
-              </View>
-              <Text
-                style={[
-                  styles.dayNumberBelowCircle,
-                  dayObj.isCurrentDay && styles.dayNumberTodayBellowCircle,
-                  dayObj.type !== 'current' && styles.dayNumberInactive,
-                ]}
-              >
-                {dayObj.day}
-              </Text>
+              <CheckmarkIcon size={width * 0.035} color="#fff" />
             </View>
-          ))}
-        </View>
+            <Text
+              style={[
+                styles.dayNumberBelowCircle,
+                dayObj.isCurrentDay && styles.dayNumberTodayBellowCircle,
+                dayObj.type !== 'current' && styles.dayNumberInactive,
+              ]}
+            >
+              {dayObj.day}
+            </Text>
+          </View>
+        ))}
       </View>
-    </SafeAreaView>
+    </MainCard>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {},
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    marginHorizontal: width * 0.05,
-    padding: width * 0.04,
-    elevation: 4,
-    shadowColor: 'rgba(0, 0, 0, 0.05)',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 2,
-  },
-
   weekDaysContainer: {
     flexDirection: 'row',
+    flexWrap: 'nowrap',
     justifyContent: 'space-around',
     marginBottom: height * 0.015,
     paddingHorizontal: width * 0.01,
@@ -150,14 +144,15 @@ const styles = StyleSheet.create({
   },
 
   daysGrid: {
+    width: cellSize * 7, // largura exata para 7 células
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
+    alignSelf: 'center',
   },
+
   calendarDayCell: {
-    width: (width * 0.9 - 2 * width * 0.04) / 7,
-    height: ((width * 0.9 - 2 * width * 0.04) / 7) * 1.5,
+    width: cellSize,
+    height: cellSize * 1.5,
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingTop: height * 0.005,
@@ -178,7 +173,7 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.005,
   },
   dayCircleChecked: {
-    backgroundColor: '#C8C8C8',
+    backgroundColor: '#41ff41ff',
     borderColor: '#C8C8C8',
   },
 

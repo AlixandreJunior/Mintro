@@ -13,6 +13,8 @@ export interface Objective {
   repeat: string; // Ex: "1x", "3x"
   streak: number;
   week_count: number;
+  success_rate_average: number;
+  diary_dates: string[];
 }
 
 export interface ObjectiveWrite {

@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { useEffect, useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 import Header from '@/components/Layout/Header';
 import HeaderWithOptions from '@/components/Layout/HeaderWithOptions';
@@ -26,6 +26,7 @@ import { Objective } from '@/types/mental/objectives';
 
 import { useObjectiveForm } from '@/hooks/forms/useObjectiveForm';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import ObjectiveFooter from '@/components/ObjectiveFooter';
 
 const { height } = Dimensions.get('window');
 
@@ -86,7 +87,6 @@ export default function ObjectiveDetailScreen(): React.JSX.Element {
   const onRepeatSelect = async (times: number) => {
     if (!objective) return;
 
-    // Ajusta string para o campo repeat conforme seleção
     const repeatStr = times === 1 ? '1x' : times === 3 ? '3x' : '5x';
     setSelectedRepeat(repeatStr);
     setUpdating(true);
@@ -161,6 +161,7 @@ export default function ObjectiveDetailScreen(): React.JSX.Element {
           { label: 'Lembretes', onPress: () => setReminderModalVisible(true) },
           { label: 'Excluir', onPress: () => handleDelete(Number(id)) },
         ]}
+        onBackPress={() => router.replace('/(tabs)/mental')}
       />
 
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -182,26 +183,18 @@ export default function ObjectiveDetailScreen(): React.JSX.Element {
           current={objective.streak}
           longest={objective.best_streak}
         />
-        <ObjectiveCalendarSection />
+        <ObjectiveCalendarSection diary_dates={objective.diary_dates} />
         <ObjectiveRateSection
           repeat={parseInt(objective.repeat)}
           week_count={objective.week_count}
+          success_rate_avarege={objective.success_rate_average}
         />
         <ObjectiveConclusionSection
           thisMonth={objective.conclusion_count}
           total={objective.conclusion_count}
         />
 
-        <View style={styles.startDateContainer}>
-          <Text style={styles.startDateLabel}>Data de Início</Text>
-          <Text style={styles.startDateValue}>
-            {new Date(objective.created_at).toLocaleDateString('pt-BR', {
-              day: '2-digit',
-              month: 'long',
-              year: 'numeric',
-            })}
-          </Text>
-        </View>
+        <ObjectiveFooter createdAt={objective.created_at} />
       </ScrollView>
 
       {/* Modal de repetição */}

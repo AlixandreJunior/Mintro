@@ -15,6 +15,7 @@ class ObjectiveReadSerializer(serializers.ModelSerializer):
     streak = serializers.SerializerMethodField()
     conclusion_count = serializers.SerializerMethodField()
     success_rate_average = serializers.SerializerMethodField()  # novo campo
+    diary_dates = serializers.SerializerMethodField()
 
     class Meta:
         model = Objective
@@ -32,12 +33,13 @@ class ObjectiveReadSerializer(serializers.ModelSerializer):
             "best_streak",
             "success_rate_average",
             "conclusion_count",
+            "diary_dates",
         ]
 
     def get_diary_dates(self, obj):
-        diaries = Diary.objects.filter(user=obj.user, activities=obj.activity).order_by(
-            "datetime"
-        )
+        diaries = Diary.objects.filter(
+            user=obj.user, activities=obj.activity, datetime__gte=obj.created_at
+        ).order_by("datetime")
 
         return sorted(set([d.datetime.date() for d in diaries]))
 
