@@ -5,141 +5,111 @@ import {
   ScrollView,
   Text,
   Switch,
-  TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import Header from '@/components/Layout/Header';
 import FormHeader from '@/components/Layout/FormHeader';
 import { PeriodsSection } from '@/components/PeriodsSection';
 import { ActivitiesSection } from '@/components/ActivitySection';
+import { DateTimeInput } from '@/components/Inputs/DateTimeInput'; // Ajuste caminho
+import { useObjectiveForm } from '@/hooks/forms/useObjectiveForm'; // Hook atualizado que você passou
 
-// --- Tipos para Props e Hooks ---
+const RepetitionsSection: FC<{
+  selected: '1x' | '3x' | '5x' | null;
+  setSelected: Dispatch<SetStateAction<'1x' | '3x' | '5x' | null>>;
+}> = ({ selected, setSelected }) => {
+  const options = [
+    { label: '1 Vez', value: '1x' },
+    { label: '3 Vezes', value: '3x' },
+    { label: '5 Vezes', value: '5x' },
+  ];
 
-type UseObjectiveFormReturn = {
-  selectedObjectiveId: number | null;
-  setSelectedObjectiveId: Dispatch<SetStateAction<number | null>>;
-  selectedRepetition: number | null;
-  setSelectedRepetition: Dispatch<SetStateAction<number | null>>;
-  selectedPeriod: string | null;
-  setSelectedPeriod: Dispatch<SetStateAction<string | null>>;
-  remindersEnabled: boolean;
-  setRemindersEnabled: Dispatch<SetStateAction<boolean>>;
-  reminderTime: string;
-  setReminderTime: Dispatch<SetStateAction<string>>;
-  handleSave: () => void;
+  return (
+    <View style={styles.sectionContainer}>
+      <Text style={styles.sectionTitle}>Repetir</Text>
+      {options.map(({ label, value }) => {
+        const isSelected = selected === value;
+        return (
+          <TouchableOpacity
+            key={value}
+            style={[
+              styles.optionContainer,
+              isSelected && styles.optionSelected,
+            ]}
+            //@ts-ignore
+            onPress={() => setSelected(value)}
+            activeOpacity={0.7}
+          >
+            <Text style={isSelected ? styles.optionTextSelected : undefined}>
+              {isSelected ? '🔘' : '⚪'} {label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
 };
 
-type RepetitionsSectionProps = {
-  title: string;
-  selected: number | null;
-  setSelected: Dispatch<SetStateAction<number | null>>;
-};
-
-type RemindersSectionProps = {
+const RemindersSection: FC<{
   enabled: boolean;
   setEnabled: Dispatch<SetStateAction<boolean>>;
   time: string;
   setTime: Dispatch<SetStateAction<string>>;
-};
+}> = ({ enabled, setEnabled, time, setTime }) => {
+  const [showPicker, setShowPicker] = useState(false);
 
-// --- Mock de Componentes e Hooks (Tipados) ---
-
-// Supondo que seu hook 'useObjectiveForm' seja atualizado para isto:
-const useObjectiveForm = (): UseObjectiveFormReturn => {
-  const [selectedObjectiveId, setSelectedObjectiveId] = useState<number | null>(
-    null
-  );
-  const [selectedRepetition, setSelectedRepetition] = useState<number | null>(
-    null
-  );
-  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
-  const [remindersEnabled, setRemindersEnabled] = useState<boolean>(true);
-  const [reminderTime, setReminderTime] = useState<string>('');
-
-  const handleSave = () => {
-    // Lógica para salvar os dados
-    console.log({
-      objectiveId: selectedObjectiveId,
-      repetition: selectedRepetition,
-      period: selectedPeriod,
-      reminders: remindersEnabled,
-      time: reminderTime,
-    });
-    // Adicione a navegação ou feedback para o usuário aqui
+  const parseTimeStringToDate = (timeStr: string) => {
+    if (!timeStr) return new Date();
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    date.setSeconds(0);
+    return date;
   };
 
-  return {
-    selectedObjectiveId,
-    setSelectedObjectiveId,
-    selectedRepetition,
-    setSelectedRepetition,
-    selectedPeriod,
-    setSelectedPeriod,
-    remindersEnabled,
-    setRemindersEnabled,
-    reminderTime,
-    setReminderTime,
-    handleSave,
+  const handleChange = (_event: any, selectedDate?: Date) => {
+    setShowPicker(false);
+    if (!selectedDate) return;
+    const hours = selectedDate.getHours().toString().padStart(2, '0');
+    const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
+    setTime(`${hours}:${minutes}`);
   };
-};
 
-// Componente para a seção "Repetir" (você pode criar em um arquivo separado)
-const RepetitionsSection: FC<RepetitionsSectionProps> = ({
-  title,
-  selected,
-  setSelected,
-}) => (
-  <View style={styles.sectionContainer}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    {/* Substitua isto por seus componentes de seleção/rádio reais */}
-    <View style={styles.optionContainer}>
-      <Text>⚪ 1 Vez</Text>
-    </View>
-    <View style={styles.optionContainer}>
-      <Text>⚪ 3 Vezes</Text>
-    </View>
-    <View style={styles.optionContainer}>
-      <Text>⚪ 5 Vezes</Text>
-    </View>
-  </View>
-);
+  return (
+    <View style={styles.sectionContainer}>
+      <View style={styles.reminderHeader}>
+        <Text style={styles.sectionTitle}>Lembretes</Text>
+        <Switch
+          value={enabled}
+          onValueChange={setEnabled}
+          trackColor={{ false: '#767577', true: '#81b0ff' }}
+          thumbColor={enabled ? '#f5dd4b' : '#f4f3f4'}
+        />
+      </View>
 
-// Componente para a seção "Lembretes"
-const RemindersSection: FC<RemindersSectionProps> = ({
-  enabled,
-  setEnabled,
-  time,
-  setTime,
-}) => (
-  <View style={styles.sectionContainer}>
-    <View style={styles.reminderHeader}>
-      <Text style={styles.sectionTitle}>Lembretes</Text>
-      <Switch
-        trackColor={{ false: '#767577', true: '#81b0ff' }}
-        thumbColor={enabled ? '#f5dd4b' : '#f4f3f4'}
-        onValueChange={setEnabled}
-        value={enabled}
+      <DateTimeInput
+        labelText="Horário do lembrete"
+        datetime={parseTimeStringToDate(time)}
+        showPicker={showPicker}
+        onPress={() => enabled && setShowPicker(true)}
+        onChange={handleChange}
+        mode="time"
       />
     </View>
-    <TextInput
-      style={styles.timeInput}
-      placeholder="Horario"
-      value={time}
-      onChangeText={setTime}
-      editable={enabled} // Desativa o input se os lembretes estiverem desligados
-    />
-  </View>
-);
+  );
+};
 
-// --- Tela Principal Atualizada ---
+// Tela principal
 
 const CreateObjectiveScreen: FC = () => {
   const {
     selectedObjectiveId,
     setSelectedObjectiveId,
-    selectedRepetition,
-    setSelectedRepetition,
     selectedPeriod,
     setSelectedPeriod,
+    selectedRepeat,
+    setSelectedRepeat,
     remindersEnabled,
     setRemindersEnabled,
     reminderTime,
@@ -157,7 +127,8 @@ const CreateObjectiveScreen: FC = () => {
         showsVerticalScrollIndicator={false}
       >
         <ActivitiesSection
-          title="Escolha um objetivo" // Título corrigido
+          title="Escolha um objetivo"
+          //@ts-ignore
           selected={selectedObjectiveId}
           //@ts-ignore
           setSelected={setSelectedObjectiveId}
@@ -165,13 +136,14 @@ const CreateObjectiveScreen: FC = () => {
         />
 
         <RepetitionsSection
-          title="Repetir"
-          selected={selectedRepetition}
-          setSelected={setSelectedRepetition}
+          selected={selectedRepeat}
+          setSelected={setSelectedRepeat}
         />
 
         <PeriodsSection
           selectedPeriod={selectedPeriod}
+          //@ts-ignore
+
           setSelectedPeriod={setSelectedPeriod}
         />
 
@@ -186,22 +158,11 @@ const CreateObjectiveScreen: FC = () => {
   );
 };
 
-// --- Estilos ---
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff', // Cor de fundo da tela
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 16, // Adiciona padding lateral
-    paddingBottom: 20, // Espaço no final da rolagem
-  },
-  sectionContainer: {
-    marginTop: 24, // Espaçamento entre as seções
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
+  scrollView: { flex: 1 },
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 20 },
+  sectionContainer: { marginTop: 24 },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -209,26 +170,24 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   optionContainer: {
-    // Estilo de exemplo para RepetitionsSection
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
     padding: 16,
     marginBottom: 8,
   },
+  optionSelected: {
+    borderColor: '#1E90FF',
+    backgroundColor: '#E6F0FF',
+  },
+  optionTextSelected: {
+    color: '#1E90FF',
+    fontWeight: 'bold',
+  },
   reminderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  timeInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    marginTop: 8,
   },
 });
 

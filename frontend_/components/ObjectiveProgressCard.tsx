@@ -1,29 +1,62 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React from "react";
-import { Dimensions, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React from 'react';
+import { Dimensions, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
-interface ObjectiveProgressCardProps {}
+const getWeekRange = (): { start: string; end: string; endDate: Date } => {
+  const today = new Date();
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - today.getDay() + 1); // segunda
+  const endOfWeek = new Date(today);
+  endOfWeek.setDate(today.getDate() + (7 - today.getDay())); // domingo
 
-const ObjectiveProgressCard: React.FC<ObjectiveProgressCardProps> = () => {
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString('pt-BR', {
+      day: 'numeric',
+      month: 'short',
+    });
+
+  return {
+    start: formatDate(startOfWeek),
+    end: formatDate(endOfWeek),
+    endDate: endOfWeek,
+  };
+};
+
+const { endDate } = getWeekRange();
+const today = new Date();
+const diffInTime = endDate.getTime() - today.getTime();
+const daysRemaining = Math.ceil(diffInTime / (1000 * 60 * 60 * 24));
+
+interface ProgressCardProps {
+  current: number;
+  total: number;
+}
+
+const ObjectiveProgressCard: React.FC<ProgressCardProps> = ({
+  current,
+  total,
+}) => {
+  const { start, end } = getWeekRange();
+
   const objectiveProgress = {
-    current: 1,
-    total: 5, // altere para testar com diferentes números de bolinhas
+    current: current,
+    total: total,
     description: 'para alcançar a meta',
-    periodStart: '6 de jul.',
-    periodEnd: '12 de jul.',
-    daysRemaining: 4,
+    periodStart: start,
+    periodEnd: end,
+    daysRemaining: daysRemaining,
   };
 
-  // Cálculo dinâmico do marginHorizontal para os ícones
   const cardWidth = 220;
-  const paddingHorizontal = 20 * 2; // paddingLeft + paddingRight
+  const paddingHorizontal = 20 * 2;
   const iconSize = 20;
   const availableWidth = cardWidth - paddingHorizontal;
   const iconsTotalWidth = objectiveProgress.total * iconSize;
   const spacesCount = objectiveProgress.total - 1;
-  const gap = spacesCount > 0 ? (availableWidth - iconsTotalWidth) / spacesCount : 0;
+  const gap =
+    spacesCount > 0 ? (availableWidth - iconsTotalWidth) / spacesCount : 0;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -36,16 +69,22 @@ const ObjectiveProgressCard: React.FC<ObjectiveProgressCardProps> = () => {
           {[...Array(objectiveProgress.total)].map((_, index) => (
             <MaterialCommunityIcons
               key={index}
-              name={index < objectiveProgress.current ? 'check-circle' : 'circle'}
+              name={
+                index < objectiveProgress.current ? 'check-circle' : 'circle'
+              }
               size={iconSize}
               color={index < objectiveProgress.current ? '#57E571' : '#D9D9D9'}
-              style={{ marginHorizontal: gap / 2 }} // metade da margem para cada lado, assim o gap total entre os ícones fica gap
+              style={{ marginHorizontal: gap / 2 }}
             />
           ))}
         </View>
 
         <Text style={styles.progressDescription}>
-          {objectiveProgress.total - objectiveProgress.current} {objectiveProgress.description}
+          {objectiveProgress.total - objectiveProgress.current > 0
+            ? `${objectiveProgress.total - objectiveProgress.current} ${
+                objectiveProgress.description
+              }`
+            : 'Parabéns! Você alcançou a meta desta semana 🎉'}
         </Text>
 
         <View style={styles.separator} />
@@ -95,9 +134,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 'auto',
     justifyContent: 'center',
     marginBottom: 10,
-  },
-  progressIcon: {
-    marginHorizontal: 4,    // diminua a margem entre os ícones para 4 (ou menos)
   },
   progressDescription: {
     fontFamily: 'Poppins_400Regular',

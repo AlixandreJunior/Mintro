@@ -1,17 +1,38 @@
-from django.urls import path
 from apps.mental_health.views import diary, mindfulness
+from django.urls import path
 
-app_name = 'mental_health'
+app_name = "mental_health"
 
 urlpatterns = [
-    path('diary/', diary.DiaryListView.as_view(), name='diary_list'),#
-    path('diary/detail/<int:id>/', diary.DiaryObjectView.as_view(), name = 'diary_object'),#
-    path('diary/detail/<int:id>/update/', diary.DiaryUpdateView.as_view(), name = 'diary_update'),#
-    path('diary/create/', diary.DiaryCreateView.as_view(), name = 'diary_create'),#
-
-    path('mindfulness/', mindfulness.MindfulnessListView.as_view(), name='mindfulness_list'),#
-    path('mindfulness/log/', mindfulness.MindfulnessLogListView.as_view(), name='mindfulness_log_list'),#
-    path('mindfulness/log/register/', mindfulness.MindfulnessLogRegisterView.as_view(), name='mindfulness_log_register'),#
-
-    path('activities', diary.ActivitiesListView.as_view(), name='activities')
+    path("diary/", diary.DiaryListView.as_view(), name="diary_list"),
+    path(
+        "diary/detail/<int:id>/", diary.DiaryObjectView.as_view(), name="diary_object"
+    ),
+    path(
+        "diary/detail/<int:id>/delete",
+        diary.DiaryDeleteView.as_view(),
+        name="diary_delete",
+    ),
+    path(
+        "diary/detail/<int:id>/update/",
+        diary.DiaryUpdateView.as_view(),
+        name="diary_update",
+    ),
+    path("diary/create/", diary.DiaryCreateView.as_view(), name="diary_create"),  #
+    path(
+        "mindfulness/",
+        mindfulness.MindfulnessListView.as_view(),
+        name="mindfulness_list",
+    ),
+    path(
+        "mindfulness/log/",
+        mindfulness.MindfulnessLogListView.as_view(),
+        name="mindfulness_log_list",
+    ),
+    path(
+        "mindfulness/log/register/",
+        mindfulness.MindfulnessLogRegisterView.as_view(),
+        name="mindfulness_log_register",
+    ),
+    path("activities", diary.ActivitiesListView.as_view(), name="activities"),
 ]

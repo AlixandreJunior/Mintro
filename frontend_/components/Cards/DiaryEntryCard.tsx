@@ -7,10 +7,14 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Dimensions,
+  Pressable,
 } from 'react-native';
 import { MoodType } from '@/types/mental/diary';
 import { getActivityIconName } from '@/utils/activityIconMapper';
 import { router } from 'expo-router';
+import { deleteDiary } from '@/services/diary/deleteDiary';
+import { useDiary } from '@/hooks/useDiary';
+import { useDiaryForm } from '@/hooks/forms/useDiaryForm';
 
 // Ícone simples dots vertical com 3 círculos
 const VerticalDotsIcon = () => (
@@ -47,7 +51,7 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
   photoUrl,
 }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
-
+  const { handleDelete } = useDiaryForm();
   // Fecha o dropdown ao clicar fora
   const handleOutsidePress = () => setDropdownVisible(false);
 
@@ -58,13 +62,14 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
     console.log('Editar diário');
   };
 
-  const onDelete = () => {
+  const onDelete = async () => {
+    await handleDelete(id);
     setDropdownVisible(false);
-    console.log('Excluir diário');
+    console.log('deletar diário');
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handleOutsidePress}>
+    <Pressable onPress={handleOutsidePress}>
       <View style={styles.timelineRow}>
         <View style={styles.timelineIconContainer}>{iconSource}</View>
 
@@ -82,7 +87,6 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
               </View>
             </View>
 
-            {/* Dots + Dropdown + Time */}
             <View style={styles.dotsContainer}>
               <TouchableOpacity
                 onPress={() => setDropdownVisible(!dropdownVisible)}
@@ -102,9 +106,10 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
                   >
                     <Text style={styles.dropdownText}>Editar</Text>
                   </TouchableOpacity>
+
                   <TouchableOpacity
                     onPress={onDelete}
-                    style={styles.dropdownItem}
+                    style={[styles.dropdownItem]}
                   >
                     <Text style={[styles.dropdownText, { color: 'red' }]}>
                       Excluir
@@ -123,7 +128,7 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
           )}
         </View>
       </View>
-    </TouchableWithoutFeedback>
+    </Pressable>
   );
 };
 
@@ -224,7 +229,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5,
+    elevation: 999,
     minWidth: 100,
     zIndex: 1000,
   },

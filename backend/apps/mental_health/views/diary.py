@@ -1,13 +1,21 @@
-from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView, CreateAPIView
+from apps.mental_health.models.diary import Activity, Diary
+from apps.mental_health.serializers.diary import (
+    ActivitySerializer,
+    DiaryReadSerializer,
+    DiaryWriteSerializer,
+)
+from rest_framework import status
+from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.generics import (
+    CreateAPIView,
+    DestroyAPIView,
+    ListAPIView,
+    RetrieveAPIView,
+    UpdateAPIView,
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
-from rest_framework.exceptions import ValidationError
 
-from rest_framework import status
-
-from apps.mental_health.serializers.diary import DiaryReadSerializer, DiaryWriteSerializer, ActivitySerializer
-from apps.mental_health.models.diary import Diary, Activity
 
 class ActivitiesListView(ListAPIView):
     permission_classes = [IsAuthenticated]
@@ -19,6 +27,7 @@ class ActivitiesListView(ListAPIView):
         if not queryset.exists():
             raise NotFound("Atividades não encontradas.")
         return queryset
+
 
 class DiaryListView(ListAPIView):
     permission_classes = [IsAuthenticated]
@@ -39,7 +48,9 @@ class DiaryListView(ListAPIView):
             try:
                 month = int(month)
                 year = int(year)
-                queryset = queryset.filter(datetime__month=month, datetime__year=year).order_by('-datetime')
+                queryset = queryset.filter(
+                    datetime__month=month, datetime__year=year
+                ).order_by("-datetime")
             except ValueError:
                 raise NotFound("Parâmetros de mês ou ano inválidos.")
 
@@ -47,25 +58,38 @@ class DiaryListView(ListAPIView):
             raise NotFound("Diários não encontrados.")
         return queryset
 
+
 class DiaryObjectView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = DiaryReadSerializer
 
     def get_object(self):
-        id = self.kwargs.get('id')
+        id = self.kwargs.get("id")
         try:
-            return Diary.objects.get(user=self.request.user, id = id)
+            return Diary.objects.get(user=self.request.user, id=id)
         except Diary.DoesNotExist:
             raise NotFound("Diário não encontrado.")
-    
+
+
+class DiaryDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        id = self.kwargs.get("id")
+        try:
+            return Diary.objects.get(user=self.request.user, id=id)
+        except Diary.DoesNotExist:
+            raise NotFound("Diário não encontrado.")
+
+
 class DiaryUpdateView(UpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = DiaryWriteSerializer
 
     def get_object(self):
-        id = self.kwargs.get('id')
+        id = self.kwargs.get("id")
         try:
-            return Diary.objects.get(user=self.request.user, id = id)
+            return Diary.objects.get(user=self.request.user, id=id)
         except Diary.DoesNotExist:
             raise NotFound("Diário não encontrado.")
 
@@ -74,7 +98,10 @@ class DiaryUpdateView(UpdateAPIView):
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        return Response({'detail': "Diario atualizado com sucesso."}, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": "Diario atualizado com sucesso."}, status=status.HTTP_200_OK
+        )
+
 
 class DiaryCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -87,10 +114,15 @@ class DiaryCreateView(CreateAPIView):
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
-            return Response({'detail': "Diário criado com sucesso."}, status=status.HTTP_201_CREATED)
+            return Response(
+                {"detail": "Diário criado com sucesso."}, status=status.HTTP_201_CREATED
+            )
         except ValidationError as e:
             print("Erro de validação no diário:", e.detail)  # Loga o erro no terminal
-            return Response({'detail': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": e.detail}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print("Erro inesperado ao criar diário:", str(e))  # Outro erro genérico
-            return Response({'detail': 'Erro interno no servidor.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"detail": "Erro interno no servidor."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

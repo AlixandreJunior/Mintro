@@ -7,6 +7,7 @@ import { appendImageToFormData } from '@/utils/appendImageToFormData';
 import { Diary } from '@/types/mental/diary';
 import { getDiary } from '@/services/diary/getDiary';
 import { updateDiary } from '@/services/diary/updateDiary';
+import { deleteDiary } from '@/services/diary/deleteDiary';
 
 export function useDiaryForm() {
   const [title, setTitle] = useState('');
@@ -75,7 +76,7 @@ export function useDiaryForm() {
       formData.append('datetime', getCombinedDateTime().toISOString());
       formData.append('mood', selectedMoodId);
       selectedActivitiesIds.forEach((id) =>
-        formData.append('activity[]', id.toString())
+        formData.append('activity', id.toString())
       );
       await appendImageToFormData(formData, selectedImageUri);
       await createDiary(formData);
@@ -88,6 +89,25 @@ export function useDiaryForm() {
         error.message || 'Erro ao criar diário. Tente novamente.'
       );
       console.error('Erro ao criar diário:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    setIsSaving(true);
+
+    try {
+      await deleteDiary(id);
+
+      Alert.alert('Sucesso', 'Diário atualizado com sucesso!');
+      router.replace('/(tabs)/mental');
+    } catch (error: any) {
+      Alert.alert(
+        'Erro',
+        error.message || 'Erro ao atualizar diário. Tente novamente.'
+      );
+      console.error('Erro ao atualizar diário:', error);
     } finally {
       setIsSaving(false);
     }
@@ -146,6 +166,7 @@ export function useDiaryForm() {
     setSelectedMoodId,
     handleSave,
     handleUpdate,
+    handleDelete,
     loadDiaryById,
   };
 }

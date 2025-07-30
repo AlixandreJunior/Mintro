@@ -1,12 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
 import CompletionIcon from '../Icons/CompletionIon';
+import { getActivityIconName } from '@/utils/activityIconMapper';
 
 interface ObjectiveDisplayCardProps {
   objectiveTitle: string;
   objectiveSubtitle: string;
-  renderIcon: React.ReactNode;
-  onPress?: ((event_:any) => void)
+  onPress?: (event_: any) => void;
 }
 
 const { width } = Dimensions.get('window');
@@ -14,18 +20,17 @@ const { width } = Dimensions.get('window');
 const ObjectiveDisplayCard: React.FC<ObjectiveDisplayCardProps> = ({
   objectiveTitle,
   objectiveSubtitle,
-  renderIcon,
-  onPress
+  onPress,
 }) => {
+  const icon = getActivityIconName(objectiveTitle);
+
   return (
     <TouchableOpacity style={styles.objectiveCard} onPress={onPress}>
       <View style={styles.objectiveLeft}>
         <View style={styles.checkboxContainer}>
           <CompletionIcon />
         </View>
-        <View style={styles.iconWrapper}>
-          {renderIcon}
-        </View>
+        <View style={styles.iconWrapper}>{icon}</View>
       </View>
       <View style={styles.objectiveContent}>
         <Text style={styles.objectiveTitle}>{objectiveTitle}</Text>
