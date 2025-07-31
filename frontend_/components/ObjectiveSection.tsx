@@ -33,9 +33,13 @@ export const ObjectiveSection = () => {
             {objectives.map((objective) => (
               <ObjectiveDisplayCard
                 key={objective.id}
-                renderIcon={getActivityIconName(objective.activity.name)}
                 objectiveTitle={objective.activity.name}
-                objectiveSubtitle={`Meta até ${formatDeadline(objective.deadline)}`}
+                objectiveSubtitle={new Date(objective.created_at).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                  })
+                }
                 //@ts-ignore
                 onPress={() => router.push(`/objective/${objective.id}`)}
               />

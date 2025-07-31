@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 140,
     alignSelf: 'center',
-    marginTop: 16,
+    marginVertical: 16,
   },
   label: {
     fontFamily: 'Poppins_500Medium',

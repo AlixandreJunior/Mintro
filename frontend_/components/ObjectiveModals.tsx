@@ -1,79 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ActivityIndicator } from 'react-native-paper';
 import MainModal from './MainModal';
 
+type ModalType = 'reminder' | 'repeat' | null;
+
 interface ObjectiveModalsProps {
-  isReminderModalVisible: boolean;
-  isRepeatModalVisible: boolean;
-  reminder: string | null;
-  repeat: string;
+  visibleModal: ModalType;
+  reminder?: string | null;
+  repeat?: string | null;
   updating?: boolean;
-  onChangeReminder: (value: string | null) => void;
-  onChangeRepeat: (value: string) => void;
-  closeReminderModal: () => void;
-  closeRepeatModal: () => void;
+  onChange: (type: 'reminder' | 'repeat', value: string | null) => void;
+  onClose: () => void;
 }
 
 const ObjectiveModals: React.FC<ObjectiveModalsProps> = ({
-  isReminderModalVisible,
-  isRepeatModalVisible,
+  visibleModal,
   reminder,
   repeat,
   updating = false,
-  onChangeReminder,
-  onChangeRepeat,
-  closeReminderModal,
-  closeRepeatModal,
+  onChange,
+  onClose,
 }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  const onTimeChange = (_: any, selected?: Date) => {
+  useEffect(() => {
+    if (reminder) {
+      const [hour, minute] = reminder.split(':').map(Number);
+      const d = new Date();
+      d.setHours(hour, minute, 0, 0);
+      setSelectedDate(d);
+    }
+  }, [reminder]);
+
+  const onTimeChange = (_event: any, selected?: Date) => {
+    if (Platform.OS === 'android') setShowTimePicker(false);
     if (selected) {
       setSelectedDate(selected);
-      const timeString = selected.toTimeString().slice(0, 5); // formato "HH:MM"
-      onChangeReminder(timeString);
+      const timeString = selected.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+      onChange('reminder', timeString);
     }
-    setShowTimePicker(false);
   };
 
   const onReminderSave = () => {
-    closeReminderModal();
+    onClose();
   };
 
   const onRepeatSelect = (times: number) => {
-    onChangeRepeat(times.toString());
-    closeRepeatModal();
+    onChange('repeat', times.toString());
+    onClose();
   };
 
   return (
     <>
-      <MainModal visible={isRepeatModalVisible} onClose={closeRepeatModal}>
+      <MainModal visible={visibleModal === 'repeat'} onClose={onClose}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Repetir objetivo</Text>
-          {[1, 3, 5].map((times) => (
-            <Pressable
-              key={times}
-              style={styles.optionButton}
-              onPress={() => onRepeatSelect(times)}
-              disabled={updating}
-            >
-              <Text style={styles.optionText}>{times} vez(es)</Text>
-            </Pressable>
-          ))}
+          {[1, 3, 5].map((times) => {
+            const isSelected = repeat === times.toString();
+            return (
+              <Pressable
+                key={times}
+                style={[
+                  styles.optionButton,
+                  isSelected && { backgroundColor: '#A6E1AF' },
+                ]}
+                onPress={() => onRepeatSelect(times)}
+                disabled={updating}
+              >
+                <Text style={styles.optionText}>{times} vez(es)</Text>
+              </Pressable>
+            );
+          })}
           {updating && (
-            <ActivityIndicator
-              size="small"
-              color="#000"
-              style={{ marginTop: 15 }}
-            />
+            <ActivityIndicator size="small" color="#000" style={{ marginTop: 15 }} />
           )}
         </View>
       </MainModal>
 
-      <MainModal visible={isReminderModalVisible} onClose={closeReminderModal}>
+      <MainModal visible={visibleModal === 'reminder'} onClose={onClose}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Escolha o horário do lembrete</Text>
 
@@ -85,6 +96,7 @@ const ObjectiveModals: React.FC<ObjectiveModalsProps> = ({
               {selectedDate.toLocaleTimeString('pt-BR', {
                 hour: '2-digit',
                 minute: '2-digit',
+                hour12: false,
               })}
             </Text>
           </Pressable>
@@ -108,11 +120,7 @@ const ObjectiveModals: React.FC<ObjectiveModalsProps> = ({
           </Pressable>
 
           {updating && (
-            <ActivityIndicator
-              size="small"
-              color="#000"
-              style={{ marginTop: 10 }}
-            />
+            <ActivityIndicator size="small" color="#000" style={{ marginTop: 10 }} />
           )}
         </View>
       </MainModal>
