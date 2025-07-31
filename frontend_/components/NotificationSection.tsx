@@ -2,10 +2,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { Alert, Dimensions, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-interface NotificationSectionProps{
-
-}
-
 const { width, height } = Dimensions.get('window');
 
 interface NotificationItem {
@@ -16,6 +12,7 @@ interface NotificationItem {
   time: string;
   read: boolean;
 }
+
 const MOCK_NOTIFICATIONS: { [key: string]: NotificationItem[] } = {
   Hoje: [
     {
@@ -54,129 +51,145 @@ const MOCK_NOTIFICATIONS: { [key: string]: NotificationItem[] } = {
     },
   ],
 };
-const NotificationSection: React.FC<NotificationSectionProps> = ({
 
-}) => {
-      const handleNotificationPress = (notificationId: string) => {
-        Alert.alert('Notificação Clicada', `Você clicou na notificação ID: ${notificationId}`);
-      };
+const NotificationSection: React.FC = () => {
+  const handleNotificationPress = (notificationId: string) => {
+    Alert.alert('Notificação Clicada', `Você clicou na notificação ID: ${notificationId}`);
+  };
 
-      const renderNotificationItem = (notification: NotificationItem): React.JSX.Element => {
-        let iconName: string;
-        let iconColor: string;
-        switch (notification.type) {
-        case 'passos':
-            iconName = 'run';
-            iconColor = '#4CAF50';
-            break;
-        case 'hidratacao':
-            iconName = 'cup';
-            iconColor = '#2196F3';
-            break;
-        case 'consulta':
-            iconName = 'calendar';
-            iconColor = '#FF9800';
-            break;
-        default:
-            iconName = 'information-outline';
-            iconColor = '#757575';
-        }
+  const renderNotificationItem = (notification: NotificationItem): React.JSX.Element => {
+    let iconName: string;
+    let iconColor: string;
+    let iconBgColor: string;
 
-        return (
-        <TouchableOpacity
-            key={notification.id}
-            style={styles.notificationCard}
-            onPress={() => handleNotificationPress(notification.id)}
-        >
-            <View style={[styles.iconCircle, { backgroundColor: iconColor + '1A' }]}>
-            <MaterialCommunityIcons name={iconName as any} size={width * 0.06} color={iconColor} />
-            </View>
-            <View style={styles.textContainer}>
-            <Text style={styles.notificationTitle}>{notification.title}</Text>
-            <Text style={styles.notificationDescription}>{notification.description}</Text>
-            </View>
-            <View style={styles.timeContainer}>
-            <Text style={styles.notificationTime}>{notification.time}</Text>
-            {!notification.read && <View style={styles.unreadIndicator} />}
-            </View>
-        </TouchableOpacity>
-        );
-    };
+    switch (notification.type) {
+      case 'passos':
+        iconName = 'run';
+        iconColor = '#6B7280';
+        iconBgColor = 'rgba(107, 114, 128, 0.2)';
+        break;
+      case 'hidratacao':
+        iconName = 'cup';
+        iconColor = '#6B7280';
+        iconBgColor = 'rgba(127, 176, 105, 0.2)';
+        break;
+      case 'consulta':
+        iconName = 'calendar';
+        iconColor = '#6B7280';
+        iconBgColor = 'rgba(107, 114, 128, 0.2)';
+        break;
+      default:
+        iconName = 'information-outline';
+        iconColor = '#757575';
+        iconBgColor = 'rgba(107, 114, 128, 0.2)';
+    }
 
-    return(
-        <SafeAreaView>
-            <ScrollView contentContainerStyle={styles.scrollViewContent}>
-                {Object.keys(MOCK_NOTIFICATIONS).map((sectionTitle) => (
-                <View key={sectionTitle} style={styles.notificationSection}>
-                    <Text style={styles.sectionTitle}>{sectionTitle}</Text>
-                    {MOCK_NOTIFICATIONS[sectionTitle].map(renderNotificationItem)}
-                </View>
-                ))}
-            </ScrollView>
-        </SafeAreaView>
-    )
-}
+    return (
+      <ScrollView style={{flex: 1}}>
+      <TouchableOpacity
+        key={notification.id}
+        style={styles.notificationCard}
+        onPress={() => handleNotificationPress(notification.id)}
+      >
+        <View style={[styles.iconCircle, { backgroundColor: iconBgColor }]}>
+          <MaterialCommunityIcons name={iconName as any} size={width * 0.045} color={iconColor} />
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={styles.notificationTitle}>{notification.title}</Text>
+          <Text style={styles.notificationDescription}>{notification.description}</Text>
+        </View>
+        <View style={styles.timeContainer}>
+          <Text style={styles.notificationTime}>{notification.time}</Text>
+        </View>
+      </TouchableOpacity>
+      </ScrollView>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        {Object.keys(MOCK_NOTIFICATIONS).map((sectionTitle) => (
+          <View key={sectionTitle} style={styles.notificationSection}>
+            <Text style={styles.sectionHeaderTitle}>{sectionTitle}</Text>
+            {MOCK_NOTIFICATIONS[sectionTitle].map(renderNotificationItem)}
+          </View>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
-    
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fffff',
+  },
   scrollViewContent: {
     flexGrow: 1,
-    paddingVertical: height * 0.02,
+    paddingVertical: height * 0.01,
   },
   notificationSection: {
-    marginBottom: height * 0.02,
+    marginBottom: height * 0.01,
   },
-  sectionTitle: {
-    fontSize: width * 0.045,
-    fontWeight: 'bold',
-    color: '#333',
-    paddingHorizontal: width * 0.05,
+  sectionHeaderTitle: {
+    fontSize: width * 0.04,
+    fontFamily: 'Poppins_500Medium',
+    color: '#000000',
+    paddingLeft: width * 0.04,
     marginBottom: height * 0.015,
   },
   notificationCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    marginHorizontal: width * 0.05,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderWidth: 1,
+    borderColor: 'rgba(184, 230, 184, 0.2)',
+    borderRadius: 16,
+    shadowColor: 'rgba(0, 0, 0, 0.05)',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 2,
+    elevation: 2,
+    marginHorizontal: width * 0.04,
     marginBottom: height * 0.01,
     padding: width * 0.04,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
   },
   iconCircle: {
     width: width * 0.12,
     height: width * 0.12,
-    borderRadius: (width * 0.12) / 2,
+    borderRadius: 999,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: width * 0.04,
+    marginRight: width * 0.03,
   },
   textContainer: {
     flex: 1,
     marginRight: width * 0.02,
   },
   notificationTitle: {
-    fontSize: width * 0.042,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 2,
+    fontSize: width * 0.035,
+    fontFamily: 'Poppins_500Medium',
+    color: '#000000',
+    marginBottom: height * 0.003,
+    lineHeight: width * 0.045,
   },
   notificationDescription: {
-    fontSize: width * 0.035,
-    color: '#666',
+    fontSize: width * 0.032,
+    fontFamily: 'Poppins_400Regular',
+    color: '#4B5563',
     lineHeight: width * 0.045,
   },
   timeContainer: {
+    height: '90%',
     alignItems: 'flex-end',
   },
   notificationTime: {
-    fontSize: width * 0.03,
-    color: '#999',
-    marginBottom: 4,
+    fontSize: width * 0.032,
+    fontFamily: 'Poppins_400Regular',
+    color: '#6B7280',
+    marginBottom: height * 0.005,
+    lineHeight: width * 0.035,
   },
   unreadIndicator: {
     width: width * 0.02,
@@ -184,6 +197,6 @@ const styles = StyleSheet.create({
     borderRadius: (width * 0.02) / 2,
     backgroundColor: '#FF0000',
   },
-})
+});
 
-export default NotificationSection
+export default NotificationSection;

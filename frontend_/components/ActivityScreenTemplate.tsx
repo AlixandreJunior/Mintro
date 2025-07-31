@@ -1,26 +1,22 @@
 // src/templates/ActivityScreenTemplate.tsx
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-  Text,
-} from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { startOfWeek, isSameDay, isSameWeek } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { router } from 'expo-router';
+import { startOfWeek, isSameDay } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
-import Header from "@/components/Layout/Header";
-import HeaderWithOptions from "@/components/Layout/HeaderWithOptions";
-import DateNavigator from "@/components/DateNavigator";
-import { SummarySection } from "@/components/SummarySection";
-import { ActivityHistorySection } from "@/components/ActivityHistorySection";
-import { WeekDaysContainer } from "@/components/WeekDaysContainer";
-import { MindfulnessLog } from "@/types/health/mindfulness";
-import { ExerciseLog } from "@/types/health/exercise";
+import Header from '@/components/Layout/Header';
+import HeaderWithOptions from '@/components/Layout/HeaderWithOptions';
+import DateNavigator from '@/components/DateNavigator';
+import { SummarySection } from '@/components/SummarySection';
+import { ActivityHistorySection } from '@/components/ActivityHistorySection';
+import { WeekDaysContainer } from '@/components/WeekDaysContainer';
+import PeriodSelector from './PeriodSelector';
+import { FloatingActionButton } from './FloatingButtonAction';
+
+import ActivityCalendar from './ActivityCalendar';
+
+import GoalModal from '@/components/GoalModal'; // Importa o GoalModal
 
 interface WeekDayDisplay {
   id: string;
@@ -31,9 +27,9 @@ interface WeekDayDisplay {
 
 interface ActivityScreenTemplateProps {
   title: string;
-  type: "exercise" | "mindfulness";
+  type: 'exercise' | 'mindfulness';
   onAddPress: () => void;
-  fetchLogs: (date: Date) => Promise<MindfulnessLog[]| ExerciseLog[]>;
+  fetchLogs: (date: Date) => Promise<any[]>; // MindfulnessLog[] | ExerciseLog[]
 }
 
 function ActivityScreenTemplate({
@@ -43,13 +39,27 @@ function ActivityScreenTemplate({
   onAddPress,
 }: ActivityScreenTemplateProps) {
   const [currentDisplayDate, setCurrentDisplayDate] = useState(new Date());
-  const [logs, setLogs] = useState<MindfulnessLog[]| ExerciseLog[]>([]);
+  const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month'>(
+    'week'
+  );
+  const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [weekDaysDisplay, setWeekDaysDisplay] = useState<WeekDayDisplay[]>([]);
-  const [fetchedWeekStartDate, setFetchedWeekStartDate] = useState<Date | null>(
-    null
-  );
+  const [fetchKey, setFetchKey] = useState<number>(0); // Força recarregamento
+
+  // === Estado para modal ===
+  const [goalModalVisible, setGoalModalVisible] = useState(false);
+
+  // Simulação das metas (aqui você deve pegar da API ou contexto global)
+  // Pode ter um estado para cada tipo se quiser mais realismo
+  const [exerciseGoal, setExerciseGoal] = useState(3); // Exemplo: 3 exercícios por semana
+  const [mindfulnessGoal, setMindfulnessGoal] = useState(2); // Exemplo: 2 sessões mindfulness por semana
+
+  const periods = [
+    { key: 'week', label: 'Semana' },
+    { key: 'month', label: 'Mês' },
+  ];
 
   useEffect(() => {
     const loadLogs = async () => {
@@ -58,44 +68,37 @@ function ActivityScreenTemplate({
         locale: ptBR,
       });
 
-      if (
-        fetchedWeekStartDate &&
-        isSameWeek(startOfCurrentWeek, fetchedWeekStartDate, {
-          weekStartsOn: 0,
-          locale: ptBR,
-        })
-      ) {
-        return;
-      }
-
       setLoading(true);
       setError(null);
 
       try {
-        const data = await fetchLogs(currentDisplayDate);
+        // @ts-ignore
+        const data = await fetchLogs(currentDisplayDate, selectedPeriod);
 
-        const currentWeekDays: Date[] = [...Array(7)].map((_, i) => {
-          const day = new Date(startOfCurrentWeek);
-          day.setDate(startOfCurrentWeek.getDate() + i);
-          return day;
-        });
+        if (selectedPeriod === 'week') {
+          const currentWeekDays: Date[] = [...Array(7)].map((_, i) => {
+            const day = new Date(startOfCurrentWeek);
+            day.setDate(startOfCurrentWeek.getDate() + i);
+            return day;
+          });
 
-        const daysOfWeek = ["D", "S", "T", "Q", "Q", "S", "S"];
+          const daysOfWeek = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
-        const weekDaysData: WeekDayDisplay[] = currentWeekDays.map(
-          (day, index) => ({
-            id: daysOfWeek[index],
-            letter: daysOfWeek[index],
-            date: day,
-            exercised: data.some((log) =>
-              isSameDay(new Date(log.datetime), day)
-            ),
-          })
-        );
+          const weekDaysData: WeekDayDisplay[] = currentWeekDays.map(
+            (day, index) => ({
+              id: daysOfWeek[index],
+              letter: daysOfWeek[index],
+              date: day,
+              exercised: data.some((log) =>
+                isSameDay(new Date(log.datetime), day)
+              ),
+            })
+          );
+
+          setWeekDaysDisplay(weekDaysData);
+        }
 
         setLogs(data);
-        setWeekDaysDisplay(weekDaysData);
-        setFetchedWeekStartDate(startOfCurrentWeek);
       } catch (err: any) {
         setError(err.message || `Erro ao carregar registros de ${type}.`);
         console.error(`Error loading ${type} logs:`, err);
@@ -106,22 +109,61 @@ function ActivityScreenTemplate({
     };
 
     loadLogs();
-  }, [currentDisplayDate, fetchedWeekStartDate, fetchLogs, type]);
+  }, [currentDisplayDate, selectedPeriod, fetchKey, fetchLogs, type]);
 
   const completedDays = weekDaysDisplay.filter((d) => d.exercised).length;
   const totalLogs = logs.length;
 
   const handleBack = () => router.back();
 
+  const handlePeriodChange = (period: typeof selectedPeriod) => {
+    setSelectedPeriod(period);
+    setFetchKey((prev) => prev + 1);
+  };
+
+  // === Handler para salvar meta do modal ===
+  const handleSaveGoal = (newGoal: number) => {
+    if (type === 'exercise') setExerciseGoal(newGoal);
+    else if (type === 'mindfulness') setMindfulnessGoal(newGoal);
+    setGoalModalVisible(false);
+    // Aqui poderia fazer update via API também
+  };
+
+  // Qual meta mostrar no modal, dependendo do tipo
+  const currentGoal = type === 'exercise' ? exerciseGoal : mindfulnessGoal;
+
+  const markedDates = logs.map((log) => new Date(log.datetime));
+
   return (
     <SafeAreaView style={styles.container}>
       <Header avatarChar="A" />
-      <HeaderWithOptions title={title} onBackPress={handleBack} onOptionPress={() => {}} />
+      <HeaderWithOptions
+        title={title}
+        onBackPress={handleBack}
+        options={[
+          {
+            label: 'Editar Meta',
+            onPress: () => setGoalModalVisible(true),
+          },
+          { label: 'Excluir', onPress: () => console.log('Excluir') },
+        ]}
+      />
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        <PeriodSelector
+          // @ts-ignore
+          periods={periods}
+          selectedPeriod={selectedPeriod}
+          // @ts-ignore
+          onPeriodChange={handlePeriodChange}
+        />
+
         <DateNavigator
-          mode="week"
           currentDate={currentDisplayDate}
+          mode={selectedPeriod}
           onDateChange={setCurrentDisplayDate}
         />
 
@@ -131,7 +173,16 @@ function ActivityScreenTemplate({
           totalExercises={totalLogs}
         />
 
-        <WeekDaysContainer weekDaysDisplay={weekDaysDisplay} />
+        {selectedPeriod === 'week' && (
+          <WeekDaysContainer weekDaysDisplay={weekDaysDisplay} />
+        )}
+
+        {selectedPeriod === 'month' && (
+          <ActivityCalendar
+            markedDates={markedDates}
+            currentDate={currentDisplayDate}
+          />
+        )}
 
         <ActivityHistorySection
           type={type}
@@ -141,32 +192,23 @@ function ActivityScreenTemplate({
         />
       </ScrollView>
 
-      <TouchableOpacity style={styles.fab} onPress={onAddPress}>
-        <MaterialCommunityIcons name="plus" size={28} color="white" />
-      </TouchableOpacity>
+      <FloatingActionButton onPress={onAddPress} />
+
+      {/* Modal de edição da meta */}
+      <GoalModal
+        visible={goalModalVisible}
+        onClose={() => setGoalModalVisible(false)}
+        onSave={handleSaveGoal}
+        currentValue={currentGoal}
+        goalType={type === 'exercise' ? 'exercise' : 'mindfulness'}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1, backgroundColor: '#fff' },
   scrollView: { flex: 1 },
-  fab: {
-    position: "absolute",
-    bottom: 30,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#4CAF50",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
 });
 
 export default ActivityScreenTemplate;

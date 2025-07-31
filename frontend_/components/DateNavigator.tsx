@@ -150,13 +150,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: height * 0.03,
-    paddingHorizontal: width * 0.05,
+    paddingVertical: height * 0.02,
+    paddingHorizontal: width * 0.04,
   },
   dateText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#374151',
+    fontSize: width * 0.045,
+    fontFamily: 'Poppins_500Medium',
   },
 });
 

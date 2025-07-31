@@ -10,10 +10,10 @@ interface TransformedActivity {
 }
 
 interface TransformedDiaryEntryData {
+  id: number;
   time: string;
   mood: MoodType;
   iconSource: any;
-  moodColor: string;
   activities: TransformedActivity[]; // NOVO: Agora é um array de atividades transformadas
   title: string;
   content: string;
@@ -41,11 +41,11 @@ const DiaryDayHistory: React.FC<DiaryDayHistoryProps> = ({ date, entries }) => {
         {entries.map((entry, entryIndex) => (
           <DiaryEntryCard
             key={entryIndex}
+            id={entry.id}
             time={entry.time}
             mood={entry.mood}
             iconSource={entry.iconSource}
-            moodColor={entry.moodColor}
-            activities={entry.activities} 
+            activities={entry.activities}
             title={entry.title}
             content={entry.content}
             photoUrl={entry.photoUrl}

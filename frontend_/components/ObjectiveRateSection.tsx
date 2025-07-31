@@ -1,73 +1,35 @@
-import React from "react";
-import { Dimensions, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import React from 'react';
+import ObjectiveInfoCardSection from './ObjectiveInfoCardSection';
 
-const { width, height } = Dimensions.get('window');
-
-interface ObjectiveRateSectionProps{
-
+interface ObjectiveRateSectionProps {
+  week_count: number;
+  success_rate_avarege: number;
+  repeat: number;
 }
 
 const ObjectiveRateSection: React.FC<ObjectiveRateSectionProps> = ({
-
+  week_count,
+  repeat,
+  success_rate_avarege,
 }) => {
-    const successRate = {
-        currentWeek: '33%',
-        previousWeeks: '0%',
-    };
+  const currentWeekRate =
+    repeat > 0 ? Math.min(100, Math.round((week_count / repeat) * 100)) : 0;
 
-    return(
-        <SafeAreaView>
-            <Text style={styles.sectionTitle}>Taxa de sucesso</Text>
-            <View style={styles.successRateContainer}>
-                <View style={styles.successRateCard}>
-                <Text style={styles.successRatePercentage}>{successRate.currentWeek}</Text>
-                <Text style={styles.successRateLabel}>Esta Semana</Text>
-                </View>
-                <View style={styles.successRateCard}>
-                <Text style={styles.successRatePercentage}>{successRate.previousWeeks}</Text>
-                <Text style={styles.successRateLabel}>Semanas anteriores</Text>
-                </View>
-            </View>
-        </SafeAreaView>
-    )
-}
-
-const styles = StyleSheet.create({
-    sectionTitle: {
-        fontSize: width * 0.05,
-        fontWeight: 'bold',
-        color: '#333',
-        paddingHorizontal: width * 0.05,
-        marginBottom: height * 0.015,
+  return (
+    <ObjectiveInfoCardSection
+      title="Taxa de Sucesso"
+      items={[
+        {
+          value: `${currentWeekRate}%`,
+          label: 'Esta semana',
         },
-    successRateContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginHorizontal: width * 0.05,
-        marginBottom: height * 0.02,
+        {
+          value: `${success_rate_avarege}%`,
+          label: 'Semanas Anteriores',
         },
-    successRateCard: {
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        alignItems: 'center',
-        paddingVertical: height * 0.02,
-        width: width * 0.42,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-    },
-    successRatePercentage: {
-        fontSize: width * 0.07,
-        fontWeight: 'bold',
-        color: '#4CAF50',
-    },
-    successRateLabel: {
-        fontSize: width * 0.035,
-        color: '#666',
-        textAlign: 'center',
-    },
-})
+      ]}
+    />
+  );
+};
 
-export default ObjectiveRateSection
+export default ObjectiveRateSection;

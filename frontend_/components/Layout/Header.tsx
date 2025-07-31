@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
 import NotificationIcon from '../Icons/ChatIcon';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface HeaderProps {
   avatarChar: string;
@@ -15,7 +16,7 @@ const Header: React.FC<HeaderProps> = ({
 
   const logoSource = require('@/assets/images/logosrobomintro.png')
   return (
-    <View style={styles.header}>
+    <SafeAreaView style={styles.header}>
       <TouchableOpacity style={styles.avatarContainer} onPress={() => router.push('/(tabs)/profile')}>
         <Text style={styles.avatarText}>{avatarChar}</Text>
       </TouchableOpacity>
@@ -24,10 +25,10 @@ const Header: React.FC<HeaderProps> = ({
         <Image source={logoSource} style={styles.logoImage} resizeMode="contain" />
       </View>
 
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push('/notification')}>
         <NotificationIcon/>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 

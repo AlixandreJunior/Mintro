@@ -3,20 +3,20 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-nati
 
 const { width, height } = Dimensions.get('window');
 
-type Period = 'day' | 'week' | 'month' | 'year';
+type Options = ('day' | 'week' | 'month' | 'year')
 
-interface PeriodSelectorProps {
-  selectedPeriod: Period;
-  onPeriodChange: (period: Period) => void;
+interface Period{
+  key: Options
+  label: string
 }
 
-export default function PeriodSelector({ selectedPeriod, onPeriodChange }: PeriodSelectorProps) {
-  const periods: { key: Period; label: string }[] = [
-    { key: 'day', label: 'Dia' },
-    { key: 'week', label: 'Semana' },
-    { key: 'month', label: 'Mês' },
-    { key: 'year', label: 'Ano' },
-  ];
+interface PeriodSelectorProps {
+  periods: Period[]
+  selectedPeriod: Options;
+  onPeriodChange: (period: Options) => void;
+}
+
+export default function PeriodSelector({ periods, selectedPeriod, onPeriodChange }: PeriodSelectorProps) {
 
   return (
     <View style={styles.container}>
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: height * 0.02,
+    paddingVertical: height * 0.005,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     backgroundColor: '#fff',
@@ -53,11 +53,10 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: width * 0.04,
-    fontWeight: '500',
-    color: '#666',
+    fontFamily: 'Poppins_400Regular',
   },
   selectedText: {
     color: '#4CAF50',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_400Regular',
   },
 });

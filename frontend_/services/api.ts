@@ -1,16 +1,18 @@
 import axios, { AxiosRequestConfig, AxiosError } from 'axios';
 
-const apiUrl = 'http://192.168.1.9:8000/api/';
+const apiUrl = 'http://localhost:8000/api/';
 
 const api = axios.create({
   baseURL: apiUrl,
-  timeout: 10000
+  timeout: 10000,
 });
 
 let onLogout: (() => void) | null = null;
-let getTokens: (() => Promise<{ access: string | null; refresh: string | null }>) | null = null;
-let saveTokens: ((access: string, refresh: string) => Promise<void>) | null = null;
- 
+let getTokens:
+  | (() => Promise<{ access: string | null; refresh: string | null }>)
+  | null = null;
+let saveTokens: ((access: string, refresh: string) => Promise<void>) | null =
+  null;
 
 export const setAuthHandlers = (handlers: {
   onLogout: () => void;
@@ -26,7 +28,9 @@ export const setAuthHandlers = (handlers: {
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as AxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -70,6 +74,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 
 export default api;

@@ -1,73 +1,83 @@
 // components/FrequentMoodSelector.tsx
 import React from 'react';
-import { StyleSheet, View, Text, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, Dimensions, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MoodType } from '@/types/mental/diary';
 
 const { width, height } = Dimensions.get('window');
 
-// Tipagens e dados movidos para cá
-type Mood = 'Excelente' | 'Bem' | 'Neutro' | 'Mal' | 'Horrível';
-const MOOD_COLORS: { [key in Mood]: string } = {
+// Tipagens (mantidas aqui para auto-suficiência)
+const MOOD_COLORS: { [key in MoodType]: string } = {
   Excelente: '#4CAF50',
-  Bem: '#8BC34A',
+  Bom: '#8BC34A',
   Neutro: '#FFEB3B',
-  Mal: '#FF9800',
-  Horrível: '#F44336',
+  Ruim: '#FF9800',
+  Péssimo: '#F44336',
 };
-const MOOD_ICONS: { [key in Mood]: string } = {
+const MOOD_ICONS: { [key in MoodType]: string } = {
   Excelente: 'robot-happy-outline',
-  Bem: 'robot-outline',
+  Bom: 'robot-outline',
   Neutro: 'robot-off-outline',
-  Mal: 'robot-dead',
-  Horrível: 'robot-angry-outline',
+  Ruim: 'robot-dead',
+  Péssimo: 'robot-angry-outline',
 };
 
 interface FrequentMoodSelectorProps {
-  selectedMood: Mood;
-  onSelect: (mood: Mood) => void;
+  selectedMood: MoodType;
+  onSelect: (mood: MoodType) => void;
+  moodCount: number; // Nova prop para a contagem (3x)
 }
 
-export default function FrequentMoodSelector({ selectedMood, onSelect }: FrequentMoodSelectorProps): React.JSX.Element {
+export default function FrequentMoodSelector({ selectedMood, onSelect, moodCount }: FrequentMoodSelectorProps): React.JSX.Element {
   return (
-    <View style={styles.frequentMoodSelector}>
+    <TouchableOpacity 
+        style={styles.selectorButton} 
+        onPress={() => onSelect(selectedMood)} // Ação de seleção
+    >
       <MaterialCommunityIcons
-        name={'ab-testing'}
-        size={width * 0.05}
-        color={MOOD_COLORS[selectedMood]}
+      //@ts-ignore
+        name={MOOD_ICONS[selectedMood]}
+        size={width * 0.055} // Ajustado para o tamanho do ícone (21.51px do CSS)
+        color="#B2B2B1" // Cor do ícone robô no Figma (base)
+        style={styles.robotIcon}
       />
-      <Text style={styles.frequentMoodText}>{selectedMood}</Text>
-      <Text style={styles.frequentMoodCount}>(3x)</Text>
-      <MaterialCommunityIcons name="chevron-down" size={width * 0.05} color="#666" />
-    </View>
+      <Text style={styles.moodText}>
+        {selectedMood} ({moodCount}x)
+      </Text>
+      <MaterialCommunityIcons
+        name="chevron-down"
+        size={width * 0.05}
+        color="rgba(0, 0, 0, 0.7)" // Cor da seta (preto com 70% de opacidade)
+        style={styles.dropdownIcon}
+      />
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  frequentMoodSelector: {
+  selectorButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    marginHorizontal: width * 0.04,
-    marginBottom: height * 0.02,
-    paddingHorizontal: width * 0.04,
-    paddingVertical: height * 0.015,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.15)', // Cor da borda
+    borderRadius: 20, // Raio da borda
+    width: width * 0.55, // Largura responsiva (~209px do CSS)
+    height: height * 0.045, // Altura responsiva (~38px do CSS)
+    justifyContent: 'center', // Centraliza o conteúdo
+    alignSelf: 'center', // Centraliza o botão dentro do pai
+    marginBottom: height * 0.02, // Espaçamento abaixo do botão
+    paddingHorizontal: width * 0.02, // Padding interno
   },
-  frequentMoodText: {
-    fontSize: width * 0.045,
-    fontWeight: 'bold',
-    color: '#333',
-    marginLeft: 10,
+  robotIcon: {
+    marginRight: width * 0.02, // Espaçamento à direita do ícone robô
   },
-  frequentMoodCount: {
-    fontSize: width * 0.04,
-    color: '#666',
-    marginLeft: 5,
-    flex: 1,
+  moodText: {
+    fontSize: width * 0.03, // Tamanho da fonte (11px do CSS)
+    fontFamily: 'Poppins_500Medium', // Poppins Medium
+    color: '#000000',
+  },
+  dropdownIcon: {
+    marginLeft: width * 0.02, // Espaçamento à esquerda da seta
   },
 });

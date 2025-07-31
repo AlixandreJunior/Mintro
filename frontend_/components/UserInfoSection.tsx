@@ -1,77 +1,95 @@
-import { StyleSheet} from "react-native"
-import { Text, View } from "react-native"
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from "react-native";
 
-interface UserInfoSectionProps{
-    displayName: string
-    avatarChar: string
-    joinYear: number | string
+const { width, height } = Dimensions.get('window');
+
+interface UserInfoSectionProps {
+  displayName: string;
+  avatarChar: string;
+  joinYear: number | string;
 }
 
 export const UserInfoSection: React.FC<UserInfoSectionProps> = ({
-    avatarChar,
-    displayName,
-    joinYear
+  avatarChar,
+  displayName,
+  joinYear
 }) => {
-    return(
-        <View style={styles.formCardCommon}>
-            <View style={styles.userInfo}>
-            <View>
-                <Text style={styles.userName}>{displayName}</Text>
-                <Text style={styles.joinDate}>Entrou em {joinYear}</Text>
-            </View>
-            <View style={styles.avatarPlaceholder}>
-                <Text style={styles.avatarText}>{avatarChar}</Text>
-            </View>
-            </View>
+  return (
+    <View style={styles.cardContainer}>
+      <View style={styles.formCardCommon}>
+        <View style={styles.userInfoTop}>
+          <View>
+            <Text style={styles.userName}>{displayName}</Text>
+            <Text style={styles.joinDate}>Entrou em {joinYear}</Text>
+          </View>
+          <View style={styles.avatarPlaceholder}>
+            <Text style={styles.avatarText}>{avatarChar}</Text>
+          </View>
         </View>
-    )
-}
+        <TouchableOpacity style={styles.editProfileButton}>
+          <Text style={styles.editProfileText}>Editar perfil</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    
+  cardContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: height * 0.02,
+    marginTop: height * 0.01,
+  },
   formCardCommon: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    borderWidth:1, 
+    borderWidth: 1,
     borderColor: '#F3F4F6',
-    paddingVertical: 15,
-    paddingHorizontal:20 ,
-    width: '100%',
-    maxWidth: 400,
-    shadowColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 16,
+    shadowColor: 'rgba(0, 0, 0, 0.05)',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    elevation: 5,
+    shadowOpacity: 1,
+    shadowRadius: 2,
+    elevation: 2,
+    width: width * 0.9,
+    paddingVertical: height * 0.025,
+    paddingHorizontal: width * 0.06,
   },
-
-  userInfo: {
+  userInfoTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: height * 0.02,
   },
   userName: {
-    fontSize: 20,
+    fontSize: width * 0.065,
     fontFamily: 'Poppins_400Regular',
     color: '#111827',
-    marginBottom: 1,
   },
   joinDate: {
-    fontSize: 14,
+    fontSize: width * 0.038,
     fontFamily: 'Poppins_400Regular',
-    color: '#7F8C8D',
-    marginBottom: 8,
+    color: '#6B7280',
+    marginTop: height * 0.005,
   },
   avatarPlaceholder: {
-    width: 64,
-    height: 64,
-    borderRadius: 35,
+    width: width * 0.17,
+    height: width * 0.17,
+    borderRadius: (width * 0.17) / 2,
     backgroundColor: '#79D457',
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarText: {
-    fontSize: 20,
+    fontSize: width * 0.05,
     fontFamily: 'Poppins_400Regular',
-    color: 'white',
+    color: '#FFFFFF',
   },
-})
+  editProfileButton: {
+    alignSelf: 'flex-start',
+  },
+  editProfileText: {
+    fontSize: width * 0.038,
+    fontFamily: 'Poppins_400Regular',
+    color: '#1FB6FF',
+  }
+});

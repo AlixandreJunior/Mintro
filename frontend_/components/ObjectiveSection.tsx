@@ -3,6 +3,8 @@ import ObjectiveDisplayCard from "./Cards/ObjectiveCard";
 import { getActivityIconName } from "@/utils/activityIconMapper";
 import { ActivityIndicator } from "react-native-paper";
 import { useObjective } from "@/hooks/useObjective";
+import { router } from "expo-router";
+
 
 export const ObjectiveSection = () => {
   const { objectives, loading, error } = useObjective(); // use o hook
@@ -34,6 +36,8 @@ export const ObjectiveSection = () => {
                 renderIcon={getActivityIconName(objective.activity.name)}
                 objectiveTitle={objective.activity.name}
                 objectiveSubtitle={`Meta até ${formatDeadline(objective.deadline)}`}
+                //@ts-ignore
+                onPress={() => router.push(`/objective/${objective.id}`)}
               />
             ))}
           </View>
@@ -46,9 +50,9 @@ export const ObjectiveSection = () => {
 const styles = StyleSheet.create({
   section: {
     marginBottom: 8,
-    paddingHorizontal: Dimensions.get('window').width * 0.05,
   },
   sectionTitle: {
+    marginHorizontal: Dimensions.get('window').width * 0.05,
     fontSize: 16,
     fontFamily: 'Poppins_400Regular',
     color: '#111827',
