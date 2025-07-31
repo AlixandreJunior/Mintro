@@ -72,9 +72,13 @@ const ObjectiveProgressCard: React.FC<ProgressCardProps> = ({
             <CompletionIcon
               key={index}
               size={iconSize}
-              checkmarkColor={'#ffffffff'}
-              circleFill="#56f72eff"
-              circleStroke={'0000'}
+              checkmarkColor={'#E5E7EB'}
+              circleFill={
+                index < objectiveProgress.current ? '#57E571' : '#ffffff'
+              }
+              circleStroke={
+                index < objectiveProgress.current ? '#57E571' : '#E5E7EB'
+              }
               circleStrokeWidth={1.5}
             />
           ))}

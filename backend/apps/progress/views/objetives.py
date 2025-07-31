@@ -71,11 +71,6 @@ class ObjectiveUpdateView(UpdateAPIView):
         except Objective.DoesNotExist:
             raise NotFound("Objetivo não encontrado.")
 
-    def partial_update(self, request, *args, **kwargs):
-        return Response(
-            {"detail": "Objetivo atualizado com sucesso."}, status=status.HTTP_200_OK
-        )
-
 
 class ObjectiveDeleteView(DestroyAPIView):
     permission_classes = [IsAuthenticated]

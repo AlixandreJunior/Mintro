@@ -1,5 +1,9 @@
-import MintroExcellentIcon from '@/components/Icons/MintroExcellentIcon';
 import { MoodType } from '@/types/mental/diary';
+import ExcellentIcon from '../assets/images/mintro_excellent.svg';
+import GoodIcon from '../assets/images/mintro_good.svg';
+import NeutralIcon from '../assets/images/mintro_neutral.svg';
+import BadIcon from '../assets/images/mintro_bad.svg';
+import VeryBadIcon from '../assets/images/mintro_verybad.svg';
 import React from 'react';
 
 interface MoodVisuals {
@@ -10,27 +14,27 @@ export function getMoodVisuals(mood: MoodType): MoodVisuals {
   switch (mood) {
     case 'Excelente':
       return {
-        iconSource: <MintroExcellentIcon />,
+        iconSource: <ExcellentIcon />,
       };
     case 'Bom':
       return {
-        iconSource: <MintroExcellentIcon />,
+        iconSource: <GoodIcon />,
       };
     case 'Neutro':
       return {
-        iconSource: <MintroExcellentIcon />,
+        iconSource: <NeutralIcon />,
       };
     case 'Ruim':
       return {
-        iconSource: <MintroExcellentIcon />,
+        iconSource: <BadIcon />,
       };
     case 'Péssimo':
       return {
-        iconSource: <MintroExcellentIcon />,
+        iconSource: <VeryBadIcon />,
       };
     default:
       return {
-        iconSource: <MintroExcellentIcon />,
+        iconSource: <NeutralIcon />,
       };
   }
 }
