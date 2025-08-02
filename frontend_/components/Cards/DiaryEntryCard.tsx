@@ -52,7 +52,6 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
 }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const { handleDelete } = useDiaryForm();
-  // Fecha o dropdown ao clicar fora
   const handleOutsidePress = () => setDropdownVisible(false);
 
   const onEdit = () => {
