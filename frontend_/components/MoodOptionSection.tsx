@@ -7,11 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import ExcellentIcon from '../assets/images/mintro_excellent.svg';
-import GoodIcon from '../assets/images/mintro_good.svg';
-import NeutralIcon from '../assets/images/mintro_neutral.svg';
-import BadIcon from '../assets/images/mintro_bad.svg';
-import VeryBadIcon from '../assets/images/mintro_verybad.svg';
+import { getMoodVisuals } from '../utils/moodHelper';
 
 interface MoodOption {
   id: string;
@@ -29,31 +25,31 @@ const MoodOptionSection: React.FC<MoodOptionProps> = ({ handleMoodSelect }) => {
     {
       id: 'Excelente',
       label: 'Excelente',
-      imageSource: <NeutralIcon />,
+      imageSource: () => getMoodVisuals('Excelente').iconSource,
       isSelected: false,
     },
     {
       id: 'Bom',
       label: 'Bom',
-      imageSource: <NeutralIcon />,
+      imageSource: () => getMoodVisuals('Bom').iconSource,
       isSelected: false,
     },
     {
       id: 'Neutro',
       label: 'Neutro',
-      imageSource: <NeutralIcon />,
+      imageSource: () => getMoodVisuals('Neutro').iconSource,
       isSelected: false,
     },
     {
       id: 'Ruim',
-      label: 'Mal',
-      imageSource: <NeutralIcon />,
+      label: 'Ruim',
+      imageSource: () => getMoodVisuals('Ruim').iconSource,
       isSelected: false,
     },
     {
       id: 'Péssimo',
-      label: 'Horrível',
-      imageSource: <NeutralIcon />,
+      label: 'Péssimo',
+      imageSource: () => getMoodVisuals('Péssimo').iconSource,
       isSelected: false,
     },
   ]);

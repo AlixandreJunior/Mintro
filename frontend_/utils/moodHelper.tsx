@@ -1,10 +1,6 @@
 import { MoodType } from '@/types/mental/diary';
-import ExcellentIcon from '../assets/images/mintro_excellent.svg';
-import GoodIcon from '../assets/images/mintro_good.svg';
-import NeutralIcon from '../assets/images/mintro_neutral.svg';
-import BadIcon from '../assets/images/mintro_bad.svg';
-import VeryBadIcon from '../assets/images/mintro_verybad.svg';
 import React from 'react';
+import { Image } from 'react-native';
 
 interface MoodVisuals {
   iconSource: React.ReactNode;
@@ -14,27 +10,39 @@ export function getMoodVisuals(mood: MoodType): MoodVisuals {
   switch (mood) {
     case 'Excelente':
       return {
-        iconSource: <ExcellentIcon />,
+        iconSource: (
+          <Image source={require('../assets/images/mintro_excellent.png')} />
+        ),
       };
     case 'Bom':
       return {
-        iconSource: <GoodIcon />,
+        iconSource: (
+          <Image source={require('../assets/images/mintro_good.png')} />
+        ),
       };
     case 'Neutro':
       return {
-        iconSource: <NeutralIcon />,
+        iconSource: (
+          <Image source={require('../assets/images/mintro_neutral.png')} />
+        ),
       };
     case 'Ruim':
       return {
-        iconSource: <BadIcon />,
+        iconSource: (
+          <Image source={require('../assets/images/mintro_bad.png')} />
+        ),
       };
     case 'Péssimo':
       return {
-        iconSource: <VeryBadIcon />,
+        iconSource: (
+          <Image source={require('../assets/images/mintro_verybad.png')} />
+        ),
       };
     default:
       return {
-        iconSource: <NeutralIcon />,
+        iconSource: (
+          <Image source={require('../assets/images/mintro_neutral.png')} />
+        ),
       };
   }
 }
