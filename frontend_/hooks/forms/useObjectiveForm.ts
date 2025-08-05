@@ -81,7 +81,6 @@ export function useObjectiveForm() {
       Alert.alert('Erro', error.message || 'Erro ao atualizar objetivo.');
     }
   };
-  
 
   return {
     selectedObjectiveId,

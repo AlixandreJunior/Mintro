@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import { MainInput } from '@/components/Inputs/MainInput';
 import { DateTimeInput } from '@/components/Inputs/DateTimeInput';
 import MoodOptionSection from '@/components/MoodOptionSection';
 import { ActivitiesSection } from '@/components/ActivitySection';
-import { ObjectiveSection } from '@/components/ObjectiveSection';
 import NotesInput from '@/components/Inputs/NotesInput';
 import PhotoPicker from '@/components/Inputs/PhotoPicker';
+
+const { width } = Dimensions.get('window');
 
 interface DiaryFormProps {
   title: string;
@@ -66,28 +67,32 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
       />
 
       <View style={styles.dateTimeContainer}>
-        <DateTimeInput
-          labelText="Data"
-          datetime={selectedDate}
-          onChange={(_: any, date?: Date) => {
-            setShowDatePicker(false);
-            if (date) onChangeDate(date);
-          }}
-          showPicker={showDatePicker}
-          onPress={() => setShowDatePicker(true)}
-          mode="date"
-        />
-        <DateTimeInput
-          labelText="Hora"
-          datetime={selectedTime}
-          onChange={(_: any, time?: Date) => {
-            setShowTimePicker(false);
-            if (time) onChangeTime(time);
-          }}
-          showPicker={showTimePicker}
-          onPress={() => setShowTimePicker(true)}
-          mode="time"
-        />
+        <View style={styles.dateInputWrapper}>
+          <DateTimeInput
+            labelText="Data"
+            datetime={selectedDate}
+            onChange={(_: any, date?: Date) => {
+              setShowDatePicker(false);
+              if (date) onChangeDate(date);
+            }}
+            showPicker={showDatePicker}
+            onPress={() => setShowDatePicker(true)}
+            mode="date"
+          />
+        </View>
+        <View style={styles.timeInputWrapper}>
+          <DateTimeInput
+            labelText="Hora"
+            datetime={selectedTime}
+            onChange={(_: any, time?: Date) => {
+              setShowTimePicker(false);
+              if (time) onChangeTime(time);
+            }}
+            showPicker={showTimePicker}
+            onPress={() => setShowTimePicker(true)}
+            mode="time"
+          />
+        </View>
       </View>
 
       <MoodOptionSection
@@ -105,8 +110,6 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
         multiple
       />
 
-      <ObjectiveSection />
-
       <NotesInput notes={notes} onChangeNotes={onChangeNotes} />
 
       <PhotoPicker
@@ -121,16 +124,18 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
 
 const styles = StyleSheet.create({
   scrollViewContent: {
-    paddingBottom: 20,
-    paddingHorizontal: 12,
-    marginTop: 10,
-    width: '90%',
-    alignSelf: 'center',
+    marginHorizontal: width * 0.05,
   },
   dateTimeContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     width: '100%',
+  },
+  dateInputWrapper: {
+    flex: 1,
+    marginRight: 8, // Espaço entre os inputs
+  },
+  timeInputWrapper: {
+    flex: 1,
   },
 });
 

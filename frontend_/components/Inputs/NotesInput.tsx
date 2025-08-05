@@ -27,14 +27,13 @@ const NotesInput: React.FC<NotesInputProps> = ({ notes, onChangeNotes }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 20,
-  },
+  container: {},
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
+    color: '#4B5563',
     marginBottom: 15,
+    textAlign: 'left',
   },
   textInput: {
     backgroundColor: 'white',

@@ -1,36 +1,24 @@
-import { ActivityIndicator } from "react-native-paper";
-import ObjectiveGridItem from "./ObjectivesGridCard";
-import { StyleSheet, View } from "react-native";
-import { getActivityIconName } from "@/utils/activityIconMapper";
-import { useEffect, useState } from "react";
-import { getActivities } from "@/services/diary/listActivities";
-import { Activity } from "@/types/mental/diary";
+import { ActivityIndicator } from 'react-native-paper';
+import ObjectiveGridItem from './ObjectivesGridCard';
+import { StyleSheet, View } from 'react-native';
+import { getActivityIconName } from '@/utils/activityIconMapper';
+import { useEffect, useState } from 'react';
+import { getActivities } from '@/services/diary/listActivities';
+import { Activity } from '@/types/mental/diary';
 
 interface ActivityGridProps {
-  multiple?: boolean; 
+  activities: Activity[];
+  multiple?: boolean;
   selected: number[] | number | null;
   setSelected: (value: number[] | number) => void;
 }
 
-export const ActivityGrid = ({ selected, setSelected, multiple = false }: ActivityGridProps) => {
-  const [loading, setLoading] = useState(true);
-  const [activities, setActivities] = useState<Activity[]>([]);
-
-  useEffect(() => {
-    const fetchActivities = async () => {
-      try {
-        const data = await getActivities();
-        setActivities(data);
-      } catch (error) {
-        console.error("Erro ao buscar atividades:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchActivities();
-  }, []);
-
+export const ActivityGrid = ({
+  activities,
+  selected,
+  setSelected,
+  multiple = false,
+}: ActivityGridProps) => {
   const isSelected = (id: number): boolean => {
     if (multiple && Array.isArray(selected)) {
       return selected.includes(id);
@@ -42,7 +30,7 @@ export const ActivityGrid = ({ selected, setSelected, multiple = false }: Activi
     if (multiple) {
       const selectedArray = Array.isArray(selected) ? selected : [];
       if (selectedArray.includes(id)) {
-        setSelected(selectedArray.filter(item => item !== id));
+        setSelected(selectedArray.filter((item) => item !== id));
       } else {
         setSelected([...selectedArray, id]);
       }
@@ -60,16 +48,21 @@ export const ActivityGrid = ({ selected, setSelected, multiple = false }: Activi
       rows.push(
         <View
           key={`row-${i}`}
-          style={i + itemsPerRow >= activities.length ? styles.objectiveRowWith4 : styles.objectiveRowWith5}
+          style={
+            i + itemsPerRow >= activities.length
+              ? styles.objectiveRowWith4
+              : styles.objectiveRowWith5
+          }
         >
           {row.map((obj) => (
-            <ObjectiveGridItem
-              key={obj.id}
-              label={obj.name}
-              renderIcon={getActivityIconName(obj.name)}
-              isSelected={isSelected(Number(obj.id))}
-              onPress={() => handleSelect(Number(obj.id))}
-            />
+            <View key={obj.id} style={styles.itemContainer}>
+              <ObjectiveGridItem
+                label={obj.name}
+                renderIcon={getActivityIconName(obj.name)}
+                isSelected={isSelected(Number(obj.id))}
+                onPress={() => handleSelect(Number(obj.id))}
+              />
+            </View>
           ))}
         </View>
       );
@@ -78,28 +71,26 @@ export const ActivityGrid = ({ selected, setSelected, multiple = false }: Activi
     return rows;
   };
 
-  return (
-    <View>
-      {loading ? (
-        <ActivityIndicator size="small" color="#4CAF50" style={{ marginTop: 20 }} />
-      ) : (
-        renderRows()
-      )}
-    </View>
-  );
+  return <View style={styles.container}>{renderRows()}</View>;
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingVertical: 8,
+  },
   objectiveRowWith5: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 12,
-    paddingHorizontal: 8,
   },
   objectiveRowWith4: {
-    flexDirection: "row",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     marginBottom: 12,
-    paddingHorizontal: 8,
+  },
+  itemContainer: {
+    flex: 1,
+    alignItems: 'center',
   },
 });
