@@ -2,12 +2,15 @@
 import * as React from 'react';
 import Svg, { Path } from 'react-native-svg';
 
-const JobIcon = (props: any) => (
+interface JobIconProps {
+  size?: number;
+}
+
+const JobIcon: React.FC<JobIconProps> = ({ size = 24, ...props }) => (
   <Svg
-    xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 512 512"
-    width={24}
-    height={24}
+    width={size}
+    height={size}
     fill="currentColor"
     {...props}
   >

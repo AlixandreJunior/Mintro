@@ -122,7 +122,7 @@ export function useDiaryForm() {
       formData.append('datetime', getCombinedDateTime().toISOString());
       formData.append('mood', selectedMoodId);
       selectedActivitiesIds.forEach((id) =>
-        formData.append('activity[]', id.toString())
+        formData.append('activity', id.toString())
       );
       await appendImageToFormData(formData, selectedImageUri);
 
