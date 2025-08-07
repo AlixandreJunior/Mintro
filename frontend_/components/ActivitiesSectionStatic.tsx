@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
-import { Activity } from "@/types/mental/diary";
-import { getActivities } from "@/services/diary/listActivities";
-import { ActivityGridStatic } from "./ActivityGridStatic";
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { Activity } from '@/types/mental/diary';
+import { getActivities } from '@/services/diary/listActivities';
+import { ActivityGridStatic } from './ActivityGridStatic';
 
 export const ActivitiesSectionStatic = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -17,8 +17,8 @@ export const ActivitiesSectionStatic = () => {
         const data = await getActivities();
         setActivities(data);
       } catch (err: any) {
-        console.error("Erro ao carregar atividades:", err);
-        setError("Erro ao carregar atividades");
+        console.error('Erro ao carregar atividades:', err);
+        setError('Erro ao carregar atividades');
       } finally {
         setLoading(false);
       }
@@ -35,11 +35,11 @@ export const ActivitiesSectionStatic = () => {
         <Text style={styles.errorText}>{error}</Text>
       ) : activities.length === 0 ? (
         <Text>Nenhuma atividade encontrada.</Text>
-      ) :  (
+      ) : (
         <View style={styles.activityGrid}>
-        <ActivityGridStatic/>
+          <ActivityGridStatic />
         </View>
-    )}
+      )}
     </View>
   );
 };
@@ -48,24 +48,24 @@ const styles = StyleSheet.create({
   section: {
     paddingHorizontal: 12,
     marginTop: 10,
-    width: "90%",
-    alignSelf: "center",
+    width: '90%',
+    alignSelf: 'center',
   },
   sectionTitle: {
     fontSize: 14,
-    fontFamily: "Poppins_400Regular",
-    color: "#4B5563",
-    marginBottom: 15,
-    textAlign: "left",
+    fontFamily: 'Poppins_400Regular',
+    color: '#4B5563',
+    marginBottom: 4,
+    textAlign: 'left',
   },
   errorText: {
-    color: "red",
+    color: 'red',
     marginTop: 10,
   },
   activityGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     gap: 8,
   },
   activityItem: {

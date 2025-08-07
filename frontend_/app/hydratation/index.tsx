@@ -1,14 +1,5 @@
 import { useState } from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  View,
-  Text,
-  Modal,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 
 import Header from '@/components/Layout/Header';
@@ -20,7 +11,7 @@ import { formatDatetimeToISO } from '@/utils/formatDatetimeToISO';
 import { useHydrationLogs } from '@/hooks/useHydratationLog';
 import { FloatingActionButton } from '@/components/FloatingButtonAction';
 import PeriodSelector from '@/components/PeriodSelector';
-import StepsChart from '@/components/StepsChart'; // Gráfico reutilizado
+import StepsChart from '@/components/StepsChart';
 import GoalModal from '@/components/GoalModal';
 
 export default function HydrationScreen() {
@@ -88,16 +79,11 @@ export default function HydrationScreen() {
     }
   };
 
-  const [editedGoal, setEditedGoal] = useState(goal.toString());
   const [goalModalVisible, setGoalModalVisible] = useState(false);
 
   const handleSaveGoal = (newGoal: number) => {
-    // Atualize a meta aqui (exemplo: API ou estado global)
-    // Exemplo:
-    // updateHydrationGoal(newGoal);
-    // Por enquanto, só fecha o modal
+    // Atualize a meta aqui (API ou contexto)
     setGoalModalVisible(false);
-    // Você pode querer atualizar localmente o goal se precisar
   };
 
   return (
@@ -110,7 +96,6 @@ export default function HydrationScreen() {
           {
             label: 'Editar Meta',
             onPress: () => {
-              setEditedGoal(goal.toString());
               setGoalModalVisible(true);
             },
           },
@@ -175,41 +160,4 @@ export default function HydrationScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   scrollView: { flex: 1 },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    paddingHorizontal: 20,
-  },
-  modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 20,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 16,
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  cancel: {
-    color: '#888',
-    fontSize: 16,
-  },
-  save: {
-    color: '#4CAF50',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
 });

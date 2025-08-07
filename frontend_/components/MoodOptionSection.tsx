@@ -10,13 +10,8 @@ import {
 } from 'react-native';
 import { getMoodVisuals } from '../utils/moodHelper';
 
-const { width } = Dimensions.get('window');
-
-const HORIZONTAL_PADDING = 8 * 2;
 const ITEMS_PER_ROW = 5;
-const GAP = 1;
-const TOTAL_GAP = GAP * (ITEMS_PER_ROW - 1);
-const ITEM_WIDTH = (width - HORIZONTAL_PADDING - TOTAL_GAP) / ITEMS_PER_ROW;
+const GAP = 8;
 
 interface MoodOption {
   id: string;
@@ -63,6 +58,16 @@ const MoodOptionSection: React.FC<MoodOptionProps> = ({ handleMoodSelect }) => {
     },
   ]);
 
+  const onSelectMood = (id: string) => {
+    setMoods((prev) =>
+      prev.map((m) => ({
+        ...m,
+        isSelected: m.id === id,
+      }))
+    );
+    handleMoodSelect(id);
+  };
+
   const MoodIcon: React.FC<{ mood: MoodOption }> = ({ mood }) => {
     return (
       <TouchableOpacity
@@ -70,7 +75,7 @@ const MoodOptionSection: React.FC<MoodOptionProps> = ({ handleMoodSelect }) => {
           styles.moodOption,
           mood.isSelected && styles.moodOptionSelected,
         ]}
-        onPress={() => handleMoodSelect(mood.id)}
+        onPress={() => onSelectMood(mood.id)}
         activeOpacity={0.7}
       >
         <View style={styles.moodIconContainer}>{mood.imageSource()}</View>
@@ -96,7 +101,7 @@ const MoodOptionSection: React.FC<MoodOptionProps> = ({ handleMoodSelect }) => {
               key={mood.id}
               style={[
                 styles.itemWrapper,
-                (index + 1) % ITEMS_PER_ROW === 0 ? { marginRight: 0 } : {},
+                (index + 1) % ITEMS_PER_ROW === 0 && { marginRight: 0 },
               ]}
             >
               <MoodIcon mood={mood} />
@@ -109,8 +114,8 @@ const MoodOptionSection: React.FC<MoodOptionProps> = ({ handleMoodSelect }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  section: { marginTop: 10 },
+  container: { flex: 1, paddingHorizontal: 8 },
+  section: {},
   sectionTitle: {
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
@@ -120,24 +125,22 @@ const styles = StyleSheet.create({
   },
   moodGrid: {
     flexDirection: 'row',
-    flexWrap: 'nowrap',
-    justifyContent: 'flex-start',
+    flexWrap: 'wrap',
   },
   itemWrapper: {
-    width: ITEM_WIDTH,
+    flexGrow: 1,
+    flexBasis: '18%',
+    maxWidth: '20%',
     marginRight: GAP,
     marginBottom: GAP,
   },
   moodOption: {
-    flexGrow: 0,
     alignItems: 'center',
     paddingVertical: 10,
     paddingHorizontal: 6,
     borderWidth: 1,
     borderColor: '#e0e0e0',
     borderRadius: 10,
-
-    // sombra leve para padrão não selecionado
     backgroundColor: '#fff',
     ...Platform.select({
       ios: {
@@ -152,20 +155,7 @@ const styles = StyleSheet.create({
     }),
   },
   moodOptionSelected: {
-    backgroundColor: '#E0F2F1',
-    borderColor: '#A5D6A7', // verde claro
-    // sombra mais forte para selecionado
-    ...Platform.select({
-      ios: {
-        shadowColor: '#A5D6A7',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.4,
-        shadowRadius: 6,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
+    borderColor: '#79D457',
   },
   moodIconContainer: {
     marginBottom: 8,
@@ -179,7 +169,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   moodLabelSelected: {
-    color: '#4CAF50',
+    color: '#79D457',
     fontWeight: '600',
   },
 });

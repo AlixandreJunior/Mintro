@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, StyleSheet, View, Animated, Text } from 'react-native';
+import {
+  TouchableOpacity,
+  StyleSheet,
+  View,
+  Animated,
+  Text,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 interface FloatingActionButtonProps {
@@ -14,7 +20,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const animation = useState(new Animated.Value(0))[0];
 
-  const toggleOpen = () => {
+  const handleToggle = () => {
     const toValue = isOpen ? 0 : 1;
     Animated.spring(animation, {
       toValue,
@@ -24,38 +30,82 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
     setIsOpen(!isOpen);
   };
 
-  const objectiveTranslateY = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -60],
-  });
-
-  const diaryTranslateY = animation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -120],
-  });
-
   const rotateIcon = animation.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '45deg'],
   });
 
+  const fabItems = [
+    {
+      label: 'Objetivo',
+      icon: 'target',
+      onPress: onPressCreateObjective,
+      animatedStyle: {
+        transform: [
+          {
+            translateY: animation.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, -80],
+            }),
+          },
+        ],
+        opacity: animation.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 1],
+        }),
+      },
+    },
+    {
+      label: 'Diário',
+      icon: 'book-open-outline',
+      onPress: onPressCreateDiary,
+      animatedStyle: {
+        transform: [
+          {
+            translateX: animation.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, -80],
+            }),
+          },
+        ],
+        opacity: animation.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 1],
+        }),
+      },
+    },
+  ];
+
   return (
-    <View style={styles.fabContainer}>
-      <Animated.View style={[styles.subFab, { transform: [{ translateY: objectiveTranslateY }] }]}>
-        <TouchableOpacity style={styles.subFabButton} onPress={onPressCreateObjective}>
-          <MaterialCommunityIcons name="target" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      </Animated.View>
+    <View style={styles.container}>
+      {fabItems.map((item, index) => (
+        <Animated.View
+          key={index}
+          style={[styles.subFabWrapper, item.animatedStyle]}
+          pointerEvents={isOpen ? 'auto' : 'none'}
+        >
+          <TouchableOpacity
+            style={styles.subFabButton}
+            onPress={() => {
+              item.onPress();
+              handleToggle(); // Fecha ao clicar
+            }}
+            accessibilityLabel={`Adicionar ${item.label}`}
+          >
+            {/*@ts-ignore*/}
+            <MaterialCommunityIcons name={item.icon} size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.label}>{item.label}</Text>
+        </Animated.View>
+      ))}
 
-      <Animated.View style={[styles.subFab, { transform: [{ translateY: diaryTranslateY }] }]}>
-        <TouchableOpacity style={styles.subFabButton} onPress={onPressCreateDiary}>
-          <MaterialCommunityIcons name="book-open-outline" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      </Animated.View>
-
-      <TouchableOpacity style={styles.mainFab} onPress={toggleOpen}>
+      <TouchableOpacity
+        style={styles.mainFab}
+        onPress={handleToggle}
+        accessibilityLabel="Botão de ação flutuante"
+      >
         <Animated.View style={{ transform: [{ rotate: rotateIcon }] }}>
-          <MaterialCommunityIcons name="plus" size={30} color="#FFFFFF" />
+          <MaterialCommunityIcons name="plus" size={30} color="#fff" />
         </Animated.View>
       </TouchableOpacity>
     </View>
@@ -63,29 +113,26 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
 };
 
 const styles = StyleSheet.create({
-  fabContainer: {
+  container: {
     position: 'absolute',
     right: 20,
-    bottom: 80,
+    bottom: 20,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   mainFab: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#8BC34A',
+    backgroundColor: '#4CAF50',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
     elevation: 8,
     zIndex: 10,
   },
-  subFab: {
+  subFabWrapper: {
     position: 'absolute',
-    bottom: 0,
+    alignItems: 'center',
   },
   subFabButton: {
     width: 50,
@@ -94,11 +141,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#66BB6A',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
     elevation: 5,
+  },
+  label: {
+    marginTop: 4,
+    color: '#444',
+    fontSize: 12,
+    fontWeight: '500',
   },
 });
 

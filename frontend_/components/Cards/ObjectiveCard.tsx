@@ -8,7 +8,8 @@ import {
 } from 'react-native';
 import CompletionIcon from '../Icons/CompletionIon';
 import { getActivityIconName } from '@/utils/activityIconMapper';
-import MainCard from '../MainCard';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import BaseCard from './BaseCard';
 
 interface ObjectiveDisplayCardProps {
   objectiveTitle: string;
@@ -16,73 +17,88 @@ interface ObjectiveDisplayCardProps {
   onPress?: (event_: any) => void;
 }
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const ObjectiveDisplayCard: React.FC<ObjectiveDisplayCardProps> = ({
   objectiveTitle,
   objectiveSubtitle,
   onPress,
 }) => {
-  const icon = getActivityIconName(objectiveTitle);
+  const icon = getActivityIconName(objectiveTitle, 20);
 
   return (
-    <MainCard>
-      <TouchableOpacity style={styles.objectiveCard} onPress={onPress}>
-        <View style={styles.objectiveLeft}>
-          <View style={styles.checkboxContainer}>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+      <BaseCard style={styles.card}>
+        <View style={styles.leftSection}>
+          <View style={styles.checkWrapper}>
             <CompletionIcon />
           </View>
           <View style={styles.iconWrapper}>{icon}</View>
         </View>
-        <View style={styles.objectiveContent}>
-          <Text style={styles.objectiveTitle}>{objectiveTitle}</Text>
-          <Text style={styles.objectiveSubtitle}>{objectiveSubtitle}</Text>
+
+        <View style={styles.textSection}>
+          <Text style={styles.title}>{objectiveTitle}</Text>
+          <Text style={styles.subtitle}>{objectiveSubtitle}</Text>
         </View>
-      </TouchableOpacity>
-    </MainCard>
+
+        <MaterialCommunityIcons
+          name="chevron-right"
+          size={20}
+          color="rgba(0, 0, 0, 0.7)"
+        />
+      </BaseCard>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  objectiveCard: {
-    flex: 1,
+  card: {
     flexDirection: 'row',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginHorizontal: 16,
+    marginVertical: 2,
   },
-  objectiveLeft: {
+  leftSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: width * 0.035,
+    gap: 12,
   },
-  checkboxContainer: {
-    width: width * 0.055,
-    height: width * 0.055,
-    borderRadius: 4,
-    alignItems: 'center',
+  checkWrapper: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
-    marginHorizontal: width * 0.025,
+    alignItems: 'center',
   },
   iconWrapper: {
-    width: width * 0.04,
-    height: width * 0.04,
-    borderRadius: 8,
-    backgroundColor: '#F3F4F6', // cinza claro
+    width: 22,
+    height: 22,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  objectiveContent: {
+  textSection: {
     flex: 1,
+    marginLeft: 14,
   },
-  objectiveTitle: {
-    fontSize: width * 0.035,
+  title: {
+    fontSize: 12,
     fontFamily: 'Poppins_500Medium',
-    color: '#000',
-    marginBottom: 1,
+    color: '#000000',
+    lineHeight: 20,
   },
-  objectiveSubtitle: {
-    fontSize: width * 0.03,
+  subtitle: {
+    fontSize: 11,
     fontFamily: 'Poppins_400Regular',
     color: '#000000',
+    lineHeight: 18,
+    marginTop: -2,
   },
 });
 

@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Pressable,
   Dimensions,
-  Platform,
 } from 'react-native';
 import { MoodType } from '@/types/mental/diary';
 import { getActivityIconName } from '@/utils/activityIconMapper';
@@ -15,6 +14,7 @@ import { router } from 'expo-router';
 import { useDiaryForm } from '@/hooks/forms/useDiaryForm';
 import VerticalDotsIcon from '../Icons/VerticalDotsIcon';
 import DiaryModal from '../Modal/DiaryModal';
+import BaseCard from './BaseCard';
 
 const screen = Dimensions.get('window');
 
@@ -99,7 +99,7 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
         <View style={styles.timelineRow}>
           <View style={styles.timelineIconContainer}>{iconSource}</View>
 
-          <View style={[styles.entryCard, { maxWidth: screen.width - 65 }]}>
+          <BaseCard style={{ marginLeft: 49, maxWidth: screen.width - 65 }}>
             <View style={styles.entryHeader}>
               <View style={styles.entryInfo}>
                 <View
@@ -162,7 +162,7 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
                 style={[styles.diaryPhoto, { maxHeight: screen.width * 0.5 }]}
               />
             )}
-          </View>
+          </BaseCard>
         </View>
       </Pressable>
 
@@ -196,21 +196,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 2,
   },
-  entryCard: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 8,
-    padding: 12,
-    marginLeft: 49,
-    marginTop: 0,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 4,
-  },
   entryHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -223,7 +208,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_600SemiBold',
     fontSize: 14,
     lineHeight: 20,
-    color: '#207700',
     marginBottom: 2,
   },
   activitiesContainer: {
@@ -246,10 +230,8 @@ const styles = StyleSheet.create({
   },
   dotsContainer: {
     alignItems: 'center',
-    position: 'relative',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignContent: 'flex-start',
     width: 50,
   },
   dotsButton: {
@@ -259,7 +241,6 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontFamily: 'Poppins_400Regular',
-    fontWeight: '400',
     fontSize: 12,
     lineHeight: 20,
     color: 'rgba(2, 2, 2, 0.5)',
@@ -274,7 +255,6 @@ const styles = StyleSheet.create({
   },
   entryContent: {
     fontFamily: 'Poppins_400Regular',
-    fontWeight: '400',
     fontSize: 10,
     lineHeight: 14,
     color: '#2B2B2B',
