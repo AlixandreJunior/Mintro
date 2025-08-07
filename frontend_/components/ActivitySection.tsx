@@ -1,15 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { ActivityGrid } from '@/components/ActivityGrid';
-import { getActivities } from '@/services/diary/listActivities';
-import { Activity } from '@/types/mental/diary';
+
+interface Activity {
+  id: string;
+  name: string;
+}
 
 interface ActivitiesSectionProps {
   title: string;
-  selected: number[] | number | null;
-  setSelected: (value: number[] | number) => void;
+  selected: string[] | string | null;
+  setSelected: (value: string[] | string) => void;
   multiple?: boolean;
 }
+
+// Atividades fixas (não depende mais do backend)
+const STATIC_ACTIVITIES: Activity[] = [
+  { id: '1', name: 'Família' },
+  { id: '2', name: 'Amigos' },
+  { id: '3', name: 'Encontro' },
+  { id: '4', name: 'Atividade Física' },
+  { id: '5', name: 'Esporte' },
+  { id: '6', name: 'Dormir Cedo' },
+  { id: '7', name: 'Alimentação Saudável' },
+  { id: '8', name: 'Descanso' },
+  { id: '9', name: 'Filmes' },
+  { id: '10', name: 'Ler' },
+  { id: '11', name: 'Jogos' },
+  { id: '12', name: 'Compras' },
+  { id: '13', name: 'Trabalho' },
+];
 
 export const ActivitiesSection = ({
   title,
@@ -17,42 +37,18 @@ export const ActivitiesSection = ({
   setSelected,
   multiple = false,
 }: ActivitiesSectionProps) => {
-  const [loading, setLoading] = useState<boolean>();
-  const [error, setError] = useState<any>();
-  const [activities, setActivities] = useState<Activity[]>([]);
-
-  useEffect(() => {
-    const fetchActivitiesData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getActivities();
-        setActivities(data);
-      } catch (err: any) {
-        setError(err.message || 'Falha ao carregar atividades.');
-        console.error('Erro ao buscar atividades:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchActivitiesData();
-  }, []);
-
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : error ? (
-        <Text style={styles.errorText}>
-          Erro ao carregar atividades: {error}
-        </Text>
-      ) : activities.length === 0 ? (
+      {STATIC_ACTIVITIES.length === 0 ? (
         <Text>Nenhuma atividade encontrada.</Text>
       ) : (
         <View style={styles.activityGrid}>
           <ActivityGrid
+            activities={STATIC_ACTIVITIES}
+            //@ts-ignore
             selected={selected}
+            //@ts-ignore
             setSelected={setSelected}
             multiple={multiple}
           />
@@ -64,10 +60,7 @@ export const ActivitiesSection = ({
 
 const styles = StyleSheet.create({
   section: {
-    paddingHorizontal: 12,
     marginTop: 10,
-    width: '90%',
-    alignSelf: 'center',
   },
   sectionTitle: {
     fontSize: 14,
@@ -75,10 +68,6 @@ const styles = StyleSheet.create({
     color: '#4B5563',
     marginBottom: 15,
     textAlign: 'left',
-  },
-  errorText: {
-    color: 'red',
-    marginTop: 10,
   },
   activityGrid: {
     flexDirection: 'row',

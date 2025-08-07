@@ -1,18 +1,11 @@
-import { Dimensions, StyleSheet, Text, View } from "react-native";
-import ObjectiveDisplayCard from "./Cards/ObjectiveCard";
-import { getActivityIconName } from "@/utils/activityIconMapper";
-import { ActivityIndicator } from "react-native-paper";
-import { useObjective } from "@/hooks/useObjective";
-import { router } from "expo-router";
-
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import ObjectiveDisplayCard from './Cards/ObjectiveCard';
+import { ActivityIndicator } from 'react-native-paper';
+import { useObjective } from '@/hooks/useObjective';
+import { router } from 'expo-router';
 
 export const ObjectiveSection = () => {
-  const { objectives, loading, error } = useObjective(); // use o hook
-
-  const formatDeadline = (deadlineString: string) => {
-    const date = new Date(deadlineString);
-    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  };
+  const { objectives, loading, error } = useObjective();
 
   return (
     <>
@@ -24,7 +17,9 @@ export const ObjectiveSection = () => {
       ) : error ? (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Objetivos</Text>
-          <Text style={styles.errorText}>Erro ao carregar objetivos: {error}</Text>
+          <Text style={styles.errorText}>
+            Erro ao carregar objetivos: {error}
+          </Text>
         </View>
       ) : (
         objectives.length > 0 && (
@@ -34,12 +29,13 @@ export const ObjectiveSection = () => {
               <ObjectiveDisplayCard
                 key={objective.id}
                 objectiveTitle={objective.activity.name}
-                objectiveSubtitle={new Date(objective.created_at).toLocaleDateString('pt-BR', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric',
-                  })
-                }
+                objectiveSubtitle={new Date(
+                  objective.created_at
+                ).toLocaleDateString('pt-BR', {
+                  day: '2-digit',
+                  month: 'long',
+                  year: 'numeric',
+                })}
                 //@ts-ignore
                 onPress={() => router.push(`/objective/${objective.id}`)}
               />

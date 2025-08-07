@@ -14,39 +14,42 @@ import { DumbbellIcon } from '@/components/Icons/DumbellIcon';
 import GameIcon from '@/components/Icons/GameIcon';
 import MoonIcon from '@/components/Icons/MoonIcon';
 
-
-export function getActivityIconName(activityName: string, iconSize?: number): React.ReactNode { // Tipo de retorno é React.ReactNode
-  const lowerCaseName = activityName?.toLowerCase() || "";
+export function getActivityIconName(
+  activityName: string,
+  iconSize?: number
+): React.ReactNode {
+  // Tipo de retorno é React.ReactNode
+  const lowerCaseName = activityName?.toLowerCase() || '';
   const size = iconSize; // Tamanho padrão para os ícones, ajuste conforme necessário
-  const iconColor = "#000"; // Cor padrão para os ícones, ajuste conforme necessário
+  const iconColor = '#000'; // Cor padrão para os ícones, ajuste conforme necessário
 
   switch (lowerCaseName) {
-    case "família":
+    case 'família':
       return <FamilyIcon size={size} color={iconColor} />;
-    case "amigos":
+    case 'amigos':
       return <FriendIcon size={size} color={iconColor} />;
-    case "encontro":
+    case 'encontro':
       return <LoveIcon size={size} color={iconColor} />;
-    case "atividade física":
+    case 'atividade física':
       return <DumbbellIcon size={size} color={iconColor} />;
-    case "esporte":
+    case 'esporte':
       return <SportIcon size={size} color={iconColor} />;
-    case "dormir cedo":
+    case 'dormir cedo':
       return <MoonIcon size={size} color={iconColor} />;
-    case "alimentação saudável":
+    case 'alimentação saudável':
       return <AppleIcon size={size} color={iconColor} />;
-    case "descanso": // Se descanso tiver um ícone diferente de dormir cedo
+    case 'descanso': // Se descanso tiver um ícone diferente de dormir cedo
       return <SleepIcon size={size} color={iconColor} />; // Ou um novo icon para Descanso
-    case "filmes":
+    case 'filmes':
       return <MovieIcon size={size} color={iconColor} />;
-    case "ler":
+    case 'ler':
       return <NotebookIcon size={size} color={iconColor} />;
-    case "jogos":
+    case 'jogos':
       return <GameIcon size={size} color={iconColor} />;
-    case "compras":
+    case 'compras':
       return <CartIcon size={size} color={iconColor} />;
-    case "trabalho":
-      return <JobIcon size={size} color={iconColor} />;
+    case 'trabalho':
+      return <JobIcon size={size} />;
     default:
       return <SmileIcon size={size} color={iconColor} />; // Ícone padrão
   }

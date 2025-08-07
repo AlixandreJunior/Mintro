@@ -39,24 +39,23 @@ export const PeriodsSection: React.FC<PeriodsSectionProps> = ({
 
 const styles = StyleSheet.create({
   section: {
-    paddingHorizontal: 16,
     marginTop: 8,
   },
   sectionTitle: {
     fontSize: 16,
-    fontFamily: "Poppins_400Regular",
-    color: "#111827",
+    fontFamily: 'Poppins_400Regular',
+    color: '#111827',
     marginBottom: 16,
   },
   periodCard: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     borderRadius: 12,
     gap: 2,
     elevation: 2,
   },
   periodOption: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 16,
     paddingHorizontal: 8,
     borderColor: '#E5E7EB',
@@ -68,25 +67,25 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: "#E0E0E0",
-    justifyContent: "center",
-    alignItems: "center",
+    borderColor: '#E0E0E0',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 12,
   },
   radioButtonSelected: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#4CAF50",
+    backgroundColor: '#4CAF50',
   },
   periodLabel: {
     fontSize: 14,
-    fontFamily: "Poppins_400Regular",
-    color: "#000",
+    fontFamily: 'Poppins_400Regular',
+    color: '#000',
   },
   periodSeparator: {
     height: 1,
-    backgroundColor: "#F0F0F0",
+    backgroundColor: '#F0F0F0',
     marginHorizontal: -16,
   },
 });

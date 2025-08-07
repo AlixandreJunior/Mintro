@@ -1,29 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  Dimensions,
   Pressable,
+  Dimensions,
 } from 'react-native';
 import { MoodType } from '@/types/mental/diary';
 import { getActivityIconName } from '@/utils/activityIconMapper';
 import { router } from 'expo-router';
-import { deleteDiary } from '@/services/diary/deleteDiary';
-import { useDiary } from '@/hooks/useDiary';
 import { useDiaryForm } from '@/hooks/forms/useDiaryForm';
+import VerticalDotsIcon from '../Icons/VerticalDotsIcon';
+import DiaryModal from '../Modal/DiaryModal';
+import BaseCard from './BaseCard';
 
-// Ícone simples dots vertical com 3 círculos
-const VerticalDotsIcon = () => (
-  <View style={styles.dotsIconContainer}>
-    <View style={styles.dot} />
-    <View style={styles.dot} />
-    <View style={styles.dot} />
-  </View>
-);
+const screen = Dimensions.get('window');
 
 interface TransformedActivity {
   name: string;
@@ -51,83 +44,138 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
   photoUrl,
 }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [menuPos, setMenuPos] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const dotsButtonRef = useRef<any>(null);
   const { handleDelete } = useDiaryForm();
-  const handleOutsidePress = () => setDropdownVisible(false);
+
+  const openDropdown = () => {
+    if (
+      dotsButtonRef.current &&
+      typeof dotsButtonRef.current.measureInWindow === 'function'
+    ) {
+      dotsButtonRef.current.measureInWindow(
+        (x: number, y: number, width: number, height: number) => {
+          setMenuPos({ x, y, width, height });
+          setDropdownVisible(true);
+        }
+      );
+    } else {
+      setMenuPos({ x: screen.width - 160, y: 120, width: 40, height: 24 });
+      setDropdownVisible(true);
+    }
+  };
+
+  const closeDropdown = () => setDropdownVisible(false);
 
   const onEdit = () => {
-    //@ts-ignore
+    // @ts-ignore
     router.push(`/diary/${id}`);
-    setDropdownVisible(false);
-    console.log('Editar diário');
+    closeDropdown();
   };
 
   const onDelete = async () => {
     await handleDelete(id);
-    setDropdownVisible(false);
-    console.log('deletar diário');
+    closeDropdown();
   };
 
-  return (
-    <Pressable onPress={handleOutsidePress}>
-      <View style={styles.timelineRow}>
-        <View style={styles.timelineIconContainer}>{iconSource}</View>
+  const menuWidth = 160;
+  const menuMarginTop = 6;
+  let menuLeft = menuPos.x + menuPos.width - menuWidth;
+  if (menuLeft < 8) menuLeft = 8;
+  if (menuLeft + menuWidth > screen.width - 8)
+    menuLeft = screen.width - menuWidth - 8;
 
-        <View style={styles.entryCard}>
-          <View style={styles.entryHeader}>
-            <View style={styles.entryInfo}>
-              <Text style={styles.moodText}>{mood}</Text>
-              <View style={styles.activitiesContainer}>
-                {activities.map((activity, index) => (
-                  <View key={index} style={styles.activityChip}>
-                    {getActivityIconName(activity.name, 12)}
-                    <Text style={styles.activityChipText}>{activity.name}</Text>
+  const availableBelow = screen.height - (menuPos.y + menuPos.height);
+  const menuTopCandidate = menuPos.y + menuPos.height + menuMarginTop;
+  const menuHeightEstimate = 88;
+  const menuTop =
+    availableBelow >= menuHeightEstimate
+      ? menuTopCandidate
+      : Math.max(8, menuPos.y - menuHeightEstimate - menuMarginTop);
+
+  return (
+    <>
+      <Pressable onPress={closeDropdown}>
+        <View style={styles.timelineRow}>
+          <View style={styles.timelineIconContainer}>{iconSource}</View>
+
+          <BaseCard style={{ marginLeft: 49, maxWidth: screen.width - 65 }}>
+            <View style={styles.entryHeader}>
+              <View style={styles.entryInfo}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Text style={[styles.moodText, { color: '#207700' }]}>
+                    {mood}
+                  </Text>
+
+                  <View style={styles.dotsContainer}>
+                    <Text style={styles.timeText}>{time}</Text>
+
+                    <TouchableOpacity
+                      ref={(ref) => {
+                        dotsButtonRef.current = ref;
+                      }}
+                      onPress={(e) => {
+                        e.stopPropagation?.();
+                        openDropdown();
+                      }}
+                      activeOpacity={0.7}
+                      style={styles.dotsButton}
+                    >
+                      <VerticalDotsIcon size={15} />
+                    </TouchableOpacity>
                   </View>
-                ))}
+                </View>
+
+                <View style={styles.activitiesContainer}>
+                  {activities.map((activity, index) => (
+                    <View
+                      key={index}
+                      style={[styles.activityChip, { maxWidth: '45%' }]}
+                    >
+                      {getActivityIconName(activity.name, 10)}
+                      <Text style={styles.activityChipText}>
+                        {activity.name}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
               </View>
             </View>
 
-            <View style={styles.dotsContainer}>
-              <TouchableOpacity
-                onPress={() => setDropdownVisible(!dropdownVisible)}
-                activeOpacity={0.7}
-                style={styles.dotsButton}
-              >
-                <VerticalDotsIcon />
-              </TouchableOpacity>
+            <Text
+              style={styles.entryTitle}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {title}
+            </Text>
+            <Text style={styles.entryContent}>{content}</Text>
 
-              <Text style={styles.timeText}>{time}</Text>
-
-              {dropdownVisible && (
-                <View style={styles.dropdownMenu}>
-                  <TouchableOpacity
-                    onPress={onEdit}
-                    style={styles.dropdownItem}
-                  >
-                    <Text style={styles.dropdownText}>Editar</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    onPress={onDelete}
-                    style={[styles.dropdownItem]}
-                  >
-                    <Text style={[styles.dropdownText, { color: 'red' }]}>
-                      Excluir
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          </View>
-
-          <Text style={styles.entryTitle}>{title}</Text>
-          <Text style={styles.entryContent}>{content}</Text>
-
-          {photoUrl && (
-            <Image source={{ uri: photoUrl }} style={styles.diaryPhoto} />
-          )}
+            {photoUrl && (
+              <Image
+                source={{ uri: photoUrl }}
+                style={[styles.diaryPhoto, { maxHeight: screen.width * 0.5 }]}
+              />
+            )}
+          </BaseCard>
         </View>
-      </View>
-    </Pressable>
+      </Pressable>
+
+      <DiaryModal
+        visible={dropdownVisible}
+        top={menuTop}
+        left={menuLeft}
+        width={menuWidth}
+        onClose={closeDropdown}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    </>
   );
 };
 
@@ -135,7 +183,7 @@ const styles = StyleSheet.create({
   timelineRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 20,
+    marginBottom: 16,
     position: 'relative',
   },
   timelineIconContainer: {
@@ -148,18 +196,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 2,
   },
-  entryCard: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    marginLeft: 40,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
   entryHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -169,93 +205,65 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   moodText: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 2,
   },
   activitiesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: 5,
+    marginTop: 4,
   },
   activityChip: {
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 15,
-    paddingVertical: 5,
-    paddingHorizontal: 4,
-    marginBottom: 6,
+    marginBottom: 1,
     marginRight: 6,
   },
   activityChipText: {
-    fontSize: 12,
-    color: '#6B7280',
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 10,
+    color: '#2B2B2B',
     marginLeft: 4,
   },
   dotsContainer: {
     alignItems: 'center',
-    position: 'relative',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: 50,
   },
   dotsButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  dotsIconContainer: {
-    width: 4,
-    justifyContent: 'space-between',
-    height: 20,
-  },
-  dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#6B7280',
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    transform: [{ rotate: '90deg' }],
   },
   timeText: {
+    fontFamily: 'Poppins_400Regular',
     fontSize: 12,
-    color: '#6B7280',
-    marginTop: 4,
-  },
-  dropdownMenu: {
-    position: 'absolute',
-    top: 28,
-    right: 0,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 999,
-    minWidth: 100,
-    zIndex: 1000,
-  },
-  dropdownItem: {
-    paddingVertical: 8,
-  },
-  dropdownText: {
-    fontSize: 16,
-    color: '#111827',
+    lineHeight: 20,
+    color: 'rgba(2, 2, 2, 0.5)',
   },
   entryTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#374151',
+    fontFamily: 'Poppins_500Medium',
+    fontSize: 12,
+    lineHeight: 16,
+    color: '#2B2B2B',
     marginBottom: 4,
-    marginTop: 12,
+    marginTop: 8,
   },
   entryContent: {
-    fontSize: 14,
-    color: '#6B7280',
-    lineHeight: 20,
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 10,
+    lineHeight: 14,
+    color: '#2B2B2B',
   },
   diaryPhoto: {
     width: '100%',
     aspectRatio: 16 / 9,
     borderRadius: 8,
-    marginTop: 15,
+    marginTop: 12,
     resizeMode: 'contain',
   },
 });

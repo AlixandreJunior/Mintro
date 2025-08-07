@@ -9,7 +9,7 @@ urlpatterns = [
         "diary/detail/<int:id>/", diary.DiaryObjectView.as_view(), name="diary_object"
     ),
     path(
-        "diary/detail/<int:id>/delete",
+        "diary/detail/<int:id>/delete/",
         diary.DiaryDeleteView.as_view(),
         name="diary_delete",
     ),
