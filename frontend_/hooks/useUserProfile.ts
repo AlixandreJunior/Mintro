@@ -1,9 +1,10 @@
-// hooks/useUserProfile.ts
 import { useState, useEffect } from 'react';
 import { getUser } from '@/services/user/getUser';
 import { getGoals } from '@/services/goals/getGoals';
+import { logout } from '@/services/auth/logout'; // importe a função de logout
 import { User } from '@/types/user/user';
 import { Goal } from '@/types/user/goal';
+import { router } from 'expo-router';
 
 export function useUserProfile() {
   const [user, setUser] = useState<User | null>(null);
@@ -12,6 +13,8 @@ export function useUserProfile() {
   const [loadingGoals, setLoadingGoals] = useState(true);
   const [errorUser, setErrorUser] = useState<string | null>(null);
   const [errorGoals, setErrorGoals] = useState<string | null>(null);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [logoutSuccess, setLogoutSuccess] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -46,6 +49,21 @@ export function useUserProfile() {
     fetchGoals();
   }, []);
 
+  const handleLogout = async () => {
+    setLogoutError(null);
+    setLogoutSuccess(false);
+    try {
+      await logout();
+      setLogoutSuccess(true);
+      setUser(null);
+      setGoals(null);
+      router.push('/auth/login')
+    } catch (err: any) {
+      setLogoutError(err.message || 'Erro ao fazer logout.');
+      console.error('Erro no logout:', err);
+    }
+  };
+
   return {
     user,
     goals,
@@ -53,5 +71,8 @@ export function useUserProfile() {
     loadingGoals,
     errorUser,
     errorGoals,
+    handleLogout,
+    logoutError,
+    logoutSuccess,
   };
 }

@@ -12,12 +12,15 @@ interface UserInfoSectionProps {
   displayName: string;
   avatarChar: string;
   joinYear: number | string;
+  onLogout: () => void; 
 }
+
 
 export const UserInfoSection: React.FC<UserInfoSectionProps> = ({
   avatarChar,
   displayName,
   joinYear,
+  onLogout
 }) => {
   return (
     <View style={styles.cardContainer}>
@@ -31,7 +34,7 @@ export const UserInfoSection: React.FC<UserInfoSectionProps> = ({
             <Text style={styles.avatarText}>{avatarChar}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.editProfileButton}>
+        <TouchableOpacity style={styles.editProfileButton} onPress={onLogout}>
           <Text style={styles.editProfileText}>Sair da Conta</Text>
         </TouchableOpacity>
       </View>
