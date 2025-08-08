@@ -2,7 +2,7 @@ import api from '../api';
 
 export const deleteObjective = async (id: number) => {
   try {
-    const response = await api.delete(`progress/objective/detail/${id}/delete/`);
+    const response = await api.delete(`diary/objective/detail/${id}/delete/`);
 
     return 'Objetivo deletado com sucesso.';
   } catch (error: any) {

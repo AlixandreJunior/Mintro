@@ -3,7 +3,7 @@ import { Diary } from '@/types/mental/diary';
 
 export const deleteDiary = async (id: number) => {
   try {
-    const response = await api.delete(`mental/diary/detail/${id}/delete/`);
+    const response = await api.delete(`diary/diary/detail/${id}/delete/`);
 
     return 'Diario deletado com sucesso.';
   } catch (error: any) {

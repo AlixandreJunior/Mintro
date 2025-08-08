@@ -2,7 +2,7 @@ import api from '../api';
 
 export const getObjective = async (id: number) => {
   try {
-    const response = await api.get(`progress/objective/detail/${id}/`);
+    const response = await api.get(`diary/objective/detail/${id}/`);
 
     const data = response.data;
     return data;

@@ -1,15 +1,14 @@
-import { User } from "@/types/user/user";
-import api from "../api";
-import { createAccountResponse } from "./createAccount";
+import { User } from '@/types/user/user';
+import api from '../api';
 
 export const updateUser = async (data: Partial<User>) => {
   try {
-    const response = await api.patch<createAccountResponse>("user/update/", data);
+    const response = await api.patch('user/update/', data);
     return response.data;
   } catch (error: any) {
     if (error.response?.data?.detail) {
       throw new Error(error.response.data.detail);
     }
-    throw new Error("Erro ao tentar atualizar usuário.");
+    throw new Error('Erro ao tentar atualizar usuário.');
   }
 };

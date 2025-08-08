@@ -1,0 +1,22 @@
+from apps.health.models.mindfulness import Mindfulness, MindfulnessLog
+from rest_framework import serializers
+
+
+class MindfulnessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mindfulness
+        fields = ["id", "name", "type"]
+
+
+class MindfulnessLogReadSerializer(serializers.ModelSerializer):
+    mindfulness = MindfulnessSerializer()
+
+    class Meta:
+        model = MindfulnessLog
+        fields = ["id", "user", "mindfulness", "duration", "description", "datetime"]
+
+
+class MindfulnessLogWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MindfulnessLog
+        fields = ["mindfulness", "duration", "datetime"]

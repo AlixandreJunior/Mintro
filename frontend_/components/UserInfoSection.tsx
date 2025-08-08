@@ -1,4 +1,10 @@
-import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -11,7 +17,7 @@ interface UserInfoSectionProps {
 export const UserInfoSection: React.FC<UserInfoSectionProps> = ({
   avatarChar,
   displayName,
-  joinYear
+  joinYear,
 }) => {
   return (
     <View style={styles.cardContainer}>
@@ -26,7 +32,7 @@ export const UserInfoSection: React.FC<UserInfoSectionProps> = ({
           </View>
         </View>
         <TouchableOpacity style={styles.editProfileButton}>
-          <Text style={styles.editProfileText}>Editar perfil</Text>
+          <Text style={styles.editProfileText}>Sair da Conta</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -90,6 +96,6 @@ const styles = StyleSheet.create({
   editProfileText: {
     fontSize: width * 0.038,
     fontFamily: 'Poppins_400Regular',
-    color: '#1FB6FF',
-  }
+    color: '#ff1f1fff',
+  },
 });
