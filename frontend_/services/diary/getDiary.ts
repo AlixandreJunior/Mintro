@@ -1,18 +1,17 @@
-import api from "../api"
-import { Diary } from "@/types/mental/diary";
+import api from '../api';
+import { Diary } from '@/types/mental/diary';
 
-export const getDiary = async ( id: number) => {
-    try {
-    const response = await api.get<Diary>(`mental/diary/detail/${id}`)
-    
-    const data = response.data
-    return data
+export const getDiary = async (id: number) => {
+  try {
+    const response = await api.get<Diary>(`diary/diary/detail/${id}`);
 
-    } catch(error: any) {
-      if (error.response?.data?.detail) {
-      throw new Error(error.response.data.detail); 
+    const data = response.data;
+    return data;
+  } catch (error: any) {
+    if (error.response?.data?.detail) {
+      throw new Error(error.response.data.detail);
     }
 
-    throw new Error("Erro ao tentar buscar diario");
-    }
+    throw new Error('Erro ao tentar buscar diario');
   }
+};

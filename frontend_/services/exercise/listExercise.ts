@@ -1,18 +1,17 @@
-import { Exercise } from "@/types/health/exercise";
-import api from "../api"
+import { Exercise } from '@/types/health/exercise';
+import api from '../api';
 
 export const getExerciseList = async () => {
-    try {
-    const response = await api.get<Exercise[]>("physical/exercise/")
-    
-    const data = response.data
-    return data
+  try {
+    const response = await api.get<Exercise[]>('health/exercise/');
 
-    } catch(error: any) {
-      if (error.response?.data?.detail) {
-      throw new Error(error.response.data.detail); 
+    const data = response.data;
+    return data;
+  } catch (error: any) {
+    if (error.response?.data?.detail) {
+      throw new Error(error.response.data.detail);
     }
 
-    throw new Error("Erro ao tentar buscar diario");
-    }
+    throw new Error('Erro ao tentar buscar diario');
   }
+};

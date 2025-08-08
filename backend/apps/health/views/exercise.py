@@ -1,0 +1,71 @@
+from apps.health.models.exercise import Exercise, ExerciseLog
+from apps.health.serializers.exercise import (
+    ExerciseLogReadSerializer,
+    ExerciseLogWriteSerializer,
+    ExerciseSerializer,
+)
+from django.utils.dateparse import parse_date
+from rest_framework import status
+from rest_framework.exceptions import NotFound
+from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+
+class ExerciseListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ExerciseSerializer
+
+    def get_queryset(self):
+        queryset = Exercise.objects.all()
+        type = self.request.GET.get("type")
+
+        if type:
+            queryset = queryset.filter(type=type)
+
+        if not queryset:
+            raise NotFound("Exercícios não encontrados.")
+        return queryset
+
+
+class ExerciseLogView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ExerciseLogReadSerializer
+
+    def get_queryset(self):
+        queryset = ExerciseLog.objects.filter(user=self.request.user)
+        start_date = self.request.GET.get("start_date")
+        end_date = self.request.GET.get("end_date")
+
+        if start_date:
+            start_date_parsed = parse_date(start_date)
+        if start_date_parsed:
+            queryset = queryset.filter(datetime__date__gte=start_date_parsed)
+
+        if end_date:
+            end_date_parsed = parse_date(end_date)
+            if end_date_parsed:
+                queryset = queryset.filter(datetime__date__lte=end_date_parsed)
+
+        if not queryset:
+            raise NotFound("Registros de Exercícios não encontrados.")
+        return queryset
+
+
+class ExerciseLogRegisterView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ExerciseLogWriteSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            {"detail": "Registro de exercícios registrado com sucesso."},
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )

@@ -8,24 +8,17 @@ import {
   GestureResponderEvent,
 } from 'react-native';
 
-interface GenericModalProps {
+interface BaseModalProps {
   visible: boolean;
   top: number;
   left: number;
   width?: number;
   onClose: (e?: GestureResponderEvent) => void;
   children: React.ReactNode;
-  /**
-   * If true, the overlay will be semi-opaque. Default: false (transparent)
-   */
   overlayDim?: boolean;
 }
 
-/**
- * Modal posicionado na tela (usando coordenadas de tela).
- * Fecha ao tocar fora (overlay).
- */
-const GenericModal: React.FC<GenericModalProps> = ({
+const BaseModal: React.FC<BaseModalProps> = ({
   visible,
   top,
   left,
@@ -86,4 +79,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GenericModal;
+export default BaseModal;

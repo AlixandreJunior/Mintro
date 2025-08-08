@@ -1,8 +1,5 @@
-from apps.progress.models import Achievement, AchievementLog, UserProgress
-from apps.user.models import User
-from apps.physical_health.models import ExerciseLog, PhysicalCheckin
-from apps.mental_health.models import MindfulnessLog, MentalCheckin
-from django.utils.timezone import now, timedelta
+from apps.progress.models import Achievement, AchievementLog
+
 
 class CheckAchievements:
     CONDITION_HANDLERS = {}
@@ -17,7 +14,9 @@ class CheckAchievements:
 
         try:
             for achievement in Achievement.objects.all():
-                if AchievementLog.objects.filter(user=user, achievement=achievement).exists():
+                if AchievementLog.objects.filter(
+                    user=user, achievement=achievement
+                ).exists():
                     continue  # Já desbloqueada
 
                 condition = achievement.condition
@@ -37,16 +36,13 @@ class CheckAchievements:
 # Handlers para conquistas de Check-in
 # ----------------------------------------
 
-class CheckAchievementsProgress(CheckAchievements):
-    ...
+
+class CheckAchievementsProgress(CheckAchievements): ...
 
 
-CheckAchievements.register_handlers({
-    
-})
+CheckAchievements.register_handlers({})
 
 
 # ----------------------------------------
 # Handlers para conquistas de Progress
 # ----------------------------------------
-

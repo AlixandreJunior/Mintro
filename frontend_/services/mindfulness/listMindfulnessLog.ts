@@ -34,7 +34,7 @@ export const getMindfulnessList = async (
     }
 
     const response = await api.get<MindfulnessLog[]>(
-      'mental/mindfulness/log/',
+      'health/mindfulness/log/',
       {
         params: {
           start_date: startDate,
