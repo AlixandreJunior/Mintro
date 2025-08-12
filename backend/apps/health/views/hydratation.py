@@ -6,6 +6,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from utils.check_achievement import check_gole_a_gole
 
 
 class HydratationLogListView(ListAPIView):
@@ -41,8 +42,13 @@ class HydratationLogRegisterView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+        unlocked_achievements = check_gole_a_gole(request.user)
+
         return Response(
-            {"detail": "Registro de Hidratação registrado com sucesso."},
+            {
+                "detail": "Registro de Hidratação registrado com sucesso.",
+                "unlocked_achievements": unlocked_achievements,
+            },
             status=status.HTTP_201_CREATED,
             headers=headers,
         )

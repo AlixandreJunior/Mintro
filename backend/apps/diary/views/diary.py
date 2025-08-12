@@ -15,6 +15,7 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from utils.check_achievement import check_narrador_da_propria_historia
 
 
 class ActivitiesListView(ListAPIView):
@@ -109,19 +110,23 @@ class DiaryCreateView(CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        print(self.request.data)
 
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
+
+            unlocked_achievements = check_narrador_da_propria_historia(request.user)
+
             return Response(
-                {"detail": "Diário criado com sucesso."}, status=status.HTTP_201_CREATED
+                {
+                    "detail": "Diário criado com sucesso.",
+                    "unlocked_achievements": unlocked_achievements,
+                },
+                status=status.HTTP_201_CREATED,
             )
         except ValidationError as e:
-            print("Erro de validação no diário:", e.detail)  # Loga o erro no terminal
             return Response({"detail": e.detail}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            print("Erro inesperado ao criar diário:", str(e))  # Outro erro genérico
+        except Exception:
             return Response(
                 {"detail": "Erro interno no servidor."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,

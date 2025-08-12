@@ -10,6 +10,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from utils.check_achievement import check_zen_total
 
 
 class MindfulnessListView(ListAPIView):
@@ -64,8 +65,13 @@ class MindfulnessLogRegisterView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+        unlocked_achievements = check_zen_total(request.user)
+
         return Response(
-            {"detail": "Registro de Mindfulness criado com sucesso."},
+            {
+                "detail": "Registro de Mindfulness criado com sucesso.",
+                "unlocked_achievements": unlocked_achievements,
+            },
             status=status.HTTP_201_CREATED,
             headers=headers,
         )
