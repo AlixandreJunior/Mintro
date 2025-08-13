@@ -38,6 +38,9 @@ class ExerciseLogView(ListAPIView):
         start_date = self.request.GET.get("start_date")
         end_date = self.request.GET.get("end_date")
 
+        start_date_parsed = None
+        end_date_parsed = None
+
         if start_date:
             start_date_parsed = parse_date(start_date)
         if start_date_parsed:
@@ -45,8 +48,8 @@ class ExerciseLogView(ListAPIView):
 
         if end_date:
             end_date_parsed = parse_date(end_date)
-            if end_date_parsed:
-                queryset = queryset.filter(datetime__date__lte=end_date_parsed)
+        if end_date_parsed:
+            queryset = queryset.filter(datetime__date__lte=end_date_parsed)
 
         if not queryset:
             raise NotFound("Registros de Exercícios não encontrados.")

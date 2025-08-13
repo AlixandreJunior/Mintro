@@ -28,7 +28,6 @@ class Objective(models.Model):
         choices=RepeatChoices.choices,
         default=RepeatChoices.ONE_TIME,
     )
-    reminder = models.TimeField(blank=True, null=True)
     best_streak = models.PositiveIntegerField(
         default=0,
         blank=True,

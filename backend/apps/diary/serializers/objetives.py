@@ -25,7 +25,6 @@ class ObjectiveReadSerializer(serializers.ModelSerializer):
             "activity",
             "period",
             "repeat",
-            "reminder",
             "created_at",
             "week_count",
             "days_with",
@@ -156,7 +155,6 @@ class ObjectiveWriteSerializer(serializers.ModelSerializer):
             "activity",
             "period",
             "repeat",
-            "reminder",
             "created_at",
         ]
         read_only_fields = ["created_at"]

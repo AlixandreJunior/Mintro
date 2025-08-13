@@ -1,4 +1,4 @@
-from apps.user.models import User
+from apps.user.models.user import User
 from django.db import models
 from django.dispatch import receiver
 
@@ -114,3 +114,17 @@ def create_initial_achievements(sender, **kwargs):
                 level=level,
                 defaults={"description": desc, "condition": condition},
             )
+
+
+@receiver(models.signals.post_save, sender=User)
+def grant_welcome_achievement(sender, instance, created, **kwargs):
+    if created:
+        try:
+            achievement = Achievement.objects.get(name="Bem-vindo ao Mintro")
+            level = achievement.levels.get(level=1)
+            if not AchievementLog.objects.filter(
+                user=instance, achievement_level=level
+            ).exists():
+                AchievementLog.objects.create(user=instance, achievement_level=level)
+        except Achievement.DoesNotExist:
+            pass

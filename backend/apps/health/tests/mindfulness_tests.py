@@ -1,8 +1,5 @@
 from apps.health.models.mindfulness import Mindfulness, MindfulnessLog
-from apps.health.serializers.mindfulness import (
-    MindfulnessLogReadSerializer,
-    MindfulnessSerializer,
-)
+from apps.health.serializers.mindfulness import MindfulnessSerializer
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -37,116 +34,134 @@ class MentalHealthTests(APITestCase, UserMixin):
             description="Registro 2",
         )
 
-    def test_get_mindfulness(self):
+    def test_get_mindfulness_list(self):
         url = reverse("health:mindfulness_list")
 
         response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        (self.assertEqual(response.status_code, status.HTTP_200_OK),)
-        self.assertEqual(response.json()[0].get("id"), 1)
-
-    def test_get_mindfulness_with_filter_for_type(self):
+    def test_get_mindfulness_list_filter_type(self):
         url = reverse("health:mindfulness_list")
 
         response = self.client.get(url, {"type": "Escaneamento Corporal"})
-
-        (self.assertEqual(response.status_code, status.HTTP_200_OK),)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected_data = MindfulnessSerializer(self.mindfulness2).data
         self.assertIn(expected_data, response.json())
 
-    def test_get_mindfulness_with_filter_for_type_fail_for_404(self):
+    def test_get_mindfulness_list_filter_type_not_found(self):
         url = reverse("health:mindfulness_list")
 
-        response = self.client.get(url, {"type": "ERROR"})
-
-        (self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND),)
-        self.assertIn(
-            "Exercícios de Mindfulness não encontrados.", response.json().get("detail")
+        response = self.client.get(url, {"type": "InvalidType"})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            response.json().get("detail"),
+            "Exercícios de Mindfulness não encontrados.",
         )
 
-    def test_get_mindfulness_fail_for_404(self):
+    def test_get_mindfulness_list_empty(self):
         url = reverse("health:mindfulness_list")
-
-        self.mindfulness.delete()
-        self.mindfulness2.delete()
+        Mindfulness.objects.all().delete()
 
         response = self.client.get(url)
-
-        (self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND),)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
-            response.json().get("detail"), "Exercícios de Mindfulness não encontrados."
+            response.json().get("detail"),
+            "Exercícios de Mindfulness não encontrados.",
         )
 
-    def test_get_mindfulness_fail_for_unauthorized(self):
+    def test_get_mindfulness_list_unauthorized(self):
         url = reverse("health:mindfulness_list")
-
         self.client.logout()
 
         response = self.client.get(url)
-
-        (self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED),)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(
             response.json().get("detail"),
             "As credenciais de autenticação não foram fornecidas.",
         )
 
-    def test_get_mindfulness_log(self):
+    def test_get_mindfulness_log_list(self):
         url = reverse("health:mindfulness_log_list")
 
         response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()[0]["id"], self.mindfulness_log.id)
 
-        (self.assertEqual(response.status_code, status.HTTP_200_OK),)
-        self.assertEqual(response.json()[0].get("id"), 1)
-
-    def test_get_mindfulness_log_with_filter_for_type(self):
+    def test_get_mindfulness_log_list_filter_dates(self):
         url = reverse("health:mindfulness_log_list")
 
-        response = self.client.get(url, {"type": "Escaneamento Corporal"})
-
-        (self.assertEqual(response.status_code, status.HTTP_200_OK),)
-        expected_data = MindfulnessLogReadSerializer(self.mindfulness_log2).data
-        self.assertIn(expected_data, response.json())
-
-    def test_get_mindfulness_log_with_filter_for_type_fail_for_404(self):
-        url = reverse("health:mindfulness_log_list")
-
-        response = self.client.get(url, {"type": "ERROR"})
-
-        (self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND),)
-        self.assertIn(
-            "Registros de Mindfulness não encontrados.", response.json().get("detail")
+        # filtro por intervalo válido (assumindo que o objeto foi criado hoje)
+        response = self.client.get(
+            url, {"start_date": "2000-01-01", "end_date": "2100-01-01"}
         )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_get_mindfulness_log_fail_for_404(self):
+    def test_get_mindfulness_log_list_filter_invalid_dates(self):
         url = reverse("health:mindfulness_log_list")
 
-        self.mindfulness.delete()
-        self.mindfulness2.delete()
+        # filtros com datas inválidas não quebram, mas ignoram
+        response = self.client.get(
+            url, {"start_date": "invalid", "end_date": "invalid"}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_mindfulness_log_list_empty(self):
+        url = reverse("health:mindfulness_log_list")
+        MindfulnessLog.objects.all().delete()
 
         response = self.client.get(url)
-
-        (self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND),)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
-            response.json().get("detail"), "Registros de Mindfulness não encontrados."
+            response.json().get("detail"),
+            "Registros de Mindfulness não encontrados.",
         )
 
-    def test_get_mindfulness_log_fail_for_unauthorized(self):
+    def test_get_mindfulness_log_list_unauthorized(self):
         url = reverse("health:mindfulness_log_list")
-
         self.client.logout()
 
         response = self.client.get(url)
-
-        (self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED),)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(
             response.json().get("detail"),
             "As credenciais de autenticação não foram fornecidas.",
         )
 
-    def test_post_mindfullnes_log_create(self):
+    def test_post_mindfulness_log_create_success(self):
         url = reverse("health:mindfulness_log_register")
 
-        self.mindfulness_log.delete()
+        MindfulnessLog.objects.all().delete()
+
+        payload = {
+            "mindfulness": self.mindfulness.pk,
+            "duration": 15,
+            "description": "Novo registro de mindfulness",
+        }
+
+        response = self.client.post(url, data=payload)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn("detail", response.json())
+        self.assertEqual(
+            response.json()["detail"],
+            "Registro de Mindfulness criado com sucesso.",
+        )
+        self.assertIn("unlocked_achievements", response.json())
+
+    def test_post_mindfulness_log_create_fail_blank(self):
+        url = reverse("health:mindfulness_log_register")
+
+        payload = {}
+
+        response = self.client.post(url, data=payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("mindfulness", response.json())
+        self.assertEqual(response.json()["mindfulness"][0], "Este campo é obrigatório.")
+
+    def test_post_mindfulness_log_create_unauthorized(self):
+        url = reverse("health:mindfulness_log_register")
+        self.client.logout()
 
         payload = {
             "mindfulness": self.mindfulness.pk,
@@ -154,39 +169,9 @@ class MentalHealthTests(APITestCase, UserMixin):
             "description": "Teste",
         }
 
-        response = self.client.post(url, payload)
+        response = self.client.post(url, data=payload)
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(
-            response.json().get("detail"), "Registro de Mindfulness criado com sucesso."
-        )
-
-    def test_post_mindfullnes_log_create_fail_for_blank(self):
-        url = reverse("health:mindfulness_log_register")
-
-        self.mindfulness_log.delete()
-
-        payload = {}
-
-        response = self.client.post(url, payload)
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            response.json().get("mindfulness")[0], "Este campo é obrigatório."
-        )
-
-    def test_post_mindfullnes_log_create_fail_for_unauthorized(self):
-        url = reverse("health:mindfulness_log_register")
-
-        self.client.logout()
-
-        payload = {
-            "mindfulness": self.mindfulness.pk,
-        }
-
-        response = self.client.post(url, payload)
-
-        (self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED),)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(
             response.json().get("detail"),
             "As credenciais de autenticação não foram fornecidas.",

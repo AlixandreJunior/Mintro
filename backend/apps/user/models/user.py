@@ -1,8 +1,5 @@
-from apps.user.models.achievement import Achievement, AchievementLog
-from apps.user.models.goals import Goal
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-from django.dispatch import receiver
 
 
 class UsersManager(BaseUserManager):
@@ -37,23 +34,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
-
-@receiver(models.signals.post_save, sender=User)
-def create_object_goal_for_user(sender, instance, created, **kwargs):
-    if created:
-        Goal.objects.get_or_create(user=instance)
-
-
-@receiver(models.signals.post_save, sender=User)
-def grant_welcome_achievement(sender, instance, created, **kwargs):
-    if created:
-        try:
-            achievement = Achievement.objects.get(name="Bem-vindo ao Mintro")
-            level = achievement.levels.get(level=1)
-            if not AchievementLog.objects.filter(
-                user=instance, achievement_level=level
-            ).exists():
-                AchievementLog.objects.create(user=instance, achievement_level=level)
-        except Achievement.DoesNotExist:
-            pass
