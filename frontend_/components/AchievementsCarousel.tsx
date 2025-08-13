@@ -29,9 +29,6 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({ achievement
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Conquistas</Text>
-        <TouchableOpacity onPress={() => router.push('/achievements')}>
-          <Text style={styles.showAll}>Mostrar todas</Text>
-        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -131,3 +128,5 @@ const styles = StyleSheet.create({
     minHeight: width * 0.07,
   },
 });
+
+

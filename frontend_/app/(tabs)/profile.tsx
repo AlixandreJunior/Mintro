@@ -24,9 +24,11 @@ interface Achievement {
 }
 
 const MOCK_ACHIEVEMENTS: Achievement[] = [
-  { id: '1', iconName: 'leaf', label: 'Bem-vindo ao Mintro', starsAchieved: 3, totalStars: 3, isUnlocked: true, primaryColor: '#4CAF50' },
-  { id: '2', iconName: 'medal', label: 'Lenda do Mintro', starsAchieved: 1, totalStars: 3, isUnlocked: true, primaryColor: '#A0A0A0' },
-  { id: '3', iconName: 'fire', label: 'Persistente', starsAchieved: 0, totalStars: 3, isUnlocked: false, primaryColor: '#A0A0A0' },
+  { id: '1', iconName: 'leaf', label: 'Bem-vindo ao Mintro', starsAchieved: 3, totalStars: 3, isUnlocked: true, primaryColor: '#79D457' }, // Verde mais claro
+  { id: '4', iconName: 'dumbbell', label: 'Foco Total', starsAchieved: 0, totalStars: 3, isUnlocked: false, primaryColor: '#A0A0A0' },
+  { id: '5', iconName: 'water', label: 'Gota a Gole', starsAchieved: 0, totalStars: 3, isUnlocked: false, primaryColor: '#A0A0A0' },
+  { id: '7', iconName: 'meditation', label: 'Zen Total', starsAchieved: 0, totalStars: 3, isUnlocked: false, primaryColor: '#A0A0A0' },
+  { id: '8', iconName: 'book-open-page-variant', label: 'Narrador da própria história', starsAchieved: 0, totalStars: 3, isUnlocked: false, primaryColor: '#A0A0A0' },
 ];
 
 export default function ProfileScreen() {
@@ -42,7 +44,7 @@ export default function ProfileScreen() {
       <Header avatarChar={avatarChar} />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <UserInfoSection avatarChar={avatarChar} displayName={displayName} joinYear={joinYear} />
-        <StatsSection fetchedUser={user} userGoals={goals} loadingGoals={loadingGoals} loadingUser={loadingUser} errorGoals={errorGoals} errorUser={errorUser} />
+        <StatsSection fetchedUser={user} loadingUser={loadingUser} errorUser={errorUser} />
         <AchievementsCarousel achievements={MOCK_ACHIEVEMENTS}/>
       </ScrollView>
     </SafeAreaView>
