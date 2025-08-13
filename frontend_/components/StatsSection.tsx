@@ -10,11 +10,8 @@ import { router } from "expo-router";
 
 interface StatsSectionProps {
   fetchedUser: User | null;
-  userGoals: Goal | null;
   loadingUser: boolean;
-  loadingGoals: boolean;
   errorUser: string | null;
-  errorGoals: string | null;
 }
 
 const { width, height } = Dimensions.get('window');
@@ -25,22 +22,14 @@ const threeColumnCardWidth = (width - (screenContentPaddingHorizontal * 2) - (ca
 
 export const StatsSection: React.FC<StatsSectionProps> = ({
   fetchedUser,
-  userGoals,
-  loadingGoals,
   loadingUser,
   errorUser,
-  errorGoals
+
 }) => {
   const statistics = fetchedUser ? [
     { icon: <NotebookIcon size={14} />, value: fetchedUser.diarys_registers, label: 'Diários registrados' },
     { icon: <MeditationIcon size={18} />, value: fetchedUser.mindfulness_registers, label: 'Sessões de Mindfulness' },
     { icon: <ExerciseIcon size={25} />, value: fetchedUser.exercises_registers, label: 'Exercícios físicos' },
-  ] : [];
-
-  const transformedGoals = userGoals ? [
-    { icon: <WaterDropIcon size={13} color='#525252' />, value: userGoals.hydration_goal, label: 'ml                    por dia' },
-    { icon: <MeditationIcon size={18} />, value: userGoals.exercise_goal, label: 'Minutos por dia' },
-    { icon: <ExerciseIcon size={25} />, value: userGoals.mindfulness_goal, label: 'Minutos por dia' },
   ] : [];
 
   return (
@@ -65,29 +54,6 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
               icon={stat.icon}
               value={stat.value}
               label={stat.label}
-              cardWidth={threeColumnCardWidth}
-            />
-          ))}
-        </View>
-      )}
-
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Minhas Metas</Text>
-      </View>
-      {loadingGoals ? (
-        <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />
-      ) : errorGoals ? (
-        <Text style={styles.errorText}>Erro ao carregar metas: {errorGoals}</Text>
-      ) : transformedGoals.length === 0 ? (
-        <Text style={styles.noDataText}>Nenhuma meta definida.</Text>
-      ) : (
-        <View style={styles.metricCardGrid}>
-          {transformedGoals.map((goal, index) => (
-            <StatCard
-              key={index}
-              icon={goal.icon}
-              value={goal.value}
-              label={goal.label}
               cardWidth={threeColumnCardWidth}
             />
           ))}
