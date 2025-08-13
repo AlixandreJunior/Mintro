@@ -2,9 +2,7 @@ import { ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity, View
 import StatCard from "./StatCard";
 import ExerciseIcon from "./Icons/ExerciseIcon";
 import MeditationIcon from "./Icons/MeditationIcon";
-import WaterDropIcon from "./Icons/WaterDropIcon";
 import NotebookIcon from "./Icons/NotebookIcon";
-import { Goal } from "@/types/user/goal";
 import { User } from "@/types/user/user";
 import { router } from "expo-router";
 

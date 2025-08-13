@@ -1,13 +1,24 @@
-import React from 'react';
-import { View, Text, StyleSheet, Dimensions, FlatList, TouchableOpacity, Alert } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet, Dimensions, FlatList } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AchievementIconBase from './Icons/AchievementIcon';
-import { router } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 const screenContentPaddingHorizontal = width * 0.05;
 const itemSpacing = width * 0.02;
 const itemWidth = (width - (2 * screenContentPaddingHorizontal) - (2 * itemSpacing)) / 3;
+
+interface BackendAchievement {
+  id: number | string;
+  name: string;
+  description: string;
+  levels: {
+    id: number | string;
+    level: number;
+    condition: string;
+    description: string;
+  }[];
+}
 
 interface Achievement {
   id: string;
@@ -21,10 +32,23 @@ interface Achievement {
 }
 
 interface AchievementsCarouselProps {
-  achievements: Achievement[];
+  achievements: BackendAchievement[]; // recebendo cru do backend
 }
 
 const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({ achievements }) => {
+  // Mapeia para o formato esperado pelo render
+  const parsedAchievements: Achievement[] = useMemo(() => {
+    return achievements.map((ach) => ({
+      id: String(ach.id),
+      iconName: 'trophy', // placeholder ou baseado no nome
+      label: ach.name,
+      starsAchieved: 0, // backend pode vir com progresso
+      totalStars: ach.levels.length,
+      isUnlocked: false, // backend pode vir com status
+      primaryColor: '#79D457'
+    }));
+  }, [achievements]);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -34,7 +58,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({ achievement
       <FlatList
         horizontal
         showsHorizontalScrollIndicator={false}
-        data={achievements}
+        data={parsedAchievements}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => {
           const isUnlockedAndAchieved = item.isUnlocked && item.starsAchieved > 0;
@@ -48,7 +72,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({ achievement
               style={[
                 styles.itemContainer,
                 { width: itemWidth },
-                index < achievements.length - 1 ? { marginRight: itemSpacing } : null
+                index < parsedAchievements.length - 1 ? { marginRight: itemSpacing } : null
               ]}
             >
               <View style={[styles.iconWrapper, { width: iconBaseSize, height: iconBaseSize * (91 / 87) }]}>
@@ -89,11 +113,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_400Regular',
     color: '#2C3E50',
   },
-  showAll: {
-    fontSize: width * 0.038,
-    fontFamily: 'Poppins_400Regular',
-    color: '#1FB6FF',
-  },
   itemContainer: {
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -108,16 +127,6 @@ const styles = StyleSheet.create({
   centerIcon: {
     position: 'absolute',
   },
-  dynamicStarsContainer: {
-    flexDirection: 'row',
-    position: 'absolute',
-    bottom: -width * 0.008,
-    width: '100%',
-    justifyContent: 'center',
-  },
-  dynamicStarIcon: {
-    marginHorizontal: width * 0.005,
-  },
   label: {
     fontSize: width * 0.032,
     fontFamily: 'Poppins_400Regular',
@@ -128,5 +137,3 @@ const styles = StyleSheet.create({
     minHeight: width * 0.07,
   },
 });
-
-
