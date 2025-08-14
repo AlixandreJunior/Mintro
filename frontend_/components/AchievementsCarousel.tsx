@@ -20,6 +20,19 @@ interface BackendAchievement {
   }[];
 }
 
+interface AchievementProgress {
+  id: number | string;
+  user: number | string;
+  achievement_level: {
+    id: number | string;
+    achievement: number | string;
+    level: number;
+    condition: string;
+    description: string;
+  };
+  date_awarded: string;
+}
+
 interface Achievement {
   id: string;
   iconName: string;
@@ -32,22 +45,40 @@ interface Achievement {
 }
 
 interface AchievementsCarouselProps {
-  achievements: BackendAchievement[]; // recebendo cru do backend
+  achievements: BackendAchievement[];
+  userAchievements: AchievementProgress[];
 }
 
-const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({ achievements }) => {
-  // Mapeia para o formato esperado pelo render
+const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({ achievements, userAchievements }) => {
+  // Mapa para progresso máximo por achievement id
+  const progressMap = useMemo(() => {
+    const map = new Map<string, number>();
+    userAchievements.forEach((progress) => {
+      const achId = String(progress.achievement_level.achievement);
+      const level = progress.achievement_level.level;
+      const currentMax = map.get(achId) ?? 0;
+      if (level > currentMax) {
+        map.set(achId, level);
+      }
+    });
+    return map;
+  }, [userAchievements]);
+
   const parsedAchievements: Achievement[] = useMemo(() => {
-    return achievements.map((ach) => ({
-      id: String(ach.id),
-      iconName: 'trophy', // placeholder ou baseado no nome
-      label: ach.name,
-      starsAchieved: 0, // backend pode vir com progresso
-      totalStars: ach.levels.length,
-      isUnlocked: false, // backend pode vir com status
-      primaryColor: '#79D457'
-    }));
-  }, [achievements]);
+    return achievements.map((ach) => {
+      const achId = String(ach.id);
+      const starsAchieved = progressMap.get(achId) ?? 0;
+      return {
+        id: achId,
+        iconName: 'trophy',
+        label: ach.name,
+        starsAchieved,
+        totalStars: ach.levels.length,
+        isUnlocked: starsAchieved > 0,
+        primaryColor: '#79D457',
+      };
+    });
+  }, [achievements, progressMap]);
 
   return (
     <View style={styles.container}>
@@ -59,30 +90,26 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({ achievement
         horizontal
         showsHorizontalScrollIndicator={false}
         data={parsedAchievements}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         renderItem={({ item, index }) => {
-          const isUnlockedAndAchieved = item.isUnlocked && item.starsAchieved > 0;
-          const baseSvgColor = isUnlockedAndAchieved ? (item.primaryColor || '#4CAF50') : '#A0A0A0';
-          const mciIconColor = isUnlockedAndAchieved ? (item.iconColor || '#FFF') : '#A0A0A0';
           const iconBaseSize = itemWidth * 0.9;
           const iconMCI_Size = iconBaseSize * 0.45;
+
+          // Mantém o ícone cinza até a primeira estrela ser conquistada
+          const mciIconColor = item.starsAchieved > 0 ? '#79D457' : '#A0A0A0';
 
           return (
             <View
               style={[
                 styles.itemContainer,
                 { width: itemWidth },
-                index < parsedAchievements.length - 1 ? { marginRight: itemSpacing } : null
+                index < parsedAchievements.length - 1 ? { marginRight: itemSpacing } : null,
               ]}
             >
               <View style={[styles.iconWrapper, { width: iconBaseSize, height: iconBaseSize * (91 / 87) }]}>
-                <AchievementIconBase size={iconBaseSize} />
+                <AchievementIconBase size={iconBaseSize} starsAchieved={item.starsAchieved} />
                 <View style={styles.centerIcon}>
-                  <MaterialCommunityIcons
-                    name={item.iconName as any}
-                    size={iconMCI_Size}
-                    color={mciIconColor}
-                  />
+                  <MaterialCommunityIcons name="trophy" size={iconMCI_Size} color={mciIconColor} />
                 </View>
               </View>
               <Text style={styles.label}>{item.label}</Text>
@@ -107,6 +134,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: height * 0.015,
+    paddingHorizontal: screenContentPaddingHorizontal,
   },
   title: {
     fontSize: width * 0.04,
