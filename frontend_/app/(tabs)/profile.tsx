@@ -11,7 +11,7 @@ const { width, height } = Dimensions.get('window');
 const screenContentPaddingHorizontal = width * 0.05;
 
 export default function ProfileScreen() {
-  const { user, loadingUser, errorUser } = useUserProfile();
+  const { user, loadingUser, errorUser, handleLogout } = useUserProfile();
   const { achievements, userAchievements, loading, error } = useAchievements();
 
 
@@ -28,7 +28,7 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.safeArea}>
       <Header avatarChar={avatarChar} />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <UserInfoSection avatarChar={avatarChar} displayName={displayName} joinYear={joinYear} />
+        <UserInfoSection avatarChar={avatarChar} displayName={displayName} joinYear={joinYear} onLogout={handleLogout} />
         <StatsSection fetchedUser={user} loadingUser={loadingUser} errorUser={errorUser} />
 
         {isReady && (
