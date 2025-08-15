@@ -10,6 +10,13 @@
     "android": "expo run:android",
     "ios": "expo run:ios"
   },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "listUnknownPackages": false
+      }
+    }
+  },
   "dependencies": {
     "@expo-google-fonts/poppins": "^0.2.3",
     "@expo/config-plugins": "~10.1.1",
@@ -35,7 +42,6 @@
     "expo-navigation-bar": "^4.2.7",
     "expo-router": "~5.1.4",
     "expo-secure-store": "^14.2.3",
-    "expo-splash-screen": "~0.30.10",
     "expo-status-bar": "~2.2.3",
     "expo-symbols": "~0.4.5",
     "expo-system-ui": "~5.0.10",
