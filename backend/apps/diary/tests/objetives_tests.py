@@ -1,9 +1,6 @@
-from datetime import datetime
-
 from apps.diary.models.diary import Activity
 from apps.diary.models.objetives import Objective
 from django.urls import reverse
-from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 from utils.usermixin import UserMixin
@@ -21,22 +18,22 @@ class ObjetivesTest(APITestCase, UserMixin):
         self.objective = Objective.objects.create(
             user=self.user,
             activity=self.activity,
-            deadline=timezone.make_aware(datetime(2000, 1, 1)),
-            period="1w",
+            period=Objective.PeriodChoices.ONE_WEEK,
+            repeat=Objective.RepeatChoices.ONE_TIME,
         )
 
         self.objective2 = Objective.objects.create(
             user=self.user,
             activity=self.activity2,
-            deadline=timezone.make_aware(datetime(2000, 1, 1)),
-            period="1w",
+            period=Objective.PeriodChoices.ONE_WEEK,
+            repeat=Objective.RepeatChoices.ONE_TIME,
         )
 
         self.objective3 = Objective.objects.create(
             user=self.user,
             activity=self.activity3,
-            deadline=timezone.make_aware(datetime(2000, 1, 1)),
-            period="1w",
+            period=Objective.PeriodChoices.ONE_WEEK,
+            repeat=Objective.RepeatChoices.ONE_TIME,
         )
 
     def test_get_objectives(self):
@@ -63,9 +60,13 @@ class ObjetivesTest(APITestCase, UserMixin):
 
         self.objective3.delete()
 
-        payload = {"activity": self.activity3.pk, "period": "2w"}
+        payload = {
+            "activity": self.activity3.pk,
+            "period": Objective.PeriodChoices.TWO_WEEKS,
+            "repeat": Objective.RepeatChoices.THREE_TIMES,
+        }
 
-        response = self.client.post(url, payload)
+        response = self.client.post(url, data=payload)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.json().get("detail"), "Objetivo criado com sucesso.")
@@ -74,9 +75,14 @@ class ObjetivesTest(APITestCase, UserMixin):
         url = reverse("diary:objective_create")
 
         self.objective3.delete()
-        payload = {"activity": self.activity.pk, "period": "2w"}
 
-        response = self.client.post(url, payload)
+        payload = {
+            "activity": self.activity2.pk,
+            "period": Objective.PeriodChoices.TWO_WEEKS,
+            "repeat": Objective.RepeatChoices.THREE_TIMES,
+        }
+
+        response = self.client.post(url, data=payload)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
@@ -87,9 +93,13 @@ class ObjetivesTest(APITestCase, UserMixin):
     def test_post_objective_create_fail_400_for_limit(self):
         url = reverse("diary:objective_create")
 
-        payload = {"activity": self.activity4.pk, "period": "2w"}
+        payload = {
+            "activity": self.activity4.pk,
+            "period": Objective.PeriodChoices.TWO_WEEKS,
+            "repeat": Objective.RepeatChoices.FIVE_TIMES,
+        }
 
-        response = self.client.post(url, payload)
+        response = self.client.post(url, data=payload)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
@@ -102,9 +112,13 @@ class ObjetivesTest(APITestCase, UserMixin):
 
         self.client.logout()
 
-        payload = {"name": "Objetivo", "description": "Descrição"}
+        payload = {
+            "activity": self.activity.pk,
+            "period": Objective.PeriodChoices.ONE_WEEK,
+            "repeat": Objective.RepeatChoices.ONE_TIME,
+        }
 
-        response = self.client.post(url, payload)
+        response = self.client.post(url, data=payload)
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(

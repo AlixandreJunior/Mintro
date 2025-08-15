@@ -1,29 +1,43 @@
-from apps.user.models.achievement import Achievement, AchievementLog
+from apps.user.models.achievement import Achievement, AchievementLevel, AchievementLog
 from rest_framework import serializers
 
 
+class AchievementLevelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AchievementLevel
+        fields = [
+            "id",
+            "achievement",
+            "level",
+            "condition",
+            "description",
+        ]
+        read_only_fields = ["id", "achievement"]
+
+
 class AchievementSerializer(serializers.ModelSerializer):
+    levels = AchievementLevelSerializer(many=True, read_only=True)
+
     class Meta:
         model = Achievement
         fields = [
             "id",
             "name",
-            "icon",
-            "category",
-            "condition",
             "description",
+            "levels",
         ]
+        read_only_fields = ["id"]
 
 
 class AchievementLogSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
-    achievement = AchievementSerializer(read_only=True)
+    achievement_level = AchievementLevelSerializer(read_only=True)
 
     class Meta:
         model = AchievementLog
         fields = [
             "id",
             "user",
-            "achievement",
+            "achievement_level",
             "date_awarded",
         ]
+        read_only_fields = ["id", "user", "achievement_level", "date_awarded"]

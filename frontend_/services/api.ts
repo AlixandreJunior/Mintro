@@ -1,11 +1,14 @@
 import axios, { AxiosRequestConfig, AxiosError } from 'axios';
+import Constants from 'expo-constants';
 
-const apiUrl = 'http://localhost:8000/api/';
+const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
 const api = axios.create({
   baseURL: apiUrl,
   timeout: 10000,
 });
+
+console.log('API URL:', apiUrl);
 
 let onLogout: (() => void) | null = null;
 let getTokens:

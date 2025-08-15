@@ -3,46 +3,69 @@ from apps.user.serializers.achievements import (
     AchievementLogSerializer,
     AchievementSerializer,
 )
-from rest_framework.exceptions import NotFound
-from rest_framework.generics import GenericAPIView
-from rest_framework.mixins import ListModelMixin
+from rest_framework.generics import (
+    CreateAPIView,
+    DestroyAPIView,
+    ListAPIView,
+    RetrieveAPIView,
+    UpdateAPIView,
+)
 from rest_framework.permissions import IsAuthenticated
 
 
-class AchievementsView(GenericAPIView, ListModelMixin):
+# Detail view da conquista
+class AchievementDetailView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AchievementSerializer
+    queryset = Achievement.objects.all()
+    lookup_field = "pk"
+
+
+# CRUD básico para Achievement
+class AchievementCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AchievementSerializer
 
-    def get_queryset(self):
-        queryset = Achievement.objects.all()
-        category = self.request.GET.get("category")
 
-        if category:
-            queryset = queryset.filter(category=category)
-
-        if not queryset:
-            raise NotFound("Conquistas não encontradas.")
-        return queryset
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+class AchievementUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AchievementSerializer
+    queryset = Achievement.objects.all()
+    lookup_field = "pk"
 
 
-class AchievementsUserView(GenericAPIView, ListModelMixin):
+class AchievementDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Achievement.objects.all()
+    lookup_field = "pk"
+
+
+# Detail view para o log da conquista do usuário
+class AchievementLogDetailView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AchievementLogSerializer
-    lookup_field = "user"
+    queryset = AchievementLog.objects.all()
+    lookup_field = "pk"
+
+
+# Criar log de conquista (opcional, geralmente criado internamente)
+class AchievementLogCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AchievementLogSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class AchievementListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AchievementSerializer
+    queryset = Achievement.objects.all()
+
+
+class AchievementLogListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AchievementLogSerializer
 
     def get_queryset(self):
-        queryset = AchievementLog.objects.filter(user=self.request.user)
-        category = self.request.GET.get("category")
-
-        if category:
-            queryset = queryset.filter(achievement__category=category)
-
-        if not queryset:
-            raise NotFound("Conquistas não encontradas.")
-        return queryset
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+        return AchievementLog.objects.filter(user=self.request.user)

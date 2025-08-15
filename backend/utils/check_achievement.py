@@ -1,48 +1,72 @@
-from apps.progress.models import Achievement, AchievementLog
+from apps.diary.models.diary import Diary
+from apps.health.models.exercise import ExerciseLog
+from apps.health.models.hydratation import HydrationLog
+from apps.health.models.mindfulness import MindfulnessLog
+from apps.user.models.achievement import Achievement, AchievementLog
 
 
-class CheckAchievements:
-    CONDITION_HANDLERS = {}
+def grant_achievement_level(
+    user, achievement_name, progress_count=None, progress_today=None
+):
+    try:
+        achievement = Achievement.objects.get(name=achievement_name)
+    except Achievement.DoesNotExist:
+        return
 
-    @classmethod
-    def register_handlers(cls, handlers):
-        cls.CONDITION_HANDLERS.update(handlers)
-
-    @staticmethod
-    def check_achievements_for_user(user):
-        unlocked = []  # Conquistas recém-desbloqueadas
-
+    levels = achievement.levels.order_by("level")
+    for level in levels:
         try:
-            for achievement in Achievement.objects.all():
-                if AchievementLog.objects.filter(
-                    user=user, achievement=achievement
-                ).exists():
-                    continue  # Já desbloqueada
-
-                condition = achievement.condition
-                handler = CheckAchievements.CONDITION_HANDLERS.get(condition)
-
-                if handler and handler(user):
-                    AchievementLog.objects.create(user=user, achievement=achievement)
-                    unlocked.append(achievement)
-
-        except Exception as e:
-            print(f"[Erro em check_achievements_for_user]: {e}")
-
-        return unlocked
+            cond_val = None
+            cond = level.condition
+            if "steps_" in cond and progress_today is not None:
+                cond_val = int(cond.split("_")[1])
+                if progress_today >= cond_val:
+                    _create_log_if_not_exists(user, level)
+            elif progress_count is not None:
+                cond_val = int(cond.split("_")[1].replace("x", ""))
+                if progress_count >= cond_val:
+                    _create_log_if_not_exists(user, level)
+        except Exception:
+            continue
 
 
-# ----------------------------------------
-# Handlers para conquistas de Check-in
-# ----------------------------------------
+def _create_log_if_not_exists(user, achievement_level):
+    if not AchievementLog.objects.filter(
+        user=user, achievement_level=achievement_level
+    ).exists():
+        AchievementLog.objects.create(user=user, achievement_level=achievement_level)
 
 
-class CheckAchievementsProgress(CheckAchievements): ...
+def check_bem_vindo_mintro(user):
+    try:
+        achievement = Achievement.objects.get(name="Bem-vindo ao Mintro")
+        level = achievement.levels.get(level=1)
+        _create_log_if_not_exists(user, level)
+    except Achievement.DoesNotExist:
+        pass
 
 
-CheckAchievements.register_handlers({})
+def check_foco_total(user):
+    total_exercises = ExerciseLog.objects.filter(user=user).count()
+    grant_achievement_level(user, "Foco Total", progress_count=total_exercises)
 
 
-# ----------------------------------------
-# Handlers para conquistas de Progress
-# ----------------------------------------
+def check_gole_a_gole(user):
+    total_water = HydrationLog.objects.filter(user=user).count()
+    grant_achievement_level(user, "Gole a Gole", progress_count=total_water)
+
+
+def check_passos_consciencia(user, steps_today):
+    grant_achievement_level(user, "Passos de Consciência", progress_today=steps_today)
+
+
+def check_zen_total(user):
+    total_mindfulness = MindfulnessLog.objects.filter(user=user).count()
+    grant_achievement_level(user, "Zen Total", progress_count=total_mindfulness)
+
+
+def check_narrador_da_propria_historia(user):
+    total_diary = Diary.objects.filter(user=user).count()
+    grant_achievement_level(
+        user, "Narrador da própria história", progress_count=total_diary
+    )

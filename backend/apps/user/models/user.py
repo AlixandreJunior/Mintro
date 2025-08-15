@@ -1,9 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.core.validators import FileExtensionValidator, MinValueValidator,MaxValueValidator
-from django.dispatch import receiver
-from apps.user.models.goals import Goal
-import os
+from django.db import models
+
 
 class UsersManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -16,14 +13,15 @@ class UsersManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
         return self.create_user(email, password, **extra_fields)
+
 
 class User(AbstractUser):
     class Meta:
-        app_label = 'user'
+        app_label = "user"
         verbose_name = "User"
         verbose_name_plural = "Users"
 
@@ -36,8 +34,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
-@receiver(models.signals.post_save, sender = User)
-def create_object_goal_for_user(sender, instance, created,**kwargs):
-    if created:
-        Goal.objects.get_or_create(user = instance)

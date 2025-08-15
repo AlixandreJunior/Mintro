@@ -1,49 +1,42 @@
 import React from 'react';
-import { Dimensions, SafeAreaView, ScrollView, StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Svg, { Path } from 'react-native-svg';
-
+import { Dimensions, SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import Header from '@/components/Layout/Header';
 import { UserInfoSection } from '@/components/UserInfoSection';
 import { StatsSection } from '@/components/StatsSection';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import AchievementIconBase from '@/components/Icons/AchievementIcon';
 import AchievementsCarousel from '@/components/AchievementsCarousel';
+import { useAchievements } from '@/hooks/useAchievements'; // hook de conquistas
 
 const { width, height } = Dimensions.get('window');
 const screenContentPaddingHorizontal = width * 0.05;
 
-interface Achievement {
-  id: string;
-  iconName: string;
-  label: string;
-  starsAchieved: number;
-  totalStars: number;
-  isUnlocked: boolean;
-  primaryColor?: string;
-}
-
-const MOCK_ACHIEVEMENTS: Achievement[] = [
-  { id: '1', iconName: 'leaf', label: 'Bem-vindo ao Mintro', starsAchieved: 3, totalStars: 3, isUnlocked: true, primaryColor: '#4CAF50' },
-  { id: '2', iconName: 'medal', label: 'Lenda do Mintro', starsAchieved: 1, totalStars: 3, isUnlocked: true, primaryColor: '#A0A0A0' },
-  { id: '3', iconName: 'fire', label: 'Persistente', starsAchieved: 0, totalStars: 3, isUnlocked: false, primaryColor: '#A0A0A0' },
-];
-
 export default function ProfileScreen() {
-  const { user, goals, loadingUser, loadingGoals, errorUser, errorGoals, handleLogout } = useUserProfile();
+  const { user, loadingUser, errorUser } = useUserProfile();
+  const { achievements, userAchievements, loading, error } = useAchievements();
+
+
   const displayName = user?.username || 'Carregando...';
   const joinYear = user?.created_at ? new Date(user.created_at).getFullYear() : 'N/A';
   const avatarChar = user?.username ? user.username.charAt(0).toUpperCase() : 'A';
 
-  const itemWidth = width * 0.4;
+  const isReady =
+    !loading && !error &&
+    !loadingUser && !errorUser &&
+    achievements.length > 0;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <Header avatarChar={avatarChar} />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <UserInfoSection avatarChar={avatarChar} displayName={displayName} joinYear={joinYear} onLogout={handleLogout} />
-        <StatsSection fetchedUser={user} userGoals={goals} loadingGoals={loadingGoals} loadingUser={loadingUser} errorGoals={errorGoals} errorUser={errorUser} />
-        <AchievementsCarousel achievements={MOCK_ACHIEVEMENTS}/>
+        <UserInfoSection avatarChar={avatarChar} displayName={displayName} joinYear={joinYear} />
+        <StatsSection fetchedUser={user} loadingUser={loadingUser} errorUser={errorUser} />
+
+        {isReady && (
+          <AchievementsCarousel
+            achievements={achievements}
+            userAchievements={userAchievements}  // Passa o progresso do usuário
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -59,52 +52,5 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     paddingHorizontal: screenContentPaddingHorizontal,
     backgroundColor: '#fff',
-  },
-  achievementsSectionContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    marginTop: height * 0.02,
-    paddingVertical: height * 0.02,
-    paddingHorizontal: screenContentPaddingHorizontal,
-    elevation: 2,
-  },
-  achievementsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: height * 0.015,
-  },
-  achievementsTitle: {
-    fontSize: width * 0.05,
-    fontFamily: 'Poppins_500Medium',
-    color: '#333',
-  },
-  showAllButton: {
-    fontSize: width * 0.038,
-    fontFamily: 'Poppins_400Regular',
-    color: '#007AFF',
-  },
-  achievementItemContainer: {
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingVertical: 5,
-  },
-  achievementIconWrapper: {
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: height * 0.01,
-  },
-  achievementCenterIcon: {
-    position: 'absolute',
-  },
-  achievementLabelText: {
-    fontSize: width * 0.032,
-    fontFamily: 'Poppins_400Regular',
-    lineHeight: width * 0.035,
-    textAlign: 'center',
-    color: '#000000',
-    width: '100%',
-    minHeight: width * 0.07,
   },
 });

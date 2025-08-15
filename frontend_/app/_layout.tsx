@@ -1,19 +1,18 @@
 import React, { useEffect } from 'react';
-import { Slot, Stack } from 'expo-router';
-import { useFonts,
-  Poppins_300Light, 
-  Poppins_400Regular, 
-  Poppins_500Medium, 
-  Poppins_600SemiBold, 
-  Poppins_700Bold 
+import { Slot } from 'expo-router';
+import {
+  useFonts,
+  Poppins_300Light,
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import AppProviders from '@/components/AppProviders';
-import AuthGuard from '@/components/AuthGuard';
-import * as NavigationBar from "expo-navigation-bar";
+import AppProviders from '../components/AppProviders';
+import AuthGuard from '../components/AuthGuard';
+import * as NavigationBar from 'expo-navigation-bar';
 import { Provider as PaperProvider } from 'react-native-paper';
-
-
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -26,12 +25,11 @@ export default function RootLayout() {
 
   useEffect(() => {
     async function setNavigationBar() {
-      await NavigationBar.setVisibilityAsync("hidden"); 
+      await NavigationBar.setVisibilityAsync('hidden');
       await NavigationBar.setBehaviorAsync('overlay-swipe');
     }
     setNavigationBar();
   }, []);
-
 
   if (!fontsLoaded) {
     return (
@@ -44,9 +42,9 @@ export default function RootLayout() {
   return (
     <AppProviders>
       <AuthGuard>
-          <PaperProvider>
-            <Slot/>
-          </PaperProvider>
+        <PaperProvider>
+          <Slot />
+        </PaperProvider>
       </AuthGuard>
     </AppProviders>
   );
