@@ -15,16 +15,6 @@ urlpatterns = [
         achievement.AchievementDetailView.as_view(),
         name="achievement_detail",
     ),
-    path(
-        "achievements/<int:pk>/update/",
-        achievement.AchievementUpdateView.as_view(),
-        name="achievement_update",
-    ),
-    path(
-        "achievements/<int:pk>/delete/",
-        achievement.AchievementDeleteView.as_view(),
-        name="achievement_delete",
-    ),
     # Achievements do usuário (logs) - supondo que você tenha uma view para listar logs do usuário
     path(
         "achievements/user/",
