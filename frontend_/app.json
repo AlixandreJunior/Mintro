@@ -41,7 +41,7 @@
       "eas": {
         "projectId": "8314ee45-5777-4547-8a14-146edc5b7f9c"
       },
-      "API_URL": "https://localhost:8000/api/"
+      "API_URL": "http://localhost:8000/api/"
     },
     "android": {
       "package": "com.alixandre.vitacare"
