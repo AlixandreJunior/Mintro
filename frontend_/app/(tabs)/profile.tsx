@@ -14,6 +14,7 @@ export default function ProfileScreen() {
   const { user, loadingUser, errorUser } = useUserProfile();
   const { achievements, userAchievements, loading, error } = useAchievements();
 
+
   const displayName = user?.username || 'Carregando...';
   const joinYear = user?.created_at ? new Date(user.created_at).getFullYear() : 'N/A';
   const avatarChar = user?.username ? user.username.charAt(0).toUpperCase() : 'A';
