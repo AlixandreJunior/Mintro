@@ -30,9 +30,6 @@
     "experiments": {
       "typedRoutes": true
     },
-    "splash": {
-      "backgroundColor": "#8A2BE2"
-    },
     "extra": {
       "router": {},
       "eas": {
