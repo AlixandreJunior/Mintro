@@ -9,8 +9,8 @@ import {
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import AppProviders from '@/components/AppProviders';
-import AuthGuard from '@/components/AuthGuard';
+import AppProviders from '../components/AppProviders';
+import AuthGuard from '../components/AuthGuard';
 import * as NavigationBar from 'expo-navigation-bar';
 import { Provider as PaperProvider } from 'react-native-paper';
 
