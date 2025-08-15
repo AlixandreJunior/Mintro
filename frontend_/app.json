@@ -30,7 +30,8 @@
         {
           "photosPermission": "O aplicativo precisa acessar suas fotos para permitir que você selecione um avatar."
         }
-      ]
+      ],
+      "expo-splash-screen"
     ],
     "experiments": {
       "typedRoutes": true
