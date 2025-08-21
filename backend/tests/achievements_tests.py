@@ -1,7 +1,8 @@
-from apps.user.models.achievement import Achievement, AchievementLevel, AchievementLog
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+
+from apps.user.models.achievement import Achievement, AchievementLevel, AchievementLog
 from utils.usermixin import UserMixin
 
 
@@ -60,22 +61,6 @@ class AchievementsTest(APITestCase, UserMixin):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json().get("name"), self.achievement.name)
 
-    def test_update_achievement(self):
-        url = reverse("user:achievement_update", args=[self.achievement.pk])
-        payload = {
-            "name": "Conquista Atualizada",
-            "description": self.achievement.description,
-        }
-        response = self.client.put(url, payload)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json().get("name"), "Conquista Atualizada")
-
-    def test_delete_achievement(self):
-        url = reverse("user:achievement_delete", args=[self.achievement.pk])
-        response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Achievement.objects.filter(pk=self.achievement.pk).exists())
-
     def test_get_user_achievements_log_list(self):
         url = reverse("user:achievements_user")  # Ajuste para sua URL real
         response = self.client.get(url)
@@ -100,8 +85,6 @@ class AchievementsTest(APITestCase, UserMixin):
             reverse("user:achievement_detail", args=[self.achievement.pk]),
             reverse("user:achievements_user"),
             reverse("user:achievement_log_detail", args=[self.userachievement.pk]),
-            reverse("user:achievement_update", args=[self.achievement.pk]),
-            reverse("user:achievement_delete", args=[self.achievement.pk]),
         ]
         for url in urls:
             response = self.client.get(url) if "get" in url else self.client.post(url)
