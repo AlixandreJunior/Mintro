@@ -15,7 +15,6 @@ import PeriodSelector from '@/components/PeriodSelector';
 import { StepsSummary } from '@/components/StepsSummary';
 import GoalModal from '@/components/GoalModal';
 
-// Importa o hook
 import { useSteps } from '@/hooks/useSteps';
 
 const { height } = Dimensions.get('window');
@@ -33,19 +32,16 @@ export default function App(): React.JSX.Element {
     { key: 'year', label: 'Ano' },
   ];
 
-  const [stepGoal, setStepGoal] = useState(10000); // Meta inicial
+  const [stepGoal, setStepGoal] = useState(10000);
   const [goalModalVisible, setGoalModalVisible] = useState(false);
 
-  // --- Hook de passos ---
   const { steps, estimatedCaloriesBurned, resetSteps } = useSteps();
 
-  // Progresso em %
   const progressPercentage = steps / stepGoal;
 
-  // Exemplo simples de chart (aqui ainda mock, mas pode ser adaptado p/ histórico real)
   const CHART_DATA = Array.from({ length: 24 }, (_, i) => ({
     x: i,
-    y: i === new Date().getHours() ? steps : 0, // mostra os passos na hora atual
+    y: i === new Date().getHours() ? steps : 0,
   }));
 
   const handlePeriodChange = (period: typeof selectedPeriod) => {
@@ -92,11 +88,6 @@ export default function App(): React.JSX.Element {
           goalSteps={stepGoal}
           progress={progressPercentage}
         />
-
-        {/* Mostrando calorias só para conferência */}
-        <Text style={{ textAlign: 'center', marginVertical: 10 }}>
-          🔥 Calorias estimadas: {estimatedCaloriesBurned.toFixed(2)}
-        </Text>
 
         <StepsChart data={CHART_DATA} mode={selectedPeriod} />
       </ScrollView>
