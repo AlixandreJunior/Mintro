@@ -1,57 +1,84 @@
-from locust import HttpUser, TaskSet, between, task
+from rest_framework import status
+from rest_framework.exceptions import NotFound
+from rest_framework.generics import (
+    CreateAPIView,
+    DestroyAPIView,
+    ListAPIView,
+    RetrieveAPIView,
+    UpdateAPIView,
+)
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+from apps.diary.models.objetives import Objective
+from apps.diary.serializers.objetives import (
+    ObjectiveReadSerializer,
+    ObjectiveWriteSerializer,
+)
 
 
-class ObjectiveBehavior(TaskSet):
-    def on_start(self):
-        """Login automático ao iniciar o teste"""
-        response = self.client.post(
-            "/api/login/", json={"email": "adm@admin.com", "password": "123"}
+class ObjectiveListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ObjectiveReadSerializer
+
+    def get_queryset(self):
+        queryset = Objective.objects.filter(user=self.request.user)
+        status = self.request.GET.get("status")
+
+        if status:
+            queryset = queryset.filter(status=status)
+
+        if not queryset:
+            raise NotFound("Objetivos não encontrados.")
+        return queryset
+
+
+class ObjectiveCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ObjectiveWriteSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(
+            {"detail": "Objetivo criado com sucesso."}, status=status.HTTP_201_CREATED
         )
-        self.token = response.json().get("access")
-        self.headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
 
-    @task(2)
-    def list_objectives(self):
-        """Listar todos os objetivos"""
-        self.client.get("/api/diary/objectives/", headers=self.headers)
-
-    @task(3)
-    def create_update_delete_objective(self):
-        """Cria, atualiza parcialmente (PATCH) e exclui um objetivo"""
-        payload = {
-            "title": "Objetivo de Teste Locust",
-            "description": "Criado automaticamente para teste de carga",
-            "status": "Pendente",
-        }
-
-        # Criar objetivo
-        post_response = self.client.post(
-            "/api/diary/objectives/create/", json=payload, headers=self.headers
-        )
-
-        if post_response.status_code == 201:
-            # Buscar lista para pegar o último objetivo
-            objectives = self.client.get(
-                "/api/diary/objectives/", headers=self.headers
-            ).json()
-            if objectives:
-                last_objective_id = objectives[-1]["id"]
-
-                # Atualizar parcialmente com PATCH
-                patch_payload = {"status": "Concluído"}
-                self.client.patch(
-                    f"/api/diary/objectives/{last_objective_id}/update/",
-                    json=patch_payload,
-                    headers=self.headers,
-                )
-
-                # Excluir para não poluir BD
-                self.client.delete(
-                    f"/api/diary/objectives/{last_objective_id}/delete/",
-                    headers=self.headers,
-                )
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
-class WebsiteUser(HttpUser):
-    tasks = [ObjectiveBehavior]
-    wait_time = between(1, 3)
+class ObjectiveDetailView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ObjectiveReadSerializer
+
+    def get_object(self):
+        id = self.kwargs.get("id")
+        try:
+            return Objective.objects.get(user=self.request.user, id=id)
+        except Objective.DoesNotExist:
+            raise NotFound("Objetivo não encontrado.")
+
+
+class ObjectiveUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ObjectiveWriteSerializer
+
+    def get_object(self):
+        id = self.kwargs.get("id")
+        try:
+            return Objective.objects.get(user=self.request.user, id=id)
+        except Objective.DoesNotExist:
+            raise NotFound("Objetivo não encontrado.")
+
+
+class ObjectiveDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        id = self.kwargs.get("id")
+        try:
+            return Objective.objects.get(user=self.request.user, id=id)
+        except Objective.DoesNotExist:
+            raise NotFound("Objetivo não encontrado.")

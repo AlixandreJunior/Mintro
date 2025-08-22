@@ -18,7 +18,13 @@
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "API_URL": "https://mintro.onrender.com/api/"
+      },
+      "android": {
+    "buildType": "apk"
+  }
     }
   },
   "submit": {

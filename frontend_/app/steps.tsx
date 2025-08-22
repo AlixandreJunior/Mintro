@@ -5,6 +5,7 @@ import {
   ScrollView,
   StatusBar,
   Dimensions,
+  Text,
 } from 'react-native';
 import Header from '@/components/Layout/Header';
 import HeaderWithOptions from '@/components/Layout/HeaderWithOptions';
@@ -12,37 +13,12 @@ import DateNavigator from '@/components/DateNavigator';
 import StepsChart from '@/components/StepsChart';
 import PeriodSelector from '@/components/PeriodSelector';
 import { StepsSummary } from '@/components/StepsSummary';
+import GoalModal from '@/components/GoalModal';
 
-import GoalModal from '@/components/GoalModal'; // Importa modal
+// Importa o hook
+import { useSteps } from '@/hooks/useSteps';
 
 const { height } = Dimensions.get('window');
-
-const CHART_DATA = [
-  { x: 0, y: 4000 },
-  { x: 1, y: 0 },
-  { x: 2, y: 0 },
-  { x: 3, y: 0 },
-  { x: 4, y: 200 },
-  { x: 5, y: 0 },
-  { x: 6, y: 0 },
-  { x: 7, y: 0 },
-  { x: 8, y: 0 },
-  { x: 9, y: 0 },
-  { x: 10, y: 0 },
-  { x: 11, y: 800 },
-  { x: 12, y: 1000 },
-  { x: 13, y: 0 },
-  { x: 14, y: 0 },
-  { x: 15, y: 1000 },
-  { x: 16, y: 0 },
-  { x: 17, y: 0 },
-  { x: 18, y: 1000 },
-  { x: 19, y: 0 },
-  { x: 20, y: 0 },
-  { x: 21, y: 1000 },
-  { x: 22, y: 0 },
-  { x: 23, y: 0 },
-];
 
 export default function App(): React.JSX.Element {
   const [selectedPeriod, setSelectedPeriod] = useState<
@@ -58,21 +34,27 @@ export default function App(): React.JSX.Element {
   ];
 
   const [stepGoal, setStepGoal] = useState(10000); // Meta inicial
-
-  const totalSteps = 6500;
-  const progressPercentage = totalSteps / stepGoal;
-
   const [goalModalVisible, setGoalModalVisible] = useState(false);
+
+  // --- Hook de passos ---
+  const { steps, estimatedCaloriesBurned, resetSteps } = useSteps();
+
+  // Progresso em %
+  const progressPercentage = steps / stepGoal;
+
+  // Exemplo simples de chart (aqui ainda mock, mas pode ser adaptado p/ histórico real)
+  const CHART_DATA = Array.from({ length: 24 }, (_, i) => ({
+    x: i,
+    y: i === new Date().getHours() ? steps : 0, // mostra os passos na hora atual
+  }));
 
   const handlePeriodChange = (period: typeof selectedPeriod) => {
     setSelectedPeriod(period);
   };
 
-  // Salvar meta do modal
   const handleSaveGoal = (newGoal: number) => {
     setStepGoal(newGoal);
     setGoalModalVisible(false);
-    // Aqui pode chamar API ou atualizar contexto
   };
 
   return (
@@ -85,6 +67,10 @@ export default function App(): React.JSX.Element {
           {
             label: 'Editar Meta',
             onPress: () => setGoalModalVisible(true),
+          },
+          {
+            label: 'Resetar',
+            onPress: () => resetSteps(),
           },
         ]}
       />
@@ -102,14 +88,19 @@ export default function App(): React.JSX.Element {
           onDateChange={setCurrentDateLabel}
         />
         <StepsSummary
-          totalSteps={totalSteps}
+          totalSteps={steps}
           goalSteps={stepGoal}
           progress={progressPercentage}
         />
+
+        {/* Mostrando calorias só para conferência */}
+        <Text style={{ textAlign: 'center', marginVertical: 10 }}>
+          🔥 Calorias estimadas: {estimatedCaloriesBurned.toFixed(2)}
+        </Text>
+
         <StepsChart data={CHART_DATA} mode={selectedPeriod} />
       </ScrollView>
 
-      {/* Modal para editar a meta de passos */}
       <GoalModal
         visible={goalModalVisible}
         onClose={() => setGoalModalVisible(false)}
