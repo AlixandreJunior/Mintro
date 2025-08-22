@@ -1,5 +1,6 @@
-from apps.diary.views import diary
 from django.urls import path
+
+from apps.diary.views import diary
 
 from .views import objetives
 

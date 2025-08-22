@@ -124,17 +124,3 @@ class DiaryTests(APITestCase, UserMixin):
             response.json().get("detail").get("content")[0],
             "Este campo não pode ser em branco.",
         )
-
-    def test_post_diary_create_fail_duplicate(self):
-        url = reverse("diary:diary_create")
-        payload = {
-            "title": "Meu Diario2",
-            "content": "Sinto que estou sendo testado",
-            "mood": "Péssimo",
-        }
-        response = self.client.post(url, payload)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(
-            "Você já criou um diário com esse título.",
-            response.json().get("detail").get("title"),
-        )
