@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from backend.apps.health.models.mindfulness import Mindfulness, MindfulnessLog
+from apps.health.models.mindfulness import Mindfulness, MindfulnessLog
 
 
 @admin.register(Mindfulness)

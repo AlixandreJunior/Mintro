@@ -21,12 +21,11 @@ const { height } = Dimensions.get('window');
 
 export default function App(): React.JSX.Element {
   const [selectedPeriod, setSelectedPeriod] = useState<
-    'day' | 'week' | 'month' | 'year'
-  >('day');
+    'week' | 'month' | 'year'
+  >('week');
   const [currentDateLabel, setCurrentDateLabel] = useState(new Date());
 
   const periods = [
-    { key: 'day', label: 'Dia' },
     { key: 'week', label: 'Semana' },
     { key: 'month', label: 'Mês' },
     { key: 'year', label: 'Ano' },
