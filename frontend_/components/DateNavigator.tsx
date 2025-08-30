@@ -32,7 +32,7 @@ const { width, height } = Dimensions.get('window');
 
 interface DateNavigatorProps {
   currentDate: Date;
-  mode: 'week' | 'month' | 'year';
+  mode: 'day' | 'week' | 'month' | 'year';
   onDateChange: (newDate: Date) => void;
 }
 
@@ -44,6 +44,9 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
   const handlePrev = () => {
     let newDate: Date;
     switch (mode) {
+      case 'day':
+        newDate = subDays(currentDate, 1);
+        break;
       case 'week':
         newDate = subWeeks(currentDate, 1);
         break;
@@ -62,6 +65,9 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
   const handleNext = () => {
     let newDate: Date;
     switch (mode) {
+      case 'day':
+        newDate = addDays(currentDate, 1);
+        break;
       case 'week':
         newDate = addWeeks(currentDate, 1);
         break;
@@ -84,6 +90,12 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
     const today = new Date();
 
     switch (mode) {
+      case 'day':
+        if (isToday(date)) return 'Hoje';
+        if (isYesterday(date)) return 'Ontem';
+        if (isTomorrow(date)) return 'Amanhã';
+        break;
+
       case 'week':
         if (isSameWeek(date, today, { weekStartsOn: 0 })) return 'Esta semana';
         if (isSameWeek(date, subWeeks(today, 1), { weekStartsOn: 0 }))
@@ -113,6 +125,10 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
     if (specialLabel) return specialLabel;
 
     switch (mode) {
+      case 'day':
+        return format(currentDate, "EEEE, d 'de' MMMM", {
+          locale: ptBR,
+        }).replace(/^\w/, (c) => c.toUpperCase());
       case 'week': {
         const start = startOfWeek(currentDate, {
           locale: ptBR,

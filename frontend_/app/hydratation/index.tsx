@@ -1,111 +1,93 @@
-import { useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
-
+import React, { useState } from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+  View,
+  Text,
+} from 'react-native';
 import Header from '@/components/Layout/Header';
 import HeaderWithOptions from '@/components/Layout/HeaderWithOptions';
 import DateNavigator from '@/components/DateNavigator';
-import { HydrationHistory } from '@/components/HydrationHistory';
-import { HydrationSummary } from '@/components/HydrationSummary';
-import { formatDatetimeToISO } from '@/utils/formatDatetimeToISO';
-import { useHydrationLogs } from '@/hooks/useHydratationLog';
-import { FloatingActionButton } from '@/components/FloatingButtonAction';
 import PeriodSelector from '@/components/PeriodSelector';
 import StepsChart from '@/components/StepsChart';
+import { StepsSummary } from '@/components/StepsSummary';
 import GoalModal from '@/components/GoalModal';
 
-export default function HydrationScreen() {
-  const [selectedDate, setSelectedDate] = useState(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-  });
+import { useSteps } from '@/hooks/useSteps';
 
+const { height } = Dimensions.get('window');
+
+export default function StepsScreen() {
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedPeriod, setSelectedPeriod] = useState<
-    'day' | 'week' | 'month' | 'year'
-  >('day');
+    'week' | 'month' | 'year'
+  >('week');
+  const [stepGoal, setStepGoal] = useState(10000);
+  const [goalModalVisible, setGoalModalVisible] = useState(false);
 
   const periods = [
-    { key: 'day', label: 'Dia' },
     { key: 'week', label: 'Semana' },
     { key: 'month', label: 'Mês' },
     { key: 'year', label: 'Ano' },
   ];
 
-  const { logs, goal, loading, error } = useHydrationLogs(selectedDate);
+  // 👉 Hook de passos
+  const { steps, loading, error, refreshSteps } = useSteps();
 
-  const total = logs.reduce((sum, { quantity = 0 }) => sum + quantity, 0);
-
-  const handlePeriodChange = (period: typeof selectedPeriod) => {
+  const handlePeriodChange = (period: typeof selectedPeriod) =>
     setSelectedPeriod(period);
+  const handleSaveGoal = (newGoal: number) => {
+    setStepGoal(newGoal);
+    setGoalModalVisible(false);
   };
 
-  const transformLogsToChartData = () => {
+  // 🔹 Transformar steps em dados do gráfico
+  const transformStepsToChartData = () => {
+    const now = new Date();
     switch (selectedPeriod) {
-      case 'day':
-        return Array.from({ length: 24 }, (_, hour) => {
-          const total = logs
-            .filter((log) => new Date(log.date).getHours() === hour)
-            .reduce((sum, log) => sum + (log.quantity ?? 0), 0);
-          return { x: hour, y: total };
-        });
-
       case 'week':
-        return Array.from({ length: 7 }, (_, day) => {
-          const total = logs
-            .filter((log) => new Date(log.date).getDay() === day)
-            .reduce((sum, log) => sum + (log.quantity ?? 0), 0);
-          return { x: day, y: total };
-        });
-
+        return Array.from({ length: 7 }, (_, day) => ({
+          x: day,
+          y: day === now.getDay() ? steps : 0,
+        }));
       case 'month':
-        return Array.from({ length: 30 }, (_, day) => {
-          const total = logs
-            .filter((log) => new Date(log.date).getDate() === day + 1)
-            .reduce((sum, log) => sum + (log.quantity ?? 0), 0);
-          return { x: day + 1, y: total };
-        });
-
+        const daysInMonth = new Date(
+          now.getFullYear(),
+          now.getMonth() + 1,
+          0
+        ).getDate();
+        return Array.from({ length: daysInMonth }, (_, day) => ({
+          x: day + 1,
+          y: day + 1 === now.getDate() ? steps : 0,
+        }));
       case 'year':
-        return Array.from({ length: 12 }, (_, month) => {
-          const total = logs
-            .filter((log) => new Date(log.date).getMonth() === month)
-            .reduce((sum, log) => sum + (log.quantity ?? 0), 0);
-          return { x: month + 1, y: total };
-        });
-
+        return Array.from({ length: 12 }, (_, month) => ({
+          x: month + 1,
+          y: month === now.getMonth() ? steps : 0,
+        }));
       default:
         return [];
     }
   };
 
-  const [goalModalVisible, setGoalModalVisible] = useState(false);
-
-  const handleSaveGoal = (newGoal: number) => {
-    // Atualize a meta aqui (API ou contexto)
-    setGoalModalVisible(false);
-  };
+  const chartData = transformStepsToChartData();
+  const progressPercentage = steps / stepGoal;
 
   return (
     <SafeAreaView style={styles.container}>
       <Header avatarChar="A" />
-
       <HeaderWithOptions
-        title="Hidratação"
+        title="Passos"
         options={[
-          {
-            label: 'Editar Meta',
-            onPress: () => {
-              setGoalModalVisible(true);
-            },
-          },
+          { label: 'Atualizar', onPress: refreshSteps },
+          { label: 'Editar Meta', onPress: () => setGoalModalVisible(true) },
         ]}
       />
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <PeriodSelector
           //@ts-ignore
           periods={periods}
@@ -119,39 +101,33 @@ export default function HydrationScreen() {
           onDateChange={setSelectedDate}
         />
 
-        <HydrationSummary
-          total={total}
-          remaining={goal - total}
-          goal={goal}
-          progress={(total / goal) * 100}
-        />
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#4CAF50" />
+          </View>
+        ) : error ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : (
+          <>
+            <StepsSummary
+              totalSteps={steps}
+              goalSteps={stepGoal}
+              progress={progressPercentage}
+            />
 
-        {selectedPeriod !== 'day' && (
-          <StepsChart
-            data={transformLogsToChartData()}
-            mode={selectedPeriod}
-            barColor="#4DC4FF"
-          />
+            <StepsChart data={chartData} mode={selectedPeriod} />
+          </>
         )}
-
-        <HydrationHistory
-          logs={logs}
-          dateLabel={formatDatetimeToISO(selectedDate)}
-          loading={loading}
-          error={error}
-        />
       </ScrollView>
-
-      <FloatingActionButton
-        onPress={() => router.push('/hydratation/register')}
-      />
 
       <GoalModal
         visible={goalModalVisible}
         onClose={() => setGoalModalVisible(false)}
         onSave={handleSaveGoal}
-        currentValue={goal}
-        goalType="hydration"
+        currentValue={stepGoal}
+        goalType="steps"
       />
     </SafeAreaView>
   );
@@ -159,5 +135,12 @@ export default function HydrationScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  scrollView: { flex: 1 },
+  scrollViewContent: { flexGrow: 1, paddingBottom: height * 0.03 },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  errorText: { color: 'red', fontSize: 16 },
 });
