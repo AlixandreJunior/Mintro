@@ -1,18 +1,16 @@
-import { Steps } from "@/types/health/steps";
-import api from "../api"
+import api from '../api';
 
 export const getStepsList = async () => {
-    try {
-    const response = await api.get<Steps[]>("mental/mindfulness/")
-    
-    const data = response.data
-    return data
+  try {
+    const response = await api.get('health/steps/');
 
-    } catch(error: any) {
-      if (error.response?.data?.detail) {
-      throw new Error(error.response.data.detail); 
+    const data = response.data;
+    return data;
+  } catch (error: any) {
+    if (error.response?.data?.detail) {
+      throw new Error(error.response.data.detail);
     }
 
-    throw new Error("Erro ao tentar buscar diario");
-    }
+    throw new Error('Erro ao tentar buscar diario');
   }
+};

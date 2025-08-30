@@ -8,7 +8,7 @@ export default function RegisterExerciseScreen() {
   return (
     <RegisterScreenTemplate
       title="Registrar Exercício"
-      labelSelect="Exercício"
+      labelSelect="Exercise"
       fetchItemList={getExerciseList}
       registerLog={registerExerciseLog}
       onSuccessRedirect={() => router.back()}

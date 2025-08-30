@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   format,
@@ -77,7 +83,10 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
     onDateChange(newDate);
   };
 
-  const getSpecialLabel = (date: Date, mode: 'day' | 'week' | 'month' | 'year') => {
+  const getSpecialLabel = (
+    date: Date,
+    mode: 'day' | 'week' | 'month' | 'year'
+  ) => {
     const today = new Date();
 
     switch (mode) {
@@ -89,8 +98,10 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
 
       case 'week':
         if (isSameWeek(date, today, { weekStartsOn: 0 })) return 'Esta semana';
-        if (isSameWeek(date, subWeeks(today, 1), { weekStartsOn: 0 })) return 'Semana passada';
-        if (isSameWeek(date, addWeeks(today, 1), { weekStartsOn: 0 })) return 'Próxima semana';
+        if (isSameWeek(date, subWeeks(today, 1), { weekStartsOn: 0 }))
+          return 'Semana passada';
+        if (isSameWeek(date, addWeeks(today, 1), { weekStartsOn: 0 }))
+          return 'Próxima semana';
         break;
 
       case 'month':
@@ -115,9 +126,14 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
 
     switch (mode) {
       case 'day':
-        return format(currentDate, "EEEE, d 'de' MMMM", { locale: ptBR }).replace(/^\w/, c => c.toUpperCase());
+        return format(currentDate, "EEEE, d 'de' MMMM", {
+          locale: ptBR,
+        }).replace(/^\w/, (c) => c.toUpperCase());
       case 'week': {
-        const start = startOfWeek(currentDate, { locale: ptBR, weekStartsOn: 0 });
+        const start = startOfWeek(currentDate, {
+          locale: ptBR,
+          weekStartsOn: 0,
+        });
         const end = endOfWeek(currentDate, { locale: ptBR, weekStartsOn: 0 });
         return `${format(start, 'd/MM')} - ${format(end, 'd/MM')}`;
       }
@@ -139,7 +155,11 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
       </TouchableOpacity>
 
       <TouchableOpacity onPress={handleNext}>
-        <MaterialCommunityIcons name="chevron-right" size={24} color="#374151" />
+        <MaterialCommunityIcons
+          name="chevron-right"
+          size={24}
+          color="#374151"
+        />
       </TouchableOpacity>
     </View>
   );

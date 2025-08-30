@@ -1,8 +1,3 @@
-from apps.diary.models.objetives import Objective
-from apps.diary.serializers.objetives import (
-    ObjectiveReadSerializer,
-    ObjectiveWriteSerializer,
-)
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import (
@@ -14,6 +9,12 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+from apps.diary.models.objetives import Objective
+from apps.diary.serializers.objetives import (
+    ObjectiveReadSerializer,
+    ObjectiveWriteSerializer,
+)
 
 
 class ObjectiveListView(ListAPIView):

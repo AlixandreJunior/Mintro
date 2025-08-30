@@ -1,91 +1,89 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   SafeAreaView,
   ScrollView,
-  StatusBar,
+  StyleSheet,
   Dimensions,
+  ActivityIndicator,
+  View,
+  Text,
 } from 'react-native';
 import Header from '@/components/Layout/Header';
 import HeaderWithOptions from '@/components/Layout/HeaderWithOptions';
 import DateNavigator from '@/components/DateNavigator';
-import StepsChart from '@/components/StepsChart';
 import PeriodSelector from '@/components/PeriodSelector';
+import StepsChart from '@/components/StepsChart';
 import { StepsSummary } from '@/components/StepsSummary';
+import GoalModal from '@/components/GoalModal';
 
-import GoalModal from '@/components/GoalModal'; // Importa modal
+import { useSteps } from '@/hooks/useSteps';
 
 const { height } = Dimensions.get('window');
 
-const CHART_DATA = [
-  { x: 0, y: 4000 },
-  { x: 1, y: 0 },
-  { x: 2, y: 0 },
-  { x: 3, y: 0 },
-  { x: 4, y: 200 },
-  { x: 5, y: 0 },
-  { x: 6, y: 0 },
-  { x: 7, y: 0 },
-  { x: 8, y: 0 },
-  { x: 9, y: 0 },
-  { x: 10, y: 0 },
-  { x: 11, y: 800 },
-  { x: 12, y: 1000 },
-  { x: 13, y: 0 },
-  { x: 14, y: 0 },
-  { x: 15, y: 1000 },
-  { x: 16, y: 0 },
-  { x: 17, y: 0 },
-  { x: 18, y: 1000 },
-  { x: 19, y: 0 },
-  { x: 20, y: 0 },
-  { x: 21, y: 1000 },
-  { x: 22, y: 0 },
-  { x: 23, y: 0 },
-];
-
-export default function App(): React.JSX.Element {
+export default function StepsScreen() {
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedPeriod, setSelectedPeriod] = useState<
-    'day' | 'week' | 'month' | 'year'
-  >('day');
-  const [currentDateLabel, setCurrentDateLabel] = useState(new Date());
+    'week' | 'month' | 'year'
+  >('week');
+  const [stepGoal, setStepGoal] = useState(10000);
+  const [goalModalVisible, setGoalModalVisible] = useState(false);
 
   const periods = [
-    { key: 'day', label: 'Dia' },
     { key: 'week', label: 'Semana' },
     { key: 'month', label: 'Mês' },
     { key: 'year', label: 'Ano' },
   ];
 
-  const [stepGoal, setStepGoal] = useState(10000); // Meta inicial
+  // 👉 Hook de passos
+  const { steps, loading, error, refreshSteps } = useSteps();
 
-  const totalSteps = 6500;
-  const progressPercentage = totalSteps / stepGoal;
-
-  const [goalModalVisible, setGoalModalVisible] = useState(false);
-
-  const handlePeriodChange = (period: typeof selectedPeriod) => {
+  const handlePeriodChange = (period: typeof selectedPeriod) =>
     setSelectedPeriod(period);
-  };
-
-  // Salvar meta do modal
   const handleSaveGoal = (newGoal: number) => {
     setStepGoal(newGoal);
     setGoalModalVisible(false);
-    // Aqui pode chamar API ou atualizar contexto
   };
 
+  // 🔹 Transformar steps em dados do gráfico
+  const transformStepsToChartData = () => {
+    const now = new Date();
+    switch (selectedPeriod) {
+      case 'week':
+        return Array.from({ length: 7 }, (_, day) => ({
+          x: day,
+          y: day === now.getDay() ? steps : 0,
+        }));
+      case 'month':
+        const daysInMonth = new Date(
+          now.getFullYear(),
+          now.getMonth() + 1,
+          0
+        ).getDate();
+        return Array.from({ length: daysInMonth }, (_, day) => ({
+          x: day + 1,
+          y: day + 1 === now.getDate() ? steps : 0,
+        }));
+      case 'year':
+        return Array.from({ length: 12 }, (_, month) => ({
+          x: month + 1,
+          y: month === now.getMonth() ? steps : 0,
+        }));
+      default:
+        return [];
+    }
+  };
+
+  const chartData = transformStepsToChartData();
+  const progressPercentage = steps / stepGoal;
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#C8E6C9" />
+    <SafeAreaView style={styles.container}>
       <Header avatarChar="A" />
       <HeaderWithOptions
         title="Passos"
         options={[
-          {
-            label: 'Editar Meta',
-            onPress: () => setGoalModalVisible(true),
-          },
+          { label: 'Atualizar', onPress: refreshSteps },
+          { label: 'Editar Meta', onPress: () => setGoalModalVisible(true) },
         ]}
       />
 
@@ -96,20 +94,34 @@ export default function App(): React.JSX.Element {
           selectedPeriod={selectedPeriod}
           onPeriodChange={handlePeriodChange}
         />
+
         <DateNavigator
-          currentDate={currentDateLabel}
+          currentDate={selectedDate}
           mode={selectedPeriod}
-          onDateChange={setCurrentDateLabel}
+          onDateChange={setSelectedDate}
         />
-        <StepsSummary
-          totalSteps={totalSteps}
-          goalSteps={stepGoal}
-          progress={progressPercentage}
-        />
-        <StepsChart data={CHART_DATA} mode={selectedPeriod} />
+
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#4CAF50" />
+          </View>
+        ) : error ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : (
+          <>
+            <StepsSummary
+              totalSteps={steps}
+              goalSteps={stepGoal}
+              progress={progressPercentage}
+            />
+
+            <StepsChart data={chartData} mode={selectedPeriod} />
+          </>
+        )}
       </ScrollView>
 
-      {/* Modal para editar a meta de passos */}
       <GoalModal
         visible={goalModalVisible}
         onClose={() => setGoalModalVisible(false)}
@@ -122,13 +134,13 @@ export default function App(): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: { flex: 1, backgroundColor: '#fff' },
+  scrollViewContent: { flexGrow: 1, paddingBottom: height * 0.03 },
+  loadingContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
   },
-  scrollViewContent: {
-    flexGrow: 1,
-    backgroundColor: '#fff',
-    paddingBottom: height * 0.03,
-  },
+  errorText: { color: 'red', fontSize: 16 },
 });

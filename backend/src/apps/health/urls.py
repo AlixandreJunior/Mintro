@@ -1,5 +1,6 @@
-from apps.health.views import exercise, hydratation, mindfulness
 from django.urls import path
+
+from apps.health.views import exercise, hydratation, mindfulness, steps
 
 app_name = "health"
 
@@ -38,4 +39,7 @@ urlpatterns = [
         mindfulness.MindfulnessLogRegisterView.as_view(),
         name="mindfulness_log_register",
     ),
+    path("steps/", steps.StepLogListView.as_view(), name="steps_list"),
+    path("steps/register/", steps.StepLogRegisterView.as_view(), name="steps_register"),
+    path("steps/detail/", steps.StepLogDetailView.as_view(), name="steps_detail"),
 ]

@@ -1,7 +1,7 @@
-from apps.diary.views import diary
 from django.urls import path
 
-from .views import objetives
+from apps.diary.views import diary, objetives
+
 
 app_name = "diary"
 

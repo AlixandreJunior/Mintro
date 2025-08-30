@@ -2,7 +2,7 @@
   "expo": {
     "name": "VITACARE",
     "slug": "vitacare",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "vitacare",
@@ -41,10 +41,11 @@
       "eas": {
         "projectId": "8314ee45-5777-4547-8a14-146edc5b7f9c"
       },
-      "API_URL": "http://localhost:8000/api/"
+      "API_URL": "https://mintro.onrender.com/api/"
     },
     "android": {
       "package": "com.alixandre.vitacare",
+      "versionCode": 2,
       "buildType": "apk"
     }
   }

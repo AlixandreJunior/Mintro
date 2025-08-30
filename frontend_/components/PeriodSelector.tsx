@@ -1,33 +1,49 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
-type Options = ('day' | 'week' | 'month' | 'year')
+type Options = 'week' | 'month' | 'year';
 
-interface Period{
-  key: Options
-  label: string
+interface Period {
+  key: Options;
+  label: string;
 }
 
 interface PeriodSelectorProps {
-  periods: Period[]
+  periods: Period[];
   selectedPeriod: Options;
   onPeriodChange: (period: Options) => void;
 }
 
-export default function PeriodSelector({ periods, selectedPeriod, onPeriodChange }: PeriodSelectorProps) {
-
+export default function PeriodSelector({
+  periods,
+  selectedPeriod,
+  onPeriodChange,
+}: PeriodSelectorProps) {
   return (
     <View style={styles.container}>
       {periods.map(({ key, label }) => (
         <TouchableOpacity
           key={key}
           onPress={() => onPeriodChange(key)}
-          style={[styles.button, selectedPeriod === key && styles.selectedButton]}
+          style={[
+            styles.button,
+            selectedPeriod === key && styles.selectedButton,
+          ]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.text, selectedPeriod === key && styles.selectedText]}>{label}</Text>
+          <Text
+            style={[styles.text, selectedPeriod === key && styles.selectedText]}
+          >
+            {label}
+          </Text>
         </TouchableOpacity>
       ))}
     </View>

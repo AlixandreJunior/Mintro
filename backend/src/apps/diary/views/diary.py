@@ -1,9 +1,3 @@
-from apps.diary.models.diary import Activity, Diary
-from apps.diary.serializers.diary import (
-    ActivitySerializer,
-    DiaryReadSerializer,
-    DiaryWriteSerializer,
-)
 from rest_framework import status
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import (
@@ -15,6 +9,13 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+from apps.diary.models.diary import Activity, Diary
+from apps.diary.serializers.diary import (
+    ActivitySerializer,
+    DiaryReadSerializer,
+    DiaryWriteSerializer,
+)
 from utils.check_achievement import check_narrador_da_propria_historia
 
 

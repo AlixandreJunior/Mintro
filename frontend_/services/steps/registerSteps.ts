@@ -1,14 +1,13 @@
-import { Steps } from "@/types/health/steps";
-import api from "../api";
+import api from '../api';
 
-export const registerStepsLog= async (data: Steps) => {
+export const registerStepsLog = async (data: any) => {
   try {
-    const response = await api.post("mental/steps/register", data);
+    const response = await api.post('health/steps/register/', data);
     return response.data;
   } catch (error: any) {
     if (error.response?.data?.detail) {
       throw new Error(error.response.data.detail);
     }
-    throw new Error("Erro ao tentar atualizar usuário.");
+    throw new Error('Erro ao tentar atualizar usuário.');
   }
 };
