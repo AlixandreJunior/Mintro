@@ -14,6 +14,7 @@ import AuthGuard from '../components/AuthGuard';
 import * as NavigationBar from 'expo-navigation-bar';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { Accelerometer } from 'expo-sensors';
+import * as Notifications from 'expo-notifications';
 import { registerStepsLog } from '@/services/steps/registerSteps';
 import { getStepsList } from '@/services/steps/listSteps';
 
@@ -48,7 +49,6 @@ export default function RootLayout() {
 
   // 🔹 Inicializar accelerometer quando app abre
   useEffect(() => {
-    // 🚨 Proteção para não quebrar no web
     if (Platform.OS === 'web') {
       console.warn('Accelerometer não disponível no web');
       return;
@@ -102,7 +102,6 @@ export default function RootLayout() {
             .then(async () => {
               console.log('✅ Passos enviados:', delta);
 
-              // só para debug: busca total no backend
               const data = await getStepsList();
               const total = data.reduce(
                 (acc: number, item: any) => acc + (item.steps || 0),
@@ -132,6 +131,25 @@ export default function RootLayout() {
       await NavigationBar.setBehaviorAsync('overlay-swipe');
     }
     setNavigationBar();
+  }, []);
+
+  // 🔹 Solicitar permissão de notificações
+  useEffect(() => {
+    const requestNotificationPermission = async () => {
+      if (Platform.OS === 'web') return;
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        console.warn('Permissão para notificações não concedida.');
+      }
+    };
+
+    requestNotificationPermission();
   }, []);
 
   if (!fontsLoaded) {
