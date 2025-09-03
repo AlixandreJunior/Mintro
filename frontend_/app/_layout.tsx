@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Slot } from 'expo-router';
 import {
   useFonts,
@@ -28,6 +28,18 @@ const UPPER_THRESHOLD_G = 0.22;
 const LOWER_THRESHOLD_G = 0.12;
 const SEND_INTERVAL_MS = 1 * 60 * 1000;
 
+// 🔹 Configura como as notificações vão aparecer
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowInForeground: true,
+    shouldShowList: true,
+  }),
+});
+
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Poppins_300Light,
@@ -47,7 +59,7 @@ export default function RootLayout() {
   const lastSendTimeRef = useRef<number | null>(null);
   const subscriptionRef = useRef<any>(null);
 
-  // 🔹 Inicializar accelerometer quando app abre
+  // 🔹 Inicializar accelerometer
   useEffect(() => {
     if (Platform.OS === 'web') {
       console.warn('Accelerometer não disponível no web');
@@ -101,7 +113,6 @@ export default function RootLayout() {
           registerStepsLog({ steps: delta })
             .then(async () => {
               console.log('✅ Passos enviados:', delta);
-
               const data = await getStepsList();
               const total = data.reduce(
                 (acc: number, item: any) => acc + (item.steps || 0),
@@ -133,10 +144,11 @@ export default function RootLayout() {
     setNavigationBar();
   }, []);
 
-  // 🔹 Solicitar permissão de notificações
+  // 🔹 Permissão e agendamento de notificações
   useEffect(() => {
-    const requestNotificationPermission = async () => {
+    const setupNotifications = async () => {
       if (Platform.OS === 'web') return;
+
       const { status: existingStatus } =
         await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
@@ -144,12 +156,34 @@ export default function RootLayout() {
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
       }
+
       if (finalStatus !== 'granted') {
         console.warn('Permissão para notificações não concedida.');
+        return;
       }
+
+      // 🔔 Notificação teste (10s depois de abrir)
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: '🚀 Teste de Notificação',
+          body: 'Se você recebeu isso, está tudo certo no Expo Go!',
+        },
+        //@ts-ignore
+        trigger: { seconds: 10 },
+      });
+
+      // 🔔 Notificação diária fixa (todo dia às 9h)
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: '☀️ Lembrete Diário',
+          body: 'Não esqueça de registrar seus objetivos hoje!',
+        },
+        //@ts-ignore
+        trigger: { hour: 9, minute: 0, repeats: true },
+      });
     };
 
-    requestNotificationPermission();
+    setupNotifications();
   }, []);
 
   if (!fontsLoaded) {
