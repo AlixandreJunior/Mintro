@@ -5,15 +5,11 @@ import WaterDropIcon from "@/components/Icons/WaterDropIcon";
 
 interface HydrationSummaryProps {
   total: number;
-  remaining: number;
-  goal: number;
   progress: number;
 }
 
 export const HydrationSummary: React.FC<HydrationSummaryProps> = ({
   total,
-  remaining,
-  goal,
   progress,
 }) => {
   return (
@@ -21,7 +17,7 @@ export const HydrationSummary: React.FC<HydrationSummaryProps> = ({
       <View style={styles.leftContent}>
         <Text style={styles.currentAmount}>{total} ml</Text>
         <Text style={styles.remainingText}>
-          Faltam {Math.max(0, remaining)} ml para você atingir{"\n"}seu objetivo diário de {goal} ml
+          Acompanhe e registre sua hidratação hoje
         </Text>
       </View>
       <View style={styles.progressContainer}>
@@ -52,7 +48,7 @@ const styles = StyleSheet.create({
   remainingText: {
     fontSize: 12,
     fontFamily: "Poppins_400Regular",
-    color: "#666",
+    color: "#667",
     lineHeight: 20,
   },
   progressContainer: {

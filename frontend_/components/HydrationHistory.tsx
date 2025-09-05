@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { Hydratation } from "@/types/health/hydratation";
+import BaseCard from "./Cards/BaseCard";
 
 interface Props {
   logs: Hydratation[];
@@ -28,7 +29,7 @@ export const HydrationHistory: React.FC<Props> = ({
         <Text style={styles.noDataText}>Nenhum registro de hidratação para essa data.</Text>
       ) : (
         logs.map((log, index) => (
-          <View key={index} style={styles.historyCard}>
+          <BaseCard key={index} style={styles.historyCard}>
             <View style={styles.historyCardContent}>
               <View>
                 <Text style={styles.cardValue}>{log.quantity} ml</Text>
@@ -39,7 +40,7 @@ export const HydrationHistory: React.FC<Props> = ({
                 </Text>
               </View>
             </View>
-          </View>
+          </BaseCard>
         ))
       )}
     </View>
@@ -78,14 +79,8 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_400Regular",
   },
   historyCard: {
-    backgroundColor: "white",
     borderRadius: 12,
     padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
     marginBottom: 16,
   },
   historyCardContent: {

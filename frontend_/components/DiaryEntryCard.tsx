@@ -12,9 +12,10 @@ import { MoodType } from '@/types/mental/diary';
 import { getActivityIconName } from '@/utils/activityIconMapper';
 import { router } from 'expo-router';
 import { useDiaryForm } from '@/hooks/forms/useDiaryForm';
-import VerticalDotsIcon from '../Icons/VerticalDotsIcon';
-import DiaryModal from '../Modal/DiaryModal';
-import BaseCard from './BaseCard';
+import VerticalDotsIcon from './Icons/VerticalDotsIcon';
+import DiaryModal from './Modal/DiaryModal';
+import BaseCard from './Cards/BaseCard';
+import DiaryCard from './Cards/DiaryCard';
 
 const screen = Dimensions.get('window');
 
@@ -99,7 +100,7 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
         <View style={styles.timelineRow}>
           <View style={styles.timelineIconContainer}>{iconSource}</View>
 
-          <BaseCard style={{ marginLeft: 49, maxWidth: screen.width - 65 }}>
+          <DiaryCard style={{ marginLeft: 49, maxWidth: screen.width - 65 }}>
             <View style={styles.entryHeader}>
               <View style={styles.entryInfo}>
                 <View
@@ -162,7 +163,7 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
                 style={[styles.diaryPhoto, { maxHeight: screen.width * 0.5 }]}
               />
             )}
-          </BaseCard>
+          </DiaryCard>
         </View>
       </Pressable>
 
@@ -232,7 +233,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: 50,
+    width: 60,
   },
   dotsButton: {
     paddingHorizontal: 4,

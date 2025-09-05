@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosError } from 'axios';
 import Constants from 'expo-constants';
 
-const apiUrl = 'http://192.168.1.10:8000/api/';
+const apiUrl = 'http://10.67.168.155:8000/api/';
 
 const api = axios.create({
   baseURL: apiUrl,
