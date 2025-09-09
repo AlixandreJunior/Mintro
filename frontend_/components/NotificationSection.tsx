@@ -1,120 +1,112 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React from "react";
-import { Alert, Dimensions, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import {
+  Alert,
+  Dimensions,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { useNotifications } from '@/hooks/useNotifications';
 
 const { width, height } = Dimensions.get('window');
 
 interface NotificationItem {
   id: string;
-  type: 'passos' | 'hidratacao' | 'consulta';
   title: string;
-  description: string;
-  time: string;
-  read: boolean;
+  body: string;
+  date: string; // vamos formatar depois
+  type: 'goal' | 'reminder' | 'other';
 }
 
-const MOCK_NOTIFICATIONS: { [key: string]: NotificationItem[] } = {
-  Hoje: [
-    {
-      id: '1',
-      type: 'passos',
-      title: 'Meta de Passos',
-      description: 'Parabéns! Você completou sua meta diária de 8.000 passos',
-      time: 'há 4h',
-      read: false,
-    },
-    {
-      id: '2',
-      type: 'hidratacao',
-      title: 'Hidratação',
-      description: 'Lembre-se de beber água! Você bebeu 1.2L hoje',
-      time: 'há 6h',
-      read: false,
-    },
-  ],
-  Ontem: [
-    {
-      id: '3',
-      type: 'passos',
-      title: 'Meta de Passos',
-      description: 'Parabéns! Você completou sua meta diária de 8.000 passos',
-      time: '22:30',
-      read: true,
-    },
-    {
-      id: '4',
-      type: 'consulta',
-      title: 'Consulta Agendada',
-      description: 'Consulta com Dr. Silva agendada para amanhã às 15:00',
-      time: '14:00',
-      read: true,
-    },
-  ],
-};
-
 const NotificationSection: React.FC = () => {
+  const { getNotificationHistory } = useNotifications();
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      const history = await getNotificationHistory();
+      // ordenar do mais recente para o mais antigo
+      const sorted = history
+        .map((n) => ({
+          ...n,
+          date: new Date(n.date).toLocaleString('pt-BR', {
+            day: '2-digit',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
+        }))
+        .sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+      setNotifications(sorted);
+    };
+
+    fetchNotifications();
+  }, []);
+
   const handleNotificationPress = (notificationId: string) => {
-    Alert.alert('Notificação Clicada', `Você clicou na notificação ID: ${notificationId}`);
+    Alert.alert(
+      'Notificação Clicada',
+      `Você clicou na notificação ID: ${notificationId}`
+    );
   };
 
-  const renderNotificationItem = (notification: NotificationItem): React.JSX.Element => {
-    let iconName: string;
-    let iconColor: string;
-    let iconBgColor: string;
+  const renderNotificationItem = (notification: NotificationItem) => {
+    let iconName = 'information-outline';
+    let iconColor = '#757575';
+    let iconBgColor = 'rgba(107, 114, 128, 0.2)';
 
-    switch (notification.type) {
-      case 'passos':
-        iconName = 'run';
-        iconColor = '#6B7280';
-        iconBgColor = 'rgba(107, 114, 128, 0.2)';
-        break;
-      case 'hidratacao':
-        iconName = 'cup';
-        iconColor = '#6B7280';
-        iconBgColor = 'rgba(127, 176, 105, 0.2)';
-        break;
-      case 'consulta':
-        iconName = 'calendar';
-        iconColor = '#6B7280';
-        iconBgColor = 'rgba(107, 114, 128, 0.2)';
-        break;
-      default:
-        iconName = 'information-outline';
-        iconColor = '#757575';
-        iconBgColor = 'rgba(107, 114, 128, 0.2)';
+    if (notification.type === 'goal') {
+      iconName = 'trophy';
+      iconColor = '#F59E0B';
+      iconBgColor = 'rgba(245, 158, 11, 0.2)';
+    } else if (notification.type === 'reminder') {
+      iconName = 'bell';
+      iconColor = '#10B981';
+      iconBgColor = 'rgba(16, 185, 129, 0.2)';
     }
 
     return (
-      <ScrollView style={{flex: 1}}>
       <TouchableOpacity
         key={notification.id}
         style={styles.notificationCard}
         onPress={() => handleNotificationPress(notification.id)}
       >
         <View style={[styles.iconCircle, { backgroundColor: iconBgColor }]}>
-          <MaterialCommunityIcons name={iconName as any} size={width * 0.045} color={iconColor} />
+          <MaterialCommunityIcons
+            name={iconName as any}
+            size={width * 0.045}
+            color={iconColor}
+          />
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.notificationTitle}>{notification.title}</Text>
-          <Text style={styles.notificationDescription}>{notification.description}</Text>
+          <Text style={styles.notificationDescription}>
+            {notification.body}
+          </Text>
         </View>
         <View style={styles.timeContainer}>
-          <Text style={styles.notificationTime}>{notification.time}</Text>
+          <Text style={styles.notificationTime}>{notification.date}</Text>
         </View>
       </TouchableOpacity>
-      </ScrollView>
     );
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {Object.keys(MOCK_NOTIFICATIONS).map((sectionTitle) => (
-          <View key={sectionTitle} style={styles.notificationSection}>
-            <Text style={styles.sectionHeaderTitle}>{sectionTitle}</Text>
-            {MOCK_NOTIFICATIONS[sectionTitle].map(renderNotificationItem)}
-          </View>
-        ))}
+        {notifications.length === 0 ? (
+          <Text style={{ textAlign: 'center', marginTop: 32 }}>
+            Nenhuma notificação encontrada.
+          </Text>
+        ) : (
+          notifications.map(renderNotificationItem)
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -123,21 +115,11 @@ const NotificationSection: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fffff',
+    backgroundColor: '#fff',
   },
   scrollViewContent: {
     flexGrow: 1,
     paddingVertical: height * 0.01,
-  },
-  notificationSection: {
-    marginBottom: height * 0.01,
-  },
-  sectionHeaderTitle: {
-    fontSize: width * 0.04,
-    fontFamily: 'Poppins_500Medium',
-    color: '#000000',
-    paddingLeft: width * 0.04,
-    marginBottom: height * 0.015,
   },
   notificationCard: {
     flexDirection: 'row',
@@ -190,12 +172,6 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginBottom: height * 0.005,
     lineHeight: width * 0.035,
-  },
-  unreadIndicator: {
-    width: width * 0.02,
-    height: width * 0.02,
-    borderRadius: (width * 0.02) / 2,
-    backgroundColor: '#FF0000',
   },
 });
 

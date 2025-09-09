@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card } from 'react-native-paper';
 import { QuantityCounter } from '@/components/Cards/QuantityCounter';
+import BaseCard from './Cards/BaseCard';
 
 interface QuantitySelectorProps {
   quantities: Record<number, number>;
@@ -26,7 +27,7 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
       <Text style={styles.sectionTitle}>
         Escolha uma opção ou adicione uma personalizada
       </Text>
-      <Card style={styles.optionsCard} elevation={1}>
+      <BaseCard style={styles.optionsCard}>
         {VOLUMES.map((vol, i) => (
           <React.Fragment key={vol}>
             <QuantityCounter
@@ -38,13 +39,13 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
             {i < VOLUMES.length - 1 && <View style={styles.separator} />}
           </React.Fragment>
         ))}
-      </Card>
+      </BaseCard>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  section: { paddingHorizontal: 16, marginTop: 20 },
+  section: {marginVertical: 10 },
   sectionTitle: {
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
@@ -56,7 +57,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
@@ -65,6 +65,6 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
     backgroundColor: '#F3F4F6',
-    marginVertical: 10,
+    marginVertical: 6,
   },
 });

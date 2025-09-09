@@ -28,7 +28,10 @@ export const MainInput: React.FC<MainInputProps> = ({
         style={styles.textInput}
         placeholder={placeholder ? placeholder : 'Opcional'}
         outlineStyle={styles.textInputOutline as ViewStyle}
-        theme={{ fonts: { regular: { fontFamily: 'Poppins_400Regular' } } }}
+        theme={{
+    fonts: {
+      regular: { fontFamily: 'Poppins_400Regular' },
+    }, }}
       />
     </View>
   );
@@ -41,7 +44,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
-    color: '#4B5563',
+    color: '#000000ff',
     marginBottom: 2,
   },
   textInput: {
@@ -57,7 +60,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#000000ff',
     minHeight: 56,
     justifyContent: 'center',
     paddingHorizontal: 12,

@@ -10,6 +10,7 @@ import CompletionIcon from '../Icons/CompletionIon';
 import { getActivityIconName } from '@/utils/activityIconMapper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import BaseCard from './BaseCard';
+import ObjectiveCard from './ObjetctiveCard';
 
 interface ObjectiveDisplayCardProps {
   objectiveTitle: string;
@@ -28,7 +29,7 @@ const ObjectiveDisplayCard: React.FC<ObjectiveDisplayCardProps> = ({
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <BaseCard style={styles.card}>
+      <ObjectiveCard style={styles.card}>
         <View style={styles.leftSection}>
           <View style={styles.checkWrapper}>
             <CompletionIcon />
@@ -46,7 +47,7 @@ const ObjectiveDisplayCard: React.FC<ObjectiveDisplayCardProps> = ({
           size={20}
           color="rgba(0, 0, 0, 0.7)"
         />
-      </BaseCard>
+      </ObjectiveCard>
     </TouchableOpacity>
   );
 };

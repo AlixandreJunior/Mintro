@@ -24,9 +24,10 @@ const RegisterHydrationScreen = () => {
   } = useHydrationForm();
 
   return (
-    <View style={styles.container}>
-      <Header avatarChar="A" />
-      <FormHeader title="Registrar Hidratação" onSavePress={handleSave} />
+    <>
+    <Header avatarChar="A" />      
+    <FormHeader title="Registrar Hidratação" onSavePress={handleSave} />
+    <View style={styles.container}>  
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <DateTimeInput
           labelText="Data"
@@ -46,11 +47,12 @@ const RegisterHydrationScreen = () => {
         />
       </ScrollView>
     </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, paddingHorizontal: 16, backgroundColor: '#fff' },
   scrollViewContent: { paddingBottom: 20 },
 });
 

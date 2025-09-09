@@ -28,7 +28,7 @@ export const DateTimeInput: React.FC<DateTimeInputProps> = ({
   mode,
 }) => {
   return (
-    <View style={styles.inputSection}>
+    <View>
       <Text style={styles.inputLabel}>{labelText}</Text>
       <TouchableOpacity
         onPress={onPress}
@@ -58,7 +58,6 @@ export const DateTimeInput: React.FC<DateTimeInputProps> = ({
 };
 
 const styles = StyleSheet.create({
-  inputSection: { marginBottom: 10 },
   inputLabel: {
     fontSize: 14,
     fontFamily: 'Poppins_400Regular', // Poppins SemiBold para labels
