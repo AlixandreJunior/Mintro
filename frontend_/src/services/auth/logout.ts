@@ -1,28 +1,21 @@
-import api from "../api"
-import { getRefreshToken } from "../../stores/authStore";
+import { useAuth } from '@/context/AuthContext';
+import api from '../api';
 
-export interface createAccountResponse{
-    detail: string
+export interface createAccountResponse {
+  detail: string;
 }
 
 export const logout = async () => {
-    const refresh = await getRefreshToken();
-    
-    if (!refresh) {
-      throw new Error("Refresh Token não existe.");
-    }
+  try {
+    const response = await api.post<createAccountResponse>('logout/', {});
 
-    try {
-        const response = await api.post<createAccountResponse>("logout/", {refresh: refresh})
-
-        const data = response.data
-        return data
-
-    } catch(error: any) {
-      if (error.response?.data?.detail) {
+    const data = response.data;
+    return data;
+  } catch (error: any) {
+    if (error.response?.data?.detail) {
       throw new Error(error.response.data.detail);
     }
 
-    throw new Error("Erro ao tentar criar usuario");
-    }
+    throw new Error('Erro ao tentar criar usuario');
   }
+};

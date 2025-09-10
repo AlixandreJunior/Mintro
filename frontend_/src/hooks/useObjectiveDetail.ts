@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
-import { Objective } from '@/src/types/mental/objectives';
-import { getObjective } from '@/src/services/objectives/getObjective';
-import { updateObjective } from '@/src/services/objectives/updateObjective'; // ajuste conforme seu import real
-import { useObjectiveForm } from '@/src/hooks/forms/useObjectiveForm';
+import { Objective } from '@/types/mental/objectives';
+import { getObjective } from '@/services/objectives/getObjective';
+import { updateObjective } from '@/services/objectives/updateObjective'; // ajuste conforme seu import real
+import { useObjectiveForm } from '@/hooks/forms/useObjectiveForm';
 import { router } from 'expo-router';
 
 export function useObjectiveDetail(id: number | null) {

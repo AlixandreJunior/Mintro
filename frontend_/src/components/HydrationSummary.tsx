@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import ProgressCircle from '@/src/components/ProgressCircle';
-import WaterDropIcon from '@/src/components/Icons/WaterDropIcon';
+import ProgressCircle from '@/components/ProgressCircle';
+import WaterDropIcon from './icons/WaterDropIcon';
 
 interface HydrationSummaryProps {
   total: number;

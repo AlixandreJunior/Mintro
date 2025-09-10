@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import { Text } from 'react-native';
-import BaseCard from '../../ui/card/BaseCard';
+import BaseCard from '../ui/card/BaseCard';
 
 const { width, height } = Dimensions.get('window');
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { ActivityGrid } from '@/src/components/ActivityGrid';
+import { ActivityGrid } from '@/components/ActivityGrid';
 
 interface Activity {
   id: string;

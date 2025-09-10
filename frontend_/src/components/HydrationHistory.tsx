@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { Hydratation } from '@/src/types/health/hydratation';
-import BaseCard from './Cards/BaseCard';
+import { Hydratation } from '@/types/health/hydratation';
+import BaseCard from './ui/card/BaseCard';
 
 interface Props {
   logs: Hydratation[];

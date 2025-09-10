@@ -9,7 +9,7 @@ import {
 import DiaryDayHistory from './DiaryDayHistory';
 import { getMoodVisuals } from '@/utils/moodHelper';
 import { getActivityIconName } from '@/utils/activityIconMapper';
-import { useDiary } from '@/src/hooks/useDiary'; // caminho do seu hook
+import { useDiary } from '@/hooks/useDiary'; // caminho do seu hook
 import { Diary, MoodType } from '@/types/mental/diary';
 
 interface TransformedActivity {

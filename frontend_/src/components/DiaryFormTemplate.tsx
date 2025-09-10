@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet, Dimensions } from 'react-native';
-import { MainInput } from '@/src/components/Inputs/MainInput';
-import { DateTimeInput } from '@/src/components/Inputs/DateTimeInput';
-import MoodOptionSection from '@/src/components/MoodOptionSection';
-import { ActivitiesSection } from '@/src/components/ActivitySection';
-import NotesInput from '@/src/components/Inputs/NotesInput';
-import PhotoPicker from '@/src/components/Inputs/PhotoPicker';
+import { MainInput } from './ui/inputs/MainInput';
+import { DateTimeInput } from './ui/inputs/DateTimeInput';
+import MoodOptionSection from '@/components/MoodOptionSection';
+import { ActivitiesSection } from '@/components/ActivitySection';
+import NotesInput from './ui/inputs/NotesInput';
+import PhotoPicker from './ui/inputs/PhotoPicker';
 
 const { width } = Dimensions.get('window');
 

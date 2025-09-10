@@ -1,69 +1,75 @@
-import { Eye, EyeOff } from "lucide-react-native"
-import React from "react"
-import { Dimensions, GestureResponderEvent, KeyboardTypeOptions, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { Eye, EyeOff } from 'lucide-react-native';
+import React from 'react';
+import {
+  Dimensions,
+  KeyboardTypeOptions,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
-interface EntryInputProps{
-    labelText: string
-    value: string
-    placeholder?: string
-    icon?: React.ReactNode
-    keyboardType: KeyboardTypeOptions
-    onChange: ((text: string) => void)
-    secureText?: {
-        showSecureText: boolean
-        setShowSecureText: ((event: GestureResponderEvent) => void)
-    }
-    
+interface EntryInputProps {
+  labelText: string;
+  value: string;
+  placeholder?: string;
+  icon?: React.ReactNode;
+  keyboardType?: KeyboardTypeOptions;
+  onChange: (text: string) => void;
+  secureText?: {
+    showSecureText: boolean;
+    setShowSecureText: () => void;
+  };
 }
 
 const { width, height } = Dimensions.get('window');
 
-
 export const EntryInput: React.FC<EntryInputProps> = ({
-    labelText,
-    placeholder,
-    icon,
-    keyboardType,
-    value,
-    onChange,
-    secureText,
+  labelText,
+  placeholder,
+  icon,
+  keyboardType = 'default',
+  value,
+  onChange,
+  secureText,
 }) => {
-    return(
-        <View style={styles.inputGroup}>
-            <Text style={styles.label}>{labelText}</Text>
-            <View style={styles.inputContainer}>
-            {icon}
-            <TextInput
-                style={styles.input}
-                placeholder={placeholder}
-                placeholderTextColor="#C7C7CD"
-                value={value}
-                onChangeText={onChange}
-                keyboardType={keyboardType}
-                autoCapitalize="none"
-                secureTextEntry={secureText ? !secureText.showSecureText : false}
-            />
-            {
-                secureText && (
-                <TouchableOpacity
-                  onPress={secureText?.setShowSecureText}
-                  style={styles.eyeIcon}
-                >
-                  {secureText?.showSecureText ? (
-                    <EyeOff size={20} color="#9CA3AF" />
-                  ) : (
-                    <Eye size={20} color="#9CA3AF" />
-                  )}
-                </TouchableOpacity>
-                )
-            }
-            </View>
-        </View>
-    )
-}
+  return (
+    <View style={styles.inputGroup}>
+      <Text style={styles.label}>{labelText}</Text>
+
+      <View style={styles.inputContainer}>
+        {icon && <View style={styles.iconWrapper}>{icon}</View>}
+
+        <TextInput
+          style={styles.input}
+          placeholder={placeholder}
+          placeholderTextColor="#C7C7CD"
+          value={value}
+          onChangeText={onChange}
+          keyboardType={keyboardType}
+          autoCapitalize="none"
+          secureTextEntry={!!secureText && !secureText.showSecureText}
+        />
+
+        {secureText && (
+          <TouchableOpacity
+            onPress={secureText.setShowSecureText}
+            style={styles.eyeIcon}
+          >
+            {secureText.showSecureText ? (
+              <EyeOff size={20} color="#9CA3AF" />
+            ) : (
+              <Eye size={20} color="#9CA3AF" />
+            )}
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    
   inputGroup: {
     marginBottom: height * 0.025,
   },
@@ -84,7 +90,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
     minHeight: height * 0.065,
   },
-  inputIcon: {
+  iconWrapper: {
     marginRight: 12,
   },
   input: {
@@ -96,4 +102,4 @@ const styles = StyleSheet.create({
   eyeIcon: {
     padding: 4,
   },
-})
+});

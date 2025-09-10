@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useNotifications } from '@/src/hooks/useNotifications';
+import { useNotifications } from '@/hooks/useNotifications';
 
 const { width, height } = Dimensions.get('window');
 

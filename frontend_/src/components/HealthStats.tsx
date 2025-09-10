@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import { MainStatsPanel } from '@/src/components/MainStatsPanel';
-import { HydratationCard } from '@/src/components/HydratationCard';
-import { ActivityCard } from '@/src/components/ActivityCard';
+import { MainStatsPanel } from '@/components/MainStatsPanel';
+import { HydratationCard } from '@/components/HydratationCard';
+import { ActivityCard } from '@/components/ActivityCard';
 import { router } from 'expo-router';
 import { isSameDay, isSameWeek, startOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';

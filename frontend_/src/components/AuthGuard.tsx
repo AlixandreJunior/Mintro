@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { useAuth } from '@/src/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { router, useSegments } from 'expo-router';
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {

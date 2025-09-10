@@ -3,7 +3,6 @@ import ObjectiveGridItem from './ObjectivesGridCard';
 import { StyleSheet, View } from 'react-native';
 import { getActivityIconName } from '@/utils/activityIconMapper';
 import { useEffect, useState } from 'react';
-import { getActivities } from '@/src/services/diary/listActivities';
 import { Activity } from '@/types/mental/diary';
 
 interface ActivityGridProps {

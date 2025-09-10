@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Objective } from '@/src/types/mental/objectives';
-import { getObjectiveList } from '@/src/services/objectives/listObjectives';
+import { Objective } from '@/types/mental/objectives';
+import { getObjectiveList } from '@/services/objectives/listObjectives';
 import { router } from 'expo-router';
 import { Alert } from 'react-native';
-import { deleteObjective } from '@/src/services/objectives/deleteObjective';
-import { getObjective } from '@/src/services/objectives/getObjective';
+import { deleteObjective } from '@/services/objectives/deleteObjective';
+import { getObjective } from '@/services/objectives/getObjective';
 
 export function useObjective() {
   const [objectives, setObjectives] = useState<Objective[]>([]);

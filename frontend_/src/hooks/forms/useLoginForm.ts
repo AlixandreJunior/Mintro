@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert } from 'react-native';
-import { login as loginService } from '@/src/services/auth/login';
-import { useAuth } from '@/src/context/AuthContext';
+import { login as loginService } from '@/services/auth/login';
+import { useAuth } from '@/context/AuthContext';
 
 export function useLoginForm() {
   const [email, setEmail] = useState('');

@@ -1,62 +1,103 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import BaseCard from './card/BaseCard';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import CompletionIcon from '../icons/CompletionIon';
+import { getActivityIconName } from '@/utils/activityIconMapper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import BaseCard from '../ui/card/BaseCard';
 
-const ObjectiveCard = () => {
+interface ObjectiveCardProps {
+  title: string;
+  subtitle: string;
+  activityName: string; // Para o ícone do livro ou outro
+}
+
+const { width } = Dimensions.get('window');
+
+const ObjectiveCard: React.FC<ObjectiveCardProps> = ({
+  title,
+  subtitle,
+  activityName,
+}) => {
+  const activityIcon = getActivityIconName(activityName, 22);
+
   return (
-    <BaseCard>
-      <View style={internalStyles.container}>
-        <View style={internalStyles.leftSection}>
-          <View style={internalStyles.checkboxPlaceholder} />
+    <BaseCard style={styles.card}>
+      {/* Left Section: Checkbox + Activity Icon */}
+      <View style={styles.leftSection}>
+        <View style={styles.checkWrapper}>
+          <CompletionIcon size={13} checkmarkColor="#8C8D8F" />
         </View>
-        <View style={internalStyles.middleSection}>
-          <Text style={internalStyles.titleText}>Ler</Text>
-          <Text style={internalStyles.subtitleText}>Sequencia de 2 dias</Text>
-        </View>
-        <View style={internalStyles.rightSection}>
-          <Text style={internalStyles.arrowText}>›</Text>
-        </View>
+        <View style={styles.iconWrapper}>{activityIcon}</View>
       </View>
+
+      {/* Middle Section: Texts */}
+      <View style={styles.middleSection}>
+        <Text style={styles.titleText}>{title}</Text>
+        <Text style={styles.subtitleText}>{subtitle}</Text>
+      </View>
+
+      {/* Right Section: Arrow */}
+      <MaterialCommunityIcons
+        name="chevron-right"
+        size={20}
+        color="rgba(0,0,0,0.7)"
+      />
     </BaseCard>
   );
 };
 
-const internalStyles = StyleSheet.create({
-  container: {
+const styles = StyleSheet.create({
+  card: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    width: width - 32, // margem de 16px dos lados
     minHeight: 60,
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    borderColor: '#E5E7EB',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginVertical: 8,
+    justifyContent: 'space-between',
   },
   leftSection: {
-    marginRight: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
-  checkboxPlaceholder: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+  checkWrapper: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     borderWidth: 1.5,
-    borderColor: '#D1D5DB',
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconWrapper: {
+    width: 22,
+    height: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   middleSection: {
     flex: 1,
+    marginLeft: 14,
   },
   titleText: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '500',
-    color: '#333',
+    color: '#000000',
+    lineHeight: 28,
   },
   subtitleText: {
-    fontSize: 12,
-    color: '#6B7280',
-  },
-  rightSection: {
-    marginLeft: 12,
-  },
-  arrowText: {
-    fontSize: 24,
-    color: '#9CA3AF',
-    fontWeight: '300',
+    fontSize: 11,
+    fontWeight: '400',
+    color: '#000000',
+    lineHeight: 28,
+    marginTop: 0,
   },
 });
 

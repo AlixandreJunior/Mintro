@@ -1,18 +1,18 @@
 import React from 'react'; // NECESSÁRIO para JSX
-import { FamilyIcon } from '@/src/components/Icons/FamilyIcon';
-import { FriendIcon } from '@/src/components/Icons/FriendIcon';
-import { LoveIcon } from '@/src/components/Icons/LoveIcon';
-import { SportIcon } from '@/src/components/Icons/SportIcon';
-import { SleepIcon } from '@/src/components/Icons/SleepIcon';
-import { AppleIcon } from '@/src/components/Icons/AppleIcon';
-import { MovieIcon } from '@/src/components/Icons/MovieIcon';
-import NotebookIcon from '@/src/components/Icons/NotebookIcon';
-import { CartIcon } from '@/src/components/Icons/CartIcon';
-import JobIcon from '@/src/components/Icons/JobIcon';
-import SmileIcon from '@/src/components/Icons/SmileIcon';
-import { DumbbellIcon } from '@/src/components/Icons/DumbellIcon';
-import GameIcon from '@/src/components/Icons/GameIcon';
-import MoonIcon from '@/src/components/Icons/MoonIcon';
+import { FamilyIcon } from '@/components/icons/FamilyIcon';
+import { FriendIcon } from '@/components/icons/FriendIcon';
+import { LoveIcon } from '@/components/icons/LoveIcon';
+import { SportIcon } from '@/components/icons/SportIcon';
+import { SleepIcon } from '@/components/icons/SleepIcon';
+import { AppleIcon } from '@/components/icons/AppleIcon';
+import { MovieIcon } from '@/components/icons/MovieIcon';
+import NotebookIcon from '@/components/icons/NotebookIcon';
+import { CartIcon } from '@/components/icons/CartIcon';
+import JobIcon from '@/components/icons/JobIcon';
+import SmileIcon from '@/components/icons/SmileIcon';
+import { DumbbellIcon } from '@/components/icons/DumbellIcon';
+import GameIcon from '@/components/icons/GameIcon';
+import MoonIcon from '@/components/icons/MoonIcon';
 
 export function getActivityIconName(
   activityName: string,

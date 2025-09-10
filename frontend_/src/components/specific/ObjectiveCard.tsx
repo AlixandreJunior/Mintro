@@ -5,17 +5,20 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  StyleProp,
+  ViewStyle,
 } from 'react-native';
-import CompletionIcon from '../icons/CompletionIon';
-import { getActivityIconName } from '@/src/utils/activityIconMapper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import BaseCard from '../../ui/card/BaseCard';
-import ObjectiveCard from './ObjetctiveCard';
+import CompletionIcon from '../icons/CompletionIon';
+import { getActivityIconName } from '@/utils/activityIconMapper';
+import BaseCard from '../ui/card/BaseCard';
 
 interface ObjectiveDisplayCardProps {
   objectiveTitle: string;
-  objectiveSubtitle: string;
-  onPress?: (event_: any) => void;
+  objectiveSubtitle?: string;
+  onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
+  completed?: boolean;
 }
 
 const { width } = Dimensions.get('window');
@@ -24,30 +27,37 @@ const ObjectiveDisplayCard: React.FC<ObjectiveDisplayCardProps> = ({
   objectiveTitle,
   objectiveSubtitle,
   onPress,
+  style,
+  completed = false,
 }) => {
   const icon = getActivityIconName(objectiveTitle, 20);
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <ObjectiveCard style={styles.card}>
+      <BaseCard style={[styles.card, style]}>
+        {/* Checkbox + ícone */}
         <View style={styles.leftSection}>
           <View style={styles.checkWrapper}>
-            <CompletionIcon />
+            {completed && <CompletionIcon />}
           </View>
           <View style={styles.iconWrapper}>{icon}</View>
         </View>
 
+        {/* Texto */}
         <View style={styles.textSection}>
           <Text style={styles.title}>{objectiveTitle}</Text>
-          <Text style={styles.subtitle}>{objectiveSubtitle}</Text>
+          {objectiveSubtitle && (
+            <Text style={styles.subtitle}>{objectiveSubtitle}</Text>
+          )}
         </View>
 
+        {/* Seta */}
         <MaterialCommunityIcons
           name="chevron-right"
           size={20}
           color="rgba(0, 0, 0, 0.7)"
         />
-      </ObjectiveCard>
+      </BaseCard>
     </TouchableOpacity>
   );
 };
@@ -61,7 +71,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     marginHorizontal: 16,
-    marginVertical: 2,
+    marginVertical: 4,
   },
   leftSection: {
     flexDirection: 'row',
@@ -89,17 +99,17 @@ const styles = StyleSheet.create({
     marginLeft: 14,
   },
   title: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: 'Poppins_500Medium',
     color: '#000000',
     lineHeight: 20,
   },
   subtitle: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: 'Poppins_400Regular',
-    color: '#000000',
+    color: '#6B7280',
     lineHeight: 18,
-    marginTop: -2,
+    marginTop: 2,
   },
 });
 

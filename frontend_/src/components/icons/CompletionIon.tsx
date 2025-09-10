@@ -11,7 +11,7 @@ interface CompletionIconProps {
 
 const CompletionIcon: React.FC<CompletionIconProps> = ({
   size = 26,
-  checkmarkColor = '#8C8D8F',
+  checkmarkColor = '#000000ff',
   circleFill = 'white',
   circleStroke = '#E5E7EB',
   circleStrokeWidth = 1.5,

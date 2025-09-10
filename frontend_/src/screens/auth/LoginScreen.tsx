@@ -4,7 +4,7 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { Mail, Lock } from 'lucide-react-native';
 import { router } from 'expo-router';
@@ -14,9 +14,9 @@ import { EntryFormCard } from '@/components/specific/EntryFormCard';
 import { EntryInput } from '@/components/ui/inputs/EntryInput';
 import { useLoginForm } from '@/hooks/forms/useLoginForm';
 
-const { width, height } = Dimensions.get('window');
-
 const LoginScreen = () => {
+  const { height, width } = useWindowDimensions();
+
   const {
     email,
     setEmail,
@@ -31,11 +31,20 @@ const LoginScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { minHeight: height }]}
         showsVerticalScrollIndicator={false}
       >
         <MintroLogo />
-        <View style={styles.content}>
+
+        <View
+          style={[
+            styles.content,
+            {
+              paddingHorizontal: width * 0.06,
+              paddingBottom: height * 0.05,
+            },
+          ]}
+        >
           <EntryFormCard
             welcomeText="Bem-vindo de volta!"
             subtitleText="Entre na sua conta para continuar"
@@ -52,7 +61,7 @@ const LoginScreen = () => {
               onChange={setEmail}
               value={email}
               placeholder="Digite seu email"
-              icon={<Mail size={20} color="#9CA3AF" style={styles.inputIcon} />}
+              icon={<Mail {...iconProps} />}
             />
 
             <EntryInput
@@ -65,7 +74,7 @@ const LoginScreen = () => {
                 showSecureText: showPassword,
                 setShowSecureText: togglePasswordVisibility,
               }}
-              icon={<Lock size={20} color="#9CA3AF" style={styles.inputIcon} />}
+              icon={<Lock {...iconProps} />}
             />
           </EntryFormCard>
         </View>
@@ -74,24 +83,20 @@ const LoginScreen = () => {
   );
 };
 
+const iconProps = { size: 20, color: '#9CA3AF', style: { marginRight: 12 } };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9f8',
+    backgroundColor: '#F8F9F8',
   },
   scrollContent: {
     flexGrow: 1,
-    minHeight: height,
   },
   content: {
     flex: 1,
-    paddingHorizontal: width * 0.06,
-    paddingBottom: height * 0.05,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  inputIcon: {
-    marginRight: 12,
   },
 });
 

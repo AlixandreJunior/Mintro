@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import BaseCard from '../../ui/card/BaseCard';
+import BaseCard from '../ui/card/BaseCard';
 
 interface DiaryCardProps {
   children: React.ReactNode;

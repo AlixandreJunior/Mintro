@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getStepsList } from '@/src/services/steps/listSteps';
+import { getStepsList } from '@/services/steps/listSteps';
 
 type StepLog = {
   id: number;

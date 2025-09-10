@@ -5,18 +5,16 @@ import { router } from 'expo-router';
 import { startOfWeek, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-import Header from '@/src/components/Layout/Header';
-import HeaderWithOptions from '@/src/components/Layout/HeaderWithOptions';
-import DateNavigator from '@/src/components/DateNavigator';
-import { SummarySection } from '@/src/components/SummarySection';
-import { ActivityHistorySection } from '@/src/components/ActivityHistorySection';
-import { WeekDaysContainer } from '@/src/components/WeekDaysContainer';
+import Header from './layout/Header';
+import HeaderWithOptions from './layout/HeaderWithOptions';
+import DateNavigator from '@/components/DateNavigator';
+import { SummarySection } from '@/components/SummarySection';
+import { ActivityHistorySection } from '@/components/ActivityHistorySection';
+import { WeekDaysContainer } from '@/components/WeekDaysContainer';
 import PeriodSelector from './PeriodSelector';
 import { FloatingActionButton } from './FloatingButtonAction';
 
 import ActivityCalendar from './ActivityCalendar';
-
-import GoalModal from '@/src/components/GoalModal'; // Importa o GoalModal
 
 interface WeekDayDisplay {
   id: string;
@@ -193,15 +191,6 @@ function ActivityScreenTemplate({
       </ScrollView>
 
       <FloatingActionButton onPress={onAddPress} />
-
-      {/* Modal de edição da meta */}
-      <GoalModal
-        visible={goalModalVisible}
-        onClose={() => setGoalModalVisible(false)}
-        onSave={handleSaveGoal}
-        currentValue={currentGoal}
-        goalType={type === 'exercise' ? 'exercise' : 'mindfulness'}
-      />
     </SafeAreaView>
   );
 }

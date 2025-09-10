@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import ProgressCircle from '@/src/components/ProgressCircle';
+import ProgressCircle from '@/components/ProgressCircle';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ShoeIcon from './icons/ShoeIcon';
 

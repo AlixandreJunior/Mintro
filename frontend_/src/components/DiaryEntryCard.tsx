@@ -8,14 +8,13 @@ import {
   Pressable,
   Dimensions,
 } from 'react-native';
-import { MoodType } from '@/src/types/mental/diary';
-import { getActivityIconName } from '@/src/utils/activityIconMapper';
+import { MoodType } from '@/types/mental/diary';
+import { getActivityIconName } from '@/utils/activityIconMapper';
 import { router } from 'expo-router';
-import { useDiaryForm } from '@/src/hooks/forms/useDiaryForm';
+import { useDiaryForm } from '@/hooks/forms/useDiaryForm';
 import VerticalDotsIcon from './icons/VerticalDotsIcon';
 import DiaryModal from './specific/DiaryModal';
-import BaseCard from './Cards/BaseCard';
-import DiaryCard from './Cards/DiaryCard';
+import DiaryCard from './specific/DiaryCard';
 
 const screen = Dimensions.get('window');
 

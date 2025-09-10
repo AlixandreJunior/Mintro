@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction, FC, useState } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
-import { DateTimeInput } from '@/src/components/Inputs/DateTimeInput';
+import { DateTimeInput } from './ui/inputs/DateTimeInput';
 
 interface RemindersSectionProps {
   enabled: boolean;

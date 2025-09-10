@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { MindfulnessLog } from '@/src/types/health/mindfulness';
-import { getMindfulnessList } from '@/src/services/mindfulness/listMindfulnessLog';
+import { MindfulnessLog } from '@/types/health/mindfulness';
+import { getMindfulnessList } from '@/services/mindfulness/listMindfulnessLog';
 
 type Period = 'week' | 'month';
 

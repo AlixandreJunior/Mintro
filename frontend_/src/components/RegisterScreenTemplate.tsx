@@ -8,11 +8,11 @@ import {
   ActivityIndicator,
   Text,
 } from 'react-native';
-import Header from '@/src/components/Layout/Header';
-import FormHeader from '@/src/components/Layout/FormHeader';
-import SelectInput from '@/src/components/Inputs/SelectInput';
-import { DateTimeInput } from '@/src/components/Inputs/DateTimeInput';
-import { MainInput } from '@/src/components/Inputs/MainInput';
+import Header from './layout/Header';
+import FormHeader from './layout/FormHeader';
+import SelectInput from './ui/inputs/SelectInput';
+import { DateTimeInput } from './ui/inputs/DateTimeInput';
+import { MainInput } from './ui/inputs/MainInput';
 
 interface Item {
   id: number;

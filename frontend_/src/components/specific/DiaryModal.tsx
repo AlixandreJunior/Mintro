@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, StyleSheet } from 'react-native';
-import BaseModal from '../Modal/BaseModal';
+import BaseModal from '../ui/modal/BaseModal';
 
 interface DiaryModalProps {
   visible: boolean;
