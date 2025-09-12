@@ -13,6 +13,7 @@ const DiaryCard: React.FC<DiaryCardProps> = ({ children, style }) => {
 
 const styles = StyleSheet.create({
   card: {
+    flex: 1,
     borderWidth: 1,
     borderColor: '#E5E7EB',
     shadowColor: '#000',
