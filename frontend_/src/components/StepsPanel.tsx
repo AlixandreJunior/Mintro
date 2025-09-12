@@ -9,7 +9,7 @@ import { router } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 
-interface MainStatsPanelProps {
+interface StepsPanelProps {
   currentDayStats: {
     distance: number;
     steps: number;
@@ -17,7 +17,7 @@ interface MainStatsPanelProps {
   };
 }
 
-export const MainStatsPanel: React.FC<MainStatsPanelProps> = ({
+export const StepsPanel: React.FC<StepsPanelProps> = ({
   currentDayStats,
 }) => {
   return (
