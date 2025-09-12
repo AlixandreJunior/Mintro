@@ -1,6 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, ReactNode } from 'react';
 import { Diary } from '@/types/mental/diary';
 import { getDiaryList } from '@/services/diary/listDiary';
+import { router } from 'expo-router';
+import { getMoodVisuals } from '@/utils/moodHelper';
+import { getActivityIconName } from '@/utils/activityIconMapper';
+
+export interface TransformedActivity {
+  name: string;
+  iconName?: ReactNode;
+}
+
+export interface DiaryEntryCardProps {
+  id: number;
+  time: string;
+  mood: string;
+  iconSource: any;
+  activities: TransformedActivity[];
+  title: string;
+  content: string;
+  photoUrl?: string;
+}
+
+export interface AdaptedDiaryHistory {
+  date: string;
+  entries: DiaryEntryCardProps[];
+}
 
 export function useDiary(initialDate: Date) {
   const [currentDate, setCurrentDate] = useState(initialDate);
@@ -28,10 +52,61 @@ export function useDiary(initialDate: Date) {
     fetchDiaries();
   }, [currentDate]);
 
+  const adaptedEntries: AdaptedDiaryHistory[] = useMemo(() => {
+    if (!diaries.length) return [];
+
+    const today = new Date().toDateString();
+    const groupedByDate: Record<string, DiaryEntryCardProps[]> = {};
+
+    diaries.forEach((diary) => {
+      const entryDate = new Date(diary.datetime);
+      const formattedDate = entryDate.toLocaleDateString('pt-BR', {
+        day: 'numeric',
+        month: 'long',
+      });
+      const displayDate =
+        entryDate.toDateString() === today
+          ? 'Hoje, ' + formattedDate
+          : formattedDate;
+
+      const moodVisuals = getMoodVisuals(diary.mood);
+
+      const transformedActivities: TransformedActivity[] = diary.activities.map(
+        (activity) => ({
+          name: activity.name,
+          iconName: getActivityIconName(activity.name),
+        })
+      );
+
+      const transformedEntry: DiaryEntryCardProps = {
+        id: diary.id,
+        time: entryDate.toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        mood: diary.mood,
+        iconSource: moodVisuals.iconSource,
+        activities: transformedActivities,
+        title: diary.title || 'Sem Título',
+        content: diary.content,
+        photoUrl: diary.photo,
+      };
+
+      if (!groupedByDate[displayDate]) groupedByDate[displayDate] = [];
+      groupedByDate[displayDate].push(transformedEntry);
+    });
+
+    return Object.entries(groupedByDate).map(([date, entries]) => ({
+      date,
+      entries,
+    }));
+  }, [diaries]);
+
   return {
     currentDate,
     setCurrentDate,
     diaries,
+    adaptedEntries,
     loading,
     error,
   };

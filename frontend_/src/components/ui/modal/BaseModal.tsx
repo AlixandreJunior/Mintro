@@ -10,22 +10,20 @@ import {
 
 interface BaseModalProps {
   visible: boolean;
-  top: number;
-  left: number;
-  width?: number;
   onClose: (e?: GestureResponderEvent) => void;
   children: React.ReactNode;
   overlayDim?: boolean;
+  align?: 'center' | 'top' | 'bottom'; // nova prop para controle
+  width?: number;
 }
 
 const BaseModal: React.FC<BaseModalProps> = ({
   visible,
-  top,
-  left,
-  width = 140,
   onClose,
   children,
   overlayDim = false,
+  align = 'center',
+  width = 280,
 }) => {
   return (
     <Modal
@@ -38,33 +36,34 @@ const BaseModal: React.FC<BaseModalProps> = ({
       <Pressable
         style={[styles.overlay, overlayDim ? styles.overlayDim : undefined]}
         onPress={onClose}
-      />
-
-      <View
-        style={[styles.container, { top, left, width }]}
-        pointerEvents="box-none"
       >
-        <View style={styles.content}>{children}</View>
-      </View>
+        <View
+          style={[
+            styles.container,
+            align === 'top' && { justifyContent: 'flex-start' },
+            align === 'bottom' && { justifyContent: 'flex-end' },
+          ]}
+          pointerEvents="box-none"
+        >
+          <View style={[styles.content, { width }]}>{children}</View>
+        </View>
+      </Pressable>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
   overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
     backgroundColor: 'transparent',
   },
   overlayDim: {
     backgroundColor: 'rgba(0,0,0,0.15)',
   },
   container: {
-    position: 'absolute',
-    zIndex: 2000,
+    flex: 1,
+    justifyContent: 'center', // centraliza por padrão
+    alignItems: 'center',
   },
   content: {
     backgroundColor: '#fff',

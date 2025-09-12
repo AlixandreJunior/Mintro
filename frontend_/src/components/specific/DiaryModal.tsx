@@ -4,34 +4,21 @@ import BaseModal from '../ui/modal/BaseModal';
 
 interface DiaryModalProps {
   visible: boolean;
-  top: number;
-  left: number;
-  width?: number;
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  /** opcional: estilo do texto de 'Excluir' por exemplo */
   deleteTextStyle?: object;
 }
 
 const DiaryModal: React.FC<DiaryModalProps> = ({
   visible,
-  top,
-  left,
-  width = 160,
   onClose,
   onEdit,
   onDelete,
   deleteTextStyle,
 }) => {
   return (
-    <BaseModal
-      visible={visible}
-      top={top}
-      left={left}
-      width={width}
-      onClose={onClose}
-    >
+    <BaseModal visible={visible} onClose={onClose}>
       <TouchableOpacity
         style={styles.item}
         activeOpacity={0.7}
