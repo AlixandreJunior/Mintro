@@ -10,8 +10,7 @@ import StatCard from './StatCard';
 import ExerciseIcon from './icons/ExerciseIcon';
 import MeditationIcon from './icons/MeditationIcon';
 import NotebookIcon from './icons/NotebookIcon';
-import { User } from '@/src/types/user/user';
-import { router } from 'expo-router';
+import { User } from '@/types/user/user';
 
 interface StatsSectionProps {
   fetchedUser: User | null;
@@ -55,12 +54,6 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
     <>
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Estatísticas</Text>
-        <TouchableOpacity
-          style={styles.seeMoreButton}
-          onPress={() => router.push('/stats')}
-        >
-          <Text style={styles.textLink}>Ver Mais</Text>
-        </TouchableOpacity>
       </View>
       {loadingUser ? (
         <ActivityIndicator

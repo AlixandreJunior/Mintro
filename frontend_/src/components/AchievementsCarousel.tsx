@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Dimensions, FlatList } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AchievementIconBase from './icons/AchievementIcon';
+import { useAchievements } from '@/hooks/useAchievements';
 
 const { width, height } = Dimensions.get('window');
 const screenContentPaddingHorizontal = width * 0.05;
@@ -9,61 +10,24 @@ const itemSpacing = width * 0.02;
 const itemWidth =
   (width - 2 * screenContentPaddingHorizontal - 2 * itemSpacing) / 3;
 
-interface BackendAchievement {
-  id: number | string;
-  name: string;
-  description: string;
-  levels: {
-    id: number | string;
-    level: number;
-    condition: string;
-    description: string;
-  }[];
-}
-
-interface AchievementProgress {
-  id: number | string;
-  user: number | string;
-  achievement_level: {
-    id: number | string;
-    achievement: number | string;
-    level: number;
-    condition: string;
-    description: string;
-  };
-  date_awarded: string;
-}
-
 interface Achievement {
   id: string;
-  iconName: string;
   label: string;
   starsAchieved: number;
   totalStars: number;
-  isUnlocked: boolean;
-  primaryColor?: string;
-  iconColor?: string;
 }
 
-interface AchievementsCarouselProps {
-  achievements: BackendAchievement[];
-  userAchievements: AchievementProgress[];
-}
+const AchievementsCarousel: React.FC = () => {
+  const { achievements, userAchievements, loading, error } = useAchievements();
 
-const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
-  achievements,
-  userAchievements,
-}) => {
-  // Mapa para progresso máximo por achievement id
+  // Hooks sempre no topo
   const progressMap = useMemo(() => {
     const map = new Map<string, number>();
     userAchievements.forEach((progress) => {
       const achId = String(progress.achievement_level.achievement);
       const level = progress.achievement_level.level;
       const currentMax = map.get(achId) ?? 0;
-      if (level > currentMax) {
-        map.set(achId, level);
-      }
+      if (level > currentMax) map.set(achId, level);
     });
     return map;
   }, [userAchievements]);
@@ -74,15 +38,15 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
       const starsAchieved = progressMap.get(achId) ?? 0;
       return {
         id: achId,
-        iconName: 'trophy',
         label: ach.name,
         starsAchieved,
         totalStars: ach.levels.length,
-        isUnlocked: starsAchieved > 0,
-        primaryColor: '#79D457',
       };
     });
   }, [achievements, progressMap]);
+
+  // JSX condicional
+  if (loading || error || achievements.length === 0) return null;
 
   return (
     <View style={styles.container}>
@@ -94,12 +58,10 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         data={parsedAchievements}
-        keyExtractor={(item) => String(item.id)}
+        keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => {
           const iconBaseSize = itemWidth * 0.9;
           const iconMCI_Size = iconBaseSize * 0.45;
-
-          // Mantém o ícone cinza até a primeira estrela ser conquistada
           const mciIconColor = item.starsAchieved > 0 ? '#79D457' : '#A0A0A0';
 
           return (
