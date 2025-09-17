@@ -76,7 +76,6 @@ const StepsScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header avatarChar="A" />
       <HeaderWithOptions
         title="Passos"
         options={[

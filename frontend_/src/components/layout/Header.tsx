@@ -1,5 +1,4 @@
 import { router } from 'expo-router';
-import React from 'react';
 import {
   View,
   Text,
@@ -10,14 +9,19 @@ import {
 } from 'react-native';
 import NotificationIcon from '../icons/ChatIcon';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
-interface HeaderProps {
-  avatarChar: string;
-}
 
 const { width, height } = Dimensions.get('window');
 
-const Header: React.FC<HeaderProps> = ({ avatarChar }) => {
+const Header = () => {
+  const { user} = useUserProfile();
+  
+    const avatarChar = user?.username
+      ? user.username.charAt(0).toUpperCase()
+      : 'A';
+  
+
   const logoSource = require('@/assets/images/logosrobomintro.png');
   return (
     <SafeAreaView style={styles.header}>

@@ -40,7 +40,6 @@ const UpdateDiaryScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Header avatarChar="A" />
       <FormHeader
         title="Editar Diário"
         onBackPress={() => router.back()}

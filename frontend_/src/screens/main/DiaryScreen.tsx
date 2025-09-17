@@ -16,8 +16,6 @@ const DiaryScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header avatarChar="A" />
-
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <DateNavigator
           currentDate={currentDate}

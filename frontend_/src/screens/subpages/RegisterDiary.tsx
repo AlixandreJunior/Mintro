@@ -31,7 +31,6 @@ const CreateDiaryScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Header avatarChar="A" />
       <FormHeader
         title="Novo Diário"
         onBackPress={() => router.replace('/(tabs)/mental')}

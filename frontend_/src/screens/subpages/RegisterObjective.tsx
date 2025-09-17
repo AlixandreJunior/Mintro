@@ -25,7 +25,6 @@ const RegisterObjectiveScreen: FC = () => {
 
   return (
     <View style={styles.container}>
-      <Header avatarChar="A" />
       <FormHeader title="Criar Objetivo" onSavePress={handleSave} />
       <ScrollView
         style={styles.scrollView}

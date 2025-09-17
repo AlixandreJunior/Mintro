@@ -8,7 +8,7 @@ const ExerciseScreen = () => {
       title="Atividade"
       type="exercise"
       fetchLogs={getExerciseLogs}
-      onAddPress={() => router.push('/exercises/register')}
+      onAddPress={() => router.push('./exercises/register')}
     />
   );
 };

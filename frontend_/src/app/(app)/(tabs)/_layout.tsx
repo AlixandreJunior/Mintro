@@ -1,6 +1,7 @@
 import { StatusBar, View } from "react-native"
 import { Stack } from "expo-router"
-import CustomTabBar from "..//../components/CustomTabBar"
+import CustomTabBar from "../../../components/CustomTabBar"
+import Header from "@/components/layout/Header"
 
 export default function TabLayout() {
   return (
