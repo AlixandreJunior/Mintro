@@ -11,17 +11,17 @@ type DataPoint = {
 
 type Mode = 'day' | 'week' | 'month' | 'year';
 
-interface StepsChartProps {
+interface ChartProps {
   data: DataPoint[];
   mode?: Mode;
   barColor?: string;
 }
 
-export default function StepsChart({
+export default function Chart({
   data,
   mode = 'week',
   barColor = '#D9D9D9',
-}: StepsChartProps): React.ReactElement | null {
+}: ChartProps): React.ReactElement | null {
   if (mode === 'day') return null;
 
   const containerPaddingHorizontal = 16;
