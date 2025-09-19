@@ -48,11 +48,11 @@ const ObjectiveModals: React.FC<ObjectiveModalsProps> = ({
     }
   };
 
-  const onReminderSave = () => {
+  const handleReminderSave = () => {
     onClose();
   };
 
-  const onRepeatSelect = (times: number) => {
+  const handleRepeatSelect = (times: number) => {
     onChange('repeat', times.toString());
     onClose();
   };
@@ -71,7 +71,7 @@ const ObjectiveModals: React.FC<ObjectiveModalsProps> = ({
                   styles.optionButton,
                   isSelected && { backgroundColor: '#A6E1AF' },
                 ]}
-                onPress={() => onRepeatSelect(times)}
+                onPress={() => handleRepeatSelect(times)}
                 disabled={updating}
               >
                 <Text style={styles.optionText}>{times} vez(es)</Text>
@@ -79,7 +79,11 @@ const ObjectiveModals: React.FC<ObjectiveModalsProps> = ({
             );
           })}
           {updating && (
-            <ActivityIndicator size="small" color="#000" style={{ marginTop: 15 }} />
+            <ActivityIndicator
+              size="small"
+              color="#000"
+              style={{ marginTop: 15 }}
+            />
           )}
         </View>
       </MainModal>
@@ -113,14 +117,18 @@ const ObjectiveModals: React.FC<ObjectiveModalsProps> = ({
 
           <Pressable
             style={[styles.optionButton, { backgroundColor: '#A6E1AF' }]}
-            onPress={onReminderSave}
+            onPress={handleReminderSave}
             disabled={updating}
           >
             <Text style={styles.optionText}>Salvar Lembrete</Text>
           </Pressable>
 
           {updating && (
-            <ActivityIndicator size="small" color="#000" style={{ marginTop: 10 }} />
+            <ActivityIndicator
+              size="small"
+              color="#000"
+              style={{ marginTop: 10 }}
+            />
           )}
         </View>
       </MainModal>

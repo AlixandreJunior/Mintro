@@ -1,14 +1,9 @@
-import { useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
 import { HydrationHistory } from '@/components/HydrationHistory';
 import { HydrationSummary } from '@/components/HydrationSummary';
 import { formatDateToISO } from '@/utils/formatDatetimeToISO';
 import { useHydrationLogs } from '@/hooks/useHydratationLog';
-import { FloatingActionButton } from '@/components/FloatingButtonAction';
-import PeriodSelector from '@/components/PeriodSelector';
 import HydrationChart from '@/components/HydratationChart';
-import HydrationHeader from '@/components/HydrationHeader';
 import HydrationDateNavigator from '@/components/HydrationDateNavigator';
 import HydrationPeriodSelector from '@/components/HydrationPeriodSelector';
 
