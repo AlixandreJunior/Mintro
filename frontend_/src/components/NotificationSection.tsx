@@ -29,7 +29,6 @@ const NotificationSection: React.FC = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       const history = await getNotificationHistory();
-      // ordenar do mais recente para o mais antigo
       const sorted = history
         .map((n) => ({
           ...n,

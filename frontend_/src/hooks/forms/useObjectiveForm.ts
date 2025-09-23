@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Alert } from 'react-native';
 import { router } from 'expo-router';
 import { registerObjectiveLog } from '@/services/objectives/createObjective';
@@ -6,36 +5,50 @@ import { updateObjective } from '@/services/objectives/updateObjective';
 import { ObjectiveWrite } from '@/types/mental/objectives';
 
 export function useObjectiveForm() {
-  const [selectedObjectiveId, setSelectedObjectiveId] = useState<string | null>(
-    null
-  );
-  const [selectedPeriod, setSelectedPeriod] = useState<
-    '1w' | '2w' | '3w' | null
-  >(null);
-  const [selectedRepeat, setSelectedRepeat] = useState<
-    '1x' | '3x' | '5x' | null
-  >(null);
-  const [remindersEnabled, setRemindersEnabled] = useState<boolean>(false);
-  const [reminderTime, setReminderTime] = useState<string>(''); // Ex: "08:30"
-
-  const handleSave = async () => {
-    if (!selectedObjectiveId || !selectedPeriod || !selectedRepeat) {
+  const validateSave = (
+    selectedObjectiveId: string | null,
+    selectedRepeat: '1x' | '3x' | '5x' | null,
+    remindersEnabled: boolean,
+    reminderTime: string
+  ) => {
+    if (!selectedObjectiveId || !selectedRepeat) {
       Alert.alert(
         'Erro',
         'Selecione objetivo, período e repetição antes de salvar.'
       );
-      return;
+      return false;
     }
-
     if (remindersEnabled && !reminderTime) {
       Alert.alert('Erro', 'Defina o horário do lembrete.');
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const handleSave = async ({
+    selectedObjectiveId,
+    selectedRepeat,
+    remindersEnabled,
+    reminderTime,
+  }: {
+    selectedObjectiveId: string | null;
+    selectedRepeat: '1x' | '3x' | '5x' | null;
+    remindersEnabled: boolean;
+    reminderTime: string;
+  }) => {
+    if (
+      !validateSave(
+        selectedObjectiveId,
+        selectedRepeat,
+        remindersEnabled,
+        reminderTime
+      )
+    )
+      return;
 
     const data: ObjectiveWrite = {
-      activity: parseInt(selectedObjectiveId, 10),
-      period: selectedPeriod,
-      repeat: selectedRepeat,
+      activity: parseInt(selectedObjectiveId!, 10),
+      repeat: selectedRepeat!,
       reminder: remindersEnabled ? reminderTime : null,
     };
 
@@ -49,7 +62,20 @@ export function useObjectiveForm() {
     }
   };
 
-  const handleUpdate = async (id: number) => {
+  const handleUpdate = async (
+    id: number,
+    {
+      selectedPeriod,
+      selectedRepeat,
+      remindersEnabled,
+      reminderTime,
+    }: {
+      selectedPeriod: '1w' | '2w' | '3w' | null;
+      selectedRepeat: '1x' | '3x' | '5x' | null;
+      remindersEnabled: boolean;
+      reminderTime: string;
+    }
+  ) => {
     if (!selectedPeriod && !selectedRepeat && !reminderTime) {
       Alert.alert(
         'Erro',
@@ -59,8 +85,6 @@ export function useObjectiveForm() {
     }
 
     const data: Partial<ObjectiveWrite> = {};
-
-    if (selectedPeriod) data.period = selectedPeriod;
     if (selectedRepeat) data.repeat = selectedRepeat;
     if (remindersEnabled) {
       if (!reminderTime) {
@@ -83,16 +107,6 @@ export function useObjectiveForm() {
   };
 
   return {
-    selectedObjectiveId,
-    setSelectedObjectiveId,
-    selectedPeriod,
-    setSelectedPeriod,
-    selectedRepeat,
-    setSelectedRepeat,
-    remindersEnabled,
-    setRemindersEnabled,
-    reminderTime,
-    setReminderTime,
     handleSave,
     handleUpdate,
   };

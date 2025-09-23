@@ -1,11 +1,9 @@
-// src/templates/ActivityScreenTemplate.tsx
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { startOfWeek, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-import Header from './layout/Header';
 import HeaderWithOptions from './layout/HeaderWithOptions';
 import DateNavigator from '@/components/DateNavigator';
 import { SummarySection } from '@/components/SummarySection';
@@ -13,7 +11,6 @@ import { ActivityHistorySection } from '@/components/ActivityHistorySection';
 import { WeekDaysContainer } from '@/components/WeekDaysContainer';
 import PeriodSelector from './PeriodSelector';
 import { FloatingActionButton } from './FloatingButtonAction';
-
 import ActivityCalendar from './ActivityCalendar';
 
 interface WeekDayDisplay {
@@ -27,7 +24,7 @@ interface ActivityScreenTemplateProps {
   title: string;
   type: 'exercise' | 'mindfulness';
   onAddPress: () => void;
-  fetchLogs: (date: Date) => Promise<any[]>; // MindfulnessLog[] | ExerciseLog[]
+  fetchLogs: (date: Date) => Promise<any[]>;
 }
 
 function ActivityScreenTemplate({
@@ -44,15 +41,7 @@ function ActivityScreenTemplate({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [weekDaysDisplay, setWeekDaysDisplay] = useState<WeekDayDisplay[]>([]);
-  const [fetchKey, setFetchKey] = useState<number>(0); // Força recarregamento
-
-  // === Estado para modal ===
-  const [goalModalVisible, setGoalModalVisible] = useState(false);
-
-  // Simulação das metas (aqui você deve pegar da API ou contexto global)
-  // Pode ter um estado para cada tipo se quiser mais realismo
-  const [exerciseGoal, setExerciseGoal] = useState(3); // Exemplo: 3 exercícios por semana
-  const [mindfulnessGoal, setMindfulnessGoal] = useState(2); // Exemplo: 2 sessões mindfulness por semana
+  const [fetchKey, setFetchKey] = useState<number>(0);
 
   const periods = [
     { key: 'week', label: 'Semana' },
@@ -119,32 +108,14 @@ function ActivityScreenTemplate({
     setFetchKey((prev) => prev + 1);
   };
 
-  // === Handler para salvar meta do modal ===
-  const handleSaveGoal = (newGoal: number) => {
-    if (type === 'exercise') setExerciseGoal(newGoal);
-    else if (type === 'mindfulness') setMindfulnessGoal(newGoal);
-    setGoalModalVisible(false);
-    // Aqui poderia fazer update via API também
-  };
-
-  // Qual meta mostrar no modal, dependendo do tipo
-  const currentGoal = type === 'exercise' ? exerciseGoal : mindfulnessGoal;
-
   const markedDates = logs.map((log) => new Date(log.datetime));
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header avatarChar="A" />
       <HeaderWithOptions
         title={title}
         onBackPress={handleBack}
-        options={[
-          {
-            label: 'Editar Meta',
-            onPress: () => setGoalModalVisible(true),
-          },
-          { label: 'Excluir', onPress: () => console.log('Excluir') },
-        ]}
+        options={[{ label: 'Excluir', onPress: () => console.log('Excluir') }]}
       />
 
       <ScrollView

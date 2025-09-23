@@ -4,7 +4,9 @@ import { PeriodOption } from './PeriodOption';
 
 interface PeriodsSectionProps {
   selectedPeriod: string | null;
-  setSelectedPeriod: (period: string) => void;
+  setSelectedPeriod: React.Dispatch<
+    React.SetStateAction<'1w' | '2w' | '3w' | null>
+  >;
 }
 
 export const PeriodsSection: React.FC<PeriodsSectionProps> = ({

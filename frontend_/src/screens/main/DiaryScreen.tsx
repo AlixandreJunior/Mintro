@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import Header from '@/components/layout/Header';
@@ -6,10 +6,9 @@ import FloatingActionButton from '@/components/DiaryFloatingButton';
 import DateNavigator from '@/components/DateNavigator';
 import { ObjectiveSection } from '@/components/ObjectiveSection';
 import { DiaryHistoricSection } from '@/components/DiaryHistoricSection';
-import { useDiary } from '@/hooks/useDiary';
 
 const DiaryScreen = () => {
-  const { currentDate, setCurrentDate } = useDiary(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const handleCreateDiary = () => router.push('/diary/create');
   const handleCreateObjective = () => router.push('/objective/create');

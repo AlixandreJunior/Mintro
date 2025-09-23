@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { ActivityGrid } from '@/components/ActivityGrid';
 
@@ -10,7 +10,7 @@ interface Activity {
 interface ActivitiesSectionProps {
   title: string;
   selected: string[] | string | null;
-  setSelected: (value: string[] | string) => void;
+  setSelected: Dispatch<SetStateAction<string | null>>;
   multiple?: boolean;
 }
 

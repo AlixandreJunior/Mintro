@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Alert, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { registerHydratationLog } from '@/services/hydratation/registerHydratation';
@@ -6,19 +5,31 @@ import { formatDateToISO } from '@/utils/formatDatetimeToISO';
 
 export const VOLUMES = [250, 500, 750, 1000] as const;
 
+interface SaveParams {
+  quantities: Record<number, number>;
+  customAmount: string;
+  selectedDate: Date;
+}
+
 export function useHydrationForm() {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [customAmount, setCustomAmount] = useState('');
-  const [quantities, setQuantities] = useState<Record<number, number>>(
-    VOLUMES.reduce((acc, vol) => ({ ...acc, [vol]: 0 }), {})
-  );
-  const [isSaving, setIsSaving] = useState(false);
+  const calculateTotal = (
+    quantities: Record<number, number>,
+    customAmount: string
+  ) => {
+    const totalFromQuantities = VOLUMES.reduce(
+      (sum, vol) => sum + (quantities[vol] || 0) * vol,
+      0
+    );
+    const custom = parseFloat(customAmount) || 0;
+    return totalFromQuantities + custom;
+  };
 
-  const handleQuantityChange = (volume: number, quantity: number) =>
-    setQuantities((q) => ({ ...q, [volume]: quantity }));
-
-  const handleDateChange = (event: any, date?: Date) => {
+  const handleDateChange = (
+    event: any,
+    date: Date | undefined,
+    setSelectedDate: (d: Date) => void,
+    setShowDatePicker: (v: boolean) => void
+  ) => {
     setShowDatePicker(false);
     if (
       (Platform.OS === 'android' && event.type === 'set' && date) ||
@@ -28,13 +39,11 @@ export function useHydrationForm() {
     }
   };
 
-  const handleSave = async () => {
-    const totalFromQuantities = VOLUMES.reduce(
-      (sum, vol) => sum + (quantities[vol] || 0) * vol,
-      0
-    );
-    const custom = parseFloat(customAmount) || 0;
-    const totalHydration = totalFromQuantities + custom;
+  const handleSave = async (
+    { quantities, customAmount, selectedDate }: SaveParams,
+    setIsSaving: (v: boolean) => void
+  ) => {
+    const totalHydration = calculateTotal(quantities, customAmount);
 
     if (totalHydration <= 0) {
       Alert.alert(
@@ -60,15 +69,8 @@ export function useHydrationForm() {
   };
 
   return {
-    selectedDate,
-    showDatePicker,
-    setShowDatePicker,
-    customAmount,
-    setCustomAmount,
-    quantities,
-    handleQuantityChange,
+    calculateTotal,
     handleDateChange,
     handleSave,
-    isSaving,
   };
 }

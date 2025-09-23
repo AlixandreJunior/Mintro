@@ -1,70 +1,50 @@
-import React, { FC } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import Header from '@/components/layout/Header';
+import React, { FC, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import FormHeader from '@/components/layout/FormHeader';
-import { PeriodsSection } from '@/components/PeriodsSection';
-import { ActivitiesSection } from '@/components/ActivitySection';
 import { useObjectiveForm } from '@/hooks/forms/useObjectiveForm';
-import { RepeatSection } from '@/components/RepeatSection';
-import { RemindersSection } from '@/components/RemindersSection';
+import ObjectiveForm from '@/components/ObjectiveForm';
 
 const RegisterObjectiveScreen: FC = () => {
-  const {
-    selectedObjectiveId,
-    setSelectedObjectiveId,
-    selectedPeriod,
-    setSelectedPeriod,
-    selectedRepeat,
-    setSelectedRepeat,
-    remindersEnabled,
-    setRemindersEnabled,
-    reminderTime,
-    setReminderTime,
-    handleSave,
-  } = useObjectiveForm();
+  const [selectedObjectiveId, setSelectedObjectiveId] = useState<string | null>(
+    null
+  );
+  const [selectedRepeat, setSelectedRepeat] = useState<
+    '1x' | '3x' | '5x' | null
+  >(null);
+  const [remindersEnabled, setRemindersEnabled] = useState(false);
+  const [reminderTime, setReminderTime] = useState('');
+
+  const { handleSave } = useObjectiveForm();
 
   return (
     <View style={styles.container}>
-      <FormHeader title="Criar Objetivo" onSavePress={handleSave} />
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <ActivitiesSection
-          title="Escolha um objetivo"
-          selected={selectedObjectiveId}
-          //@ts-ignore
-          setSelected={setSelectedObjectiveId}
-          multiple={false}
-        />
-
-        <RepeatSection
-          selectedRepeat={selectedRepeat}
-          setSelectedRepeat={setSelectedRepeat}
-        />
-
-        <PeriodsSection
-          selectedPeriod={selectedPeriod}
-          //@ts-ignore
-          setSelectedPeriod={setSelectedPeriod}
-        />
-
-        <RemindersSection
-          enabled={remindersEnabled}
-          setEnabled={setRemindersEnabled}
-          time={reminderTime}
-          setTime={setReminderTime}
-        />
-      </ScrollView>
+      <FormHeader
+        title="Criar Objetivo"
+        onSavePress={() =>
+          handleSave({
+            selectedObjectiveId,
+            selectedRepeat,
+            remindersEnabled,
+            reminderTime,
+          })
+        }
+      />
+      <ObjectiveForm
+        reminderTime={reminderTime}
+        remindersEnabled={remindersEnabled}
+        selectedObjectiveId={selectedObjectiveId}
+        selectedRepeat={selectedRepeat}
+        setReminderTime={setReminderTime}
+        setRemindersEnabled={setRemindersEnabled}
+        setSelectedObjectiveId={setSelectedObjectiveId}
+        setSelectedRepeat={setSelectedRepeat}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  scrollView: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 20 },
 });
 
 export default RegisterObjectiveScreen;

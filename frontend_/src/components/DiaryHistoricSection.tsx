@@ -1,9 +1,10 @@
+import { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import DiaryDayHistory from './DiaryDayHistory';
-import { useDiary } from '@/hooks/useDiary';
 import DiaryEmptyState from './DiaryEmptyState';
 import LoadingState from './LoadingState';
 import DiaryErrorState from './DiaryErrorState';
+import { AdaptedDiaryHistory, useDiaryManager } from '@/hooks/useDiary';
 
 interface DiaryHistoricSectionProps {
   initialDate: Date;
@@ -12,7 +13,30 @@ interface DiaryHistoricSectionProps {
 export const DiaryHistoricSection: React.FC<DiaryHistoricSectionProps> = ({
   initialDate,
 }) => {
-  const { adaptedEntries, loading, error } = useDiary(initialDate);
+  const { getDiaryHistory } = useDiaryManager(initialDate);
+  const [adaptedEntries, setAdaptedEntries] = useState<AdaptedDiaryHistory[]>(
+    []
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const history = await getDiaryHistory(initialDate);
+        setAdaptedEntries(history);
+      } catch (err: any) {
+        setError(err.message || 'Erro ao carregar histórico');
+        console.error('Erro ao carregar histórico:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHistory();
+  }, [initialDate]);
 
   return (
     <View style={styles.section}>

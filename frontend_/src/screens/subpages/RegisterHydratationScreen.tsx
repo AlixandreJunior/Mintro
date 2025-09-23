@@ -1,52 +1,44 @@
-import { View, StyleSheet, ScrollView } from 'react-native';
-import Header from '@/components/layout/Header';
+import { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import FormHeader from '@/components/layout/FormHeader';
-import { DateTimeInput } from '@/components/ui/inputs/DateTimeInput';
-import { MainInput } from '@/components/ui/inputs/MainInput';
-import { QuantitySelector } from '@/components/QuantitySelector';
-import { useHydrationForm } from '@/hooks/forms/useHydratationForm';
+import RegisterHydrationMainContent from '@/components/RegisterHydrationMainContent';
+import { useHydrationForm, VOLUMES } from '@/hooks/forms/useHydratationForm';
 
 const RegisterHydrationScreen = () => {
-  const {
-    selectedDate,
-    showDatePicker,
-    setShowDatePicker,
-    quantities,
-    handleQuantityChange,
-    handleDateChange,
-    customAmount,
-    setCustomAmount,
-    handleSave,
-  } = useHydrationForm();
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [customAmount, setCustomAmount] = useState('');
+  const [quantities, setQuantities] = useState<Record<number, number>>(
+    VOLUMES.reduce((acc, vol) => ({ ...acc, [vol]: 0 }), {})
+  );
+  const [isSaving, setIsSaving] = useState(false);
+
+  const { handleDateChange, handleSave } = useHydrationForm();
+
+  const handleQuantityChange = (volume: number, quantity: number) =>
+    setQuantities((q) => ({ ...q, [volume]: quantity }));
 
   return (
     <>
-      <Header avatarChar="A" />
-      <FormHeader title="Registrar Hidratação" onSavePress={handleSave} />
+      <FormHeader
+        title="Registrar Hidratação"
+        onSavePress={() =>
+          handleSave({ quantities, customAmount, selectedDate }, setIsSaving)
+        }
+      />
       <View style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          <DateTimeInput
-            labelText="Data"
-            datetime={selectedDate}
-            mode="date"
-            onChange={handleDateChange}
-            onPress={() => setShowDatePicker(true)}
-            showPicker={showDatePicker}
-          />
-          <QuantitySelector
-            quantities={quantities}
-            onQuantityChange={handleQuantityChange}
-          />
-          <MainInput
-            labelText="Quantidade Personalizada"
-            keyboardType="numeric"
-            onChangeText={(text) =>
-              setCustomAmount(text.replace(/[^0-9]/g, ''))
-            }
-            value={customAmount}
-            placeholder="Coloque uma quantidade personalizada"
-          />
-        </ScrollView>
+        <RegisterHydrationMainContent
+          customAmount={customAmount}
+          handleDateChange={(event, date) =>
+            handleDateChange(event, date, setSelectedDate, setShowDatePicker)
+          }
+          handleQuantityChange={handleQuantityChange}
+          quantities={quantities}
+          selectedDate={selectedDate}
+          setCustomAmount={setCustomAmount}
+          setShowDatePicker={setShowDatePicker}
+          showDatePicker={showDatePicker}
+        />
       </View>
     </>
   );
@@ -54,7 +46,6 @@ const RegisterHydrationScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 16, backgroundColor: '#fff' },
-  scrollViewContent: { paddingBottom: 20 },
 });
 
 export default RegisterHydrationScreen;

@@ -19,7 +19,6 @@ export interface Objective {
 
 export interface ObjectiveWrite {
   activity: number;
-  period: '1w' | '2w' | '3w';
   repeat: '1x' | '3x' | '5x';
   reminder: string | null;
 }

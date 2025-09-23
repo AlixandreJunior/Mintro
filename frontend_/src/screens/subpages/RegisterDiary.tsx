@@ -1,40 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import Header from '@/components/layout/Header';
+
 import FormHeader from '@/components/layout/FormHeader';
-import { useDiaryForm } from '@/hooks/forms/useDiaryForm';
 import DiaryForm from '@/components/DiaryFormTemplate';
+import { useDiaryManager } from '@/hooks/useDiary';
 
 const CreateDiaryScreen = () => {
-  const {
-    title,
-    setTitle,
-    selectedDate,
-    setSelectedDate,
-    selectedTime,
-    setSelectedTime,
-    showDatePicker,
-    setShowDatePicker,
-    showTimePicker,
-    setShowTimePicker,
-    selectedActivitiesIds,
-    setSelectedActivitiesIds,
-    notes,
-    setNotes,
-    selectedImageUri,
-    setSelectedImageUri,
-    selectedMoodId,
-    setSelectedMoodId,
-    handleSave,
-  } = useDiaryForm();
+  const [title, setTitle] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedActivitiesIds, setSelectedActivitiesIds] = useState<string[]>(
+    []
+  );
+  const [notes, setNotes] = useState('');
+  const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
+  const [selectedMoodId, setSelectedMoodId] = useState('Neutro');
+
+  const { handleSave } = useDiaryManager(selectedDate);
+
+  const onSave = () => {
+    handleSave({
+      title,
+      notes,
+      selectedDate,
+      selectedTime,
+      selectedMoodId,
+      selectedActivitiesIds,
+      selectedImageUri,
+    });
+  };
 
   return (
     <View style={styles.container}>
       <FormHeader
         title="Novo Diário"
-        onBackPress={() => router.replace('/(tabs)/mental')}
-        onSavePress={handleSave}
+        onBackPress={() => router.replace('/(app)/(tabs)/mental')}
+        onSavePress={onSave}
       />
 
       <DiaryForm
@@ -50,13 +54,10 @@ const CreateDiaryScreen = () => {
         setShowTimePicker={setShowTimePicker}
         selectedMoodId={selectedMoodId}
         onSelectMood={setSelectedMoodId}
-        //@ts-ignore
         selectedActivitiesIds={selectedActivitiesIds}
-        //@ts-ignore
         onSelectActivities={setSelectedActivitiesIds}
         notes={notes}
         onChangeNotes={setNotes}
-        //@ts-ignore
         selectedImageUri={selectedImageUri}
         onImageSelected={setSelectedImageUri}
       />

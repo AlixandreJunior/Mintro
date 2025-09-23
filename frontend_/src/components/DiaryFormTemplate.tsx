@@ -32,7 +32,7 @@ interface DiaryFormProps {
   notes: string;
   onChangeNotes: (text: string) => void;
 
-  selectedImageUri?: string;
+  selectedImageUri: string | null;
   onImageSelected: (uri: string) => void;
 }
 

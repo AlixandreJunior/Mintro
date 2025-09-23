@@ -20,8 +20,14 @@ type ExerciseLog = {
 const STEP_LENGTH_METERS = 0.762;
 const CALORIES_PER_STEP = 0.05;
 
-export const useSteps = (date: Date) => {
-  const { logs: exerciseLogs } = useExerciseLogs(date) as { logs: ExerciseLog[] };
+export const useSteps = (
+  date: Date,
+  selectedPeriod: 'week' | 'month' | 'year',
+  stepGoal: number
+) => {
+  const { logs: exerciseLogs } = useExerciseLogs(date) as {
+    logs: ExerciseLog[];
+  };
 
   const [steps, setSteps] = useState<number>(0);
   const [calories, setCalories] = useState<number>(0);
@@ -37,7 +43,8 @@ export const useSteps = (date: Date) => {
       setCalories(totalSteps * CALORIES_PER_STEP);
       setError(null);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Erro ao buscar steps';
+      const message =
+        err instanceof Error ? err.message : 'Erro ao buscar steps';
       console.error('Erro ao buscar steps:', message);
       setError(message);
     } finally {
@@ -53,7 +60,7 @@ export const useSteps = (date: Date) => {
     let totalDistance = 0;
     let totalDurationMinutes = 0;
 
-    exerciseLogs.forEach(log => {
+    exerciseLogs.forEach((log) => {
       const logDate = new Date(log.datetime);
       if (isSameDay(logDate, date)) {
         totalDistance += log.distance ?? 0;
@@ -74,16 +81,50 @@ export const useSteps = (date: Date) => {
     const sensorDistanceKm = (steps * STEP_LENGTH_METERS) / 1000;
 
     return {
-      distance: Number((currentDayStats.distance + sensorDistanceKm).toFixed(2)),
+      distance: Number(
+        (currentDayStats.distance + sensorDistanceKm).toFixed(2)
+      ),
       steps: currentDayStats.steps + steps,
       kcal: currentDayStats.kcal + Math.round(calories),
     };
   }, [steps, calories, loading, currentDayStats]);
 
+  const chartData = useMemo(() => {
+    const now = new Date();
+    switch (selectedPeriod) {
+      case 'week':
+        return Array.from({ length: 7 }, (_, day) => ({
+          x: day,
+          y: day === now.getDay() ? steps : 0,
+        }));
+      case 'month':
+        const daysInMonth = new Date(
+          now.getFullYear(),
+          now.getMonth() + 1,
+          0
+        ).getDate();
+        return Array.from({ length: daysInMonth }, (_, day) => ({
+          x: day + 1,
+          y: day + 1 === now.getDate() ? steps : 0,
+        }));
+      case 'year':
+        return Array.from({ length: 12 }, (_, month) => ({
+          x: month + 1,
+          y: month === now.getMonth() ? steps : 0,
+        }));
+      default:
+        return [];
+    }
+  }, [selectedPeriod, steps]);
+
+  const progressPercentage = useMemo(() => steps / stepGoal, [steps, stepGoal]);
+
   return {
     mergedStats,
     steps,
     calories,
+    chartData,
+    progressPercentage,
     loading,
     error,
     refreshSteps: fetchSteps,

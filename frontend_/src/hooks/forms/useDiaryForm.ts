@@ -1,172 +1,212 @@
-import { useState } from 'react';
+import { useEffect, useState, useMemo, ReactNode } from 'react';
 import { Alert } from 'react-native';
 import { router } from 'expo-router';
 
-import { createDiary } from '@/services/diary/createDiary';
-import { appendImageToFormData } from '@/utils/appendImageToFormData';
 import { Diary } from '@/types/mental/diary';
+import { getDiaryList } from '@/services/diary/listDiary';
 import { getDiary } from '@/services/diary/getDiary';
+import { createDiary } from '@/services/diary/createDiary';
 import { updateDiary } from '@/services/diary/updateDiary';
 import { deleteDiary } from '@/services/diary/deleteDiary';
+import { appendImageToFormData } from '@/utils/appendImageToFormData';
+import { getMoodVisuals } from '@/utils/moodHelper';
+import { getActivityIconName } from '@/utils/activityIconMapper';
 
-export function useDiaryForm() {
-  const [title, setTitle] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-  const [selectedActivitiesIds, setSelectedActivitiesIds] = useState<number[]>(
-    []
-  );
-  const [notes, setNotes] = useState('');
-  const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [selectedMoodId, setSelectedMoodId] = useState('Neutro');
+export interface TransformedActivity {
+  name: string;
+  iconName?: ReactNode;
+}
 
-  async function loadDiaryById(id: number) {
+export interface DiaryEntryCardProps {
+  id: number;
+  time: string;
+  mood: string;
+  iconSource: any;
+  activities: TransformedActivity[];
+  title: string;
+  content: string;
+  photoUrl?: string;
+}
+
+export interface AdaptedDiaryHistory {
+  date: string;
+  entries: DiaryEntryCardProps[];
+}
+
+export function useDiaryManager(initialDate: Date) {
+  const getCombinedDateTime = (date: Date, time: Date) =>
+    new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      time.getHours(),
+      time.getMinutes(),
+      time.getSeconds()
+    );
+
+  const loadDiaryById = async (id: number): Promise<Partial<Diary> | null> => {
     try {
       const diary: Diary = await getDiary(id);
-
-      setTitle(diary.title);
-      setNotes(diary.content);
-      setSelectedMoodId(diary.mood);
-
-      if (Array.isArray(diary.activities)) {
-        const activityIds = diary.activities.map((act: any) =>
-          typeof act === 'number' ? act : act.id
-        );
-        setSelectedActivitiesIds(activityIds);
-      } else {
-        setSelectedActivitiesIds([]);
-      }
-
-      if (diary.datetime) {
-        const dateTime = new Date(diary.datetime);
-        setSelectedDate(dateTime);
-        setSelectedTime(dateTime);
-      }
-
-      if (diary.photo) {
-        setSelectedImageUri(diary.photo);
-      } else {
-        setSelectedImageUri(null);
-      }
+      return {
+        title: diary.title,
+        content: diary.content,
+        mood: diary.mood,
+        activities: Array.isArray(diary.activities)
+          ? diary.activities.map((act: any) =>
+              typeof act === 'number' ? act : act.id
+            )
+          : [],
+        datetime: diary.datetime ? new Date(diary.datetime) : new Date(),
+        photo: diary.photo,
+      };
     } catch (error: any) {
       Alert.alert('Erro', error.message || 'Erro ao carregar diário');
       console.error('Erro ao carregar diário:', error);
+      return null;
     }
-  }
+  };
 
-  const getCombinedDateTime = () =>
-    new Date(
-      selectedDate.getFullYear(),
-      selectedDate.getMonth(),
-      selectedDate.getDate(),
-      selectedTime.getHours(),
-      selectedTime.getMinutes(),
-      selectedTime.getSeconds()
-    );
-
-  const handleSave = async () => {
-    setIsSaving(true);
+  const handleSave = async (form: {
+    title: string;
+    notes: string;
+    selectedDate: Date;
+    selectedTime: Date;
+    selectedMoodId: string;
+    selectedActivitiesIds: string[];
+    selectedImageUri: string | null;
+  }) => {
     try {
       const formData = new FormData();
-      formData.append('title', title);
-      formData.append('content', notes);
-      formData.append('datetime', getCombinedDateTime().toISOString());
-      formData.append('mood', selectedMoodId);
-      selectedActivitiesIds.forEach((id) =>
-        formData.append('activity', id.toString())
+      formData.append('title', form.title);
+      formData.append('content', form.notes);
+      formData.append(
+        'datetime',
+        getCombinedDateTime(form.selectedDate, form.selectedTime).toISOString()
       );
-      await appendImageToFormData(formData, selectedImageUri);
-      await createDiary(formData);
+      formData.append('mood', form.selectedMoodId);
+      form.selectedActivitiesIds.forEach((id) =>
+        formData.append('activity', id)
+      );
+      await appendImageToFormData(formData, form.selectedImageUri);
 
+      await createDiary(formData);
       Alert.alert('Sucesso', 'Diário criado com sucesso!');
-      router.replace('/(tabs)/mental');
+      router.replace('/(app)/(tabs)/mental');
     } catch (error: any) {
-      Alert.alert(
-        'Erro',
-        error.message || 'Erro ao criar diário. Tente novamente.'
-      );
+      Alert.alert('Erro', error.message || 'Erro ao criar diário.');
       console.error('Erro ao criar diário:', error);
-    } finally {
-      setIsSaving(false);
+    }
+  };
+
+  const handleUpdate = async (
+    id: number,
+    form: {
+      title: string;
+      notes: string;
+      selectedDate: Date;
+      selectedTime: Date;
+      selectedMoodId: string;
+      selectedActivitiesIds: string[];
+      selectedImageUri: string | null;
+    }
+  ) => {
+    try {
+      const formData = new FormData();
+      formData.append('title', form.title);
+      formData.append('content', form.notes);
+      formData.append(
+        'datetime',
+        getCombinedDateTime(form.selectedDate, form.selectedTime).toISOString()
+      );
+      formData.append('mood', form.selectedMoodId);
+      form.selectedActivitiesIds.forEach((id) =>
+        formData.append('activity', id)
+      );
+      await appendImageToFormData(formData, form.selectedImageUri);
+
+      await updateDiary(id, formData);
+      Alert.alert('Sucesso', 'Diário atualizado com sucesso!');
+      router.replace('/(app)/(tabs)/mental');
+    } catch (error: any) {
+      Alert.alert('Erro', error.message || 'Erro ao atualizar diário.');
+      console.error('Erro ao atualizar diário:', error);
     }
   };
 
   const handleDelete = async (id: number) => {
-    setIsSaving(true);
-
     try {
       await deleteDiary(id);
-
-      Alert.alert('Sucesso', 'Diário atualizado com sucesso!');
-      router.replace('/(tabs)/mental');
+      Alert.alert('Sucesso', 'Diário deletado com sucesso!');
+      router.replace('/(app)/(tabs)/mental');
     } catch (error: any) {
-      Alert.alert(
-        'Erro',
-        error.message || 'Erro ao atualizar diário. Tente novamente.'
-      );
-      console.error('Erro ao atualizar diário:', error);
-    } finally {
-      setIsSaving(false);
+      Alert.alert('Erro', error.message || 'Erro ao deletar diário.');
+      console.error('Erro ao deletar diário:', error);
     }
   };
 
-  const handleUpdate = async (id: number) => {
-    setIsSaving(true);
+  const getDiaryHistory = async (
+    date: Date
+  ): Promise<AdaptedDiaryHistory[]> => {
     try {
-      const formData = new FormData();
-      formData.append('title', title);
-      formData.append('content', notes);
-      formData.append('datetime', getCombinedDateTime().toISOString());
-      formData.append('mood', selectedMoodId);
-      selectedActivitiesIds.forEach((id) =>
-        formData.append('activity', id.toString())
-      );
-      await appendImageToFormData(formData, selectedImageUri);
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      const diaries: Diary[] = await getDiaryList(month, year);
 
-      // Aqui usa updateDiary que espera Partial<Diary>, mas você está enviando FormData,
-      // então precisa ajustar updateDiary para aceitar FormData ou usar api.patch direto aqui:
-      // Supondo que updateDiary aceite FormData:
-      await updateDiary(id, formData);
+      const today = new Date().toDateString();
+      const groupedByDate: Record<string, DiaryEntryCardProps[]> = {};
 
-      Alert.alert('Sucesso', 'Diário atualizado com sucesso!');
-      router.replace('/(tabs)/mental');
+      diaries.forEach((diary) => {
+        const entryDate = new Date(diary.datetime);
+        const formattedDate = entryDate.toLocaleDateString('pt-BR', {
+          day: 'numeric',
+          month: 'long',
+        });
+        const displayDate =
+          entryDate.toDateString() === today
+            ? 'Hoje, ' + formattedDate
+            : formattedDate;
+
+        const moodVisuals = getMoodVisuals(diary.mood);
+
+        const transformedActivities: TransformedActivity[] =
+          diary.activities.map((activity) => ({
+            name: activity.name,
+            iconName: getActivityIconName(activity.name),
+          }));
+
+        const transformedEntry: DiaryEntryCardProps = {
+          id: diary.id,
+          time: entryDate.toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
+          mood: diary.mood,
+          iconSource: moodVisuals.iconSource,
+          activities: transformedActivities,
+          title: diary.title || 'Sem Título',
+          content: diary.content,
+          photoUrl: diary.photo,
+        };
+
+        if (!groupedByDate[displayDate]) groupedByDate[displayDate] = [];
+        groupedByDate[displayDate].push(transformedEntry);
+      });
+
+      return Object.entries(groupedByDate).map(([date, entries]) => ({
+        date,
+        entries,
+      }));
     } catch (error: any) {
-      Alert.alert(
-        'Erro',
-        error.message || 'Erro ao atualizar diário. Tente novamente.'
-      );
-      console.error('Erro ao atualizar diário:', error);
-    } finally {
-      setIsSaving(false);
+      console.error('Erro ao buscar histórico de diários:', error);
+      return [];
     }
   };
 
   return {
-    title,
-    setTitle,
-    selectedDate,
-    setSelectedDate,
-    selectedTime,
-    setSelectedTime,
-    showDatePicker,
-    setShowDatePicker,
-    showTimePicker,
-    setShowTimePicker,
-    selectedActivitiesIds,
-    setSelectedActivitiesIds,
-    notes,
-    setNotes,
-    selectedImageUri,
-    setSelectedImageUri,
-    isSaving,
-    selectedMoodId,
-    setSelectedMoodId,
+    loadDiaryById,
     handleSave,
     handleUpdate,
     handleDelete,
-    loadDiaryById,
+    getDiaryHistory,
   };
 }

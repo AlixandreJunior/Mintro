@@ -1,49 +1,77 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import Header from '@/components/layout/Header';
 import FormHeader from '@/components/layout/FormHeader';
-import { useDiaryForm } from '@/hooks/forms/useDiaryForm';
 import DiaryForm from '@/components/DiaryFormTemplate';
+import { Diary } from '@/types/mental/diary';
+import { useDiaryManager } from '@/hooks/useDiary';
 
 const UpdateDiaryScreen = () => {
   const { id } = useLocalSearchParams();
 
-  const {
-    title,
-    setTitle,
-    selectedDate,
-    setSelectedDate,
-    selectedTime,
-    setSelectedTime,
-    showDatePicker,
-    setShowDatePicker,
-    showTimePicker,
-    setShowTimePicker,
-    selectedActivitiesIds,
-    setSelectedActivitiesIds,
-    notes,
-    setNotes,
-    selectedImageUri,
-    setSelectedImageUri,
-    selectedMoodId,
-    setSelectedMoodId,
-    loadDiaryById,
-    handleUpdate,
-  } = useDiaryForm();
+  const [title, setTitle] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedActivitiesIds, setSelectedActivitiesIds] = useState<string[]>(
+    []
+  );
+  const [notes, setNotes] = useState('');
+  const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
+  const [selectedMoodId, setSelectedMoodId] = useState('Neutro');
+
+  const { loadDiaryById, handleUpdate } = useDiaryManager(selectedDate);
 
   useEffect(() => {
-    if (id) {
-      loadDiaryById(Number(id));
-    }
+    const fetchDiary = async () => {
+      if (id) {
+        const diary: Partial<Diary> | null = await loadDiaryById(Number(id));
+        if (!diary) return;
+
+        if (diary.title) setTitle(diary.title);
+        if (diary.datetime) {
+          const dt = new Date(diary.datetime);
+          setSelectedDate(dt);
+          setSelectedTime(dt);
+        }
+        if (diary.content) setNotes(diary.content);
+        if (diary.mood) setSelectedMoodId(diary.mood);
+        if (diary.photo) setSelectedImageUri(diary.photo);
+        if (diary.activities)
+          setSelectedActivitiesIds(
+            Array.isArray(diary.activities)
+              ? diary.activities.map((a: any) =>
+                  typeof a === 'number' ? a.toString() : a.id.toString()
+                )
+              : []
+          );
+      }
+    };
+
+    fetchDiary();
   }, [id]);
+
+  const onSave = () => {
+    if (id) {
+      handleUpdate(Number(id), {
+        title,
+        notes,
+        selectedDate,
+        selectedTime,
+        selectedMoodId,
+        selectedActivitiesIds,
+        selectedImageUri,
+      });
+    }
+  };
 
   return (
     <View style={styles.container}>
       <FormHeader
         title="Editar Diário"
         onBackPress={() => router.back()}
-        onSavePress={() => handleUpdate(Number(id))}
+        onSavePress={onSave}
       />
 
       <DiaryForm
@@ -59,13 +87,10 @@ const UpdateDiaryScreen = () => {
         setShowTimePicker={setShowTimePicker}
         selectedMoodId={selectedMoodId}
         onSelectMood={setSelectedMoodId}
-        //@ts-ignore
         selectedActivitiesIds={selectedActivitiesIds}
-        //@ts-ignore
         onSelectActivities={setSelectedActivitiesIds}
         notes={notes}
         onChangeNotes={setNotes}
-        //@ts-ignore
         selectedImageUri={selectedImageUri}
         onImageSelected={setSelectedImageUri}
       />
