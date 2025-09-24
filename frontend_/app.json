@@ -4,7 +4,7 @@
     "slug": "vitacare",
     "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./src/assets/images/icon.png",
     "scheme": "vitacare",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -14,10 +14,10 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./src/assets/images/favicon.png"
     },
     "splash": {
-      "image": "./assets/splashscreen_logo.png",
+      "image": "./src/assets/splashscreen_logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

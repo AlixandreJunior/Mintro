@@ -1,0 +1,80 @@
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import ProgressCircle from '@/components/ProgressCircle';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import ShoeIcon from './icons/ShoeIcon';
+
+interface StepsSummaryProps {
+  totalSteps: number;
+  goalSteps: number;
+  progress: number; // entre 0 e 1
+}
+
+export const StepsSummary: React.FC<StepsSummaryProps> = ({
+  totalSteps,
+  goalSteps,
+  progress,
+}) => {
+  const remaining = Math.max(0, goalSteps - totalSteps);
+
+  return (
+    <View style={styles.mainContent}>
+      <View style={styles.leftContent}>
+        <Text style={styles.currentAmount}>
+          {totalSteps.toLocaleString('pt-BR')} passos
+        </Text>
+        <Text style={styles.remainingText}>
+          Faltam {remaining.toLocaleString('pt-BR')} passos para você atingir
+          {'\n'}sua meta diária de {goalSteps.toLocaleString('pt-BR')} passos
+        </Text>
+      </View>
+      <View style={styles.progressContainer}>
+        <ProgressCircle
+          progress={progress}
+          size={100}
+          color="#A5D6A7"
+          strokeWidth={8}
+        />
+        <View style={styles.progressIcon}>
+          <ShoeIcon />
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  mainContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginBottom: 40,
+  },
+  leftContent: {
+    flex: 1,
+    marginRight: 20,
+  },
+  currentAmount: {
+    fontSize: 30,
+    fontFamily: 'Poppins_500Medium',
+    color: '#000',
+    marginBottom: 8,
+  },
+  remainingText: {
+    fontSize: 12,
+    fontFamily: 'Poppins_400Regular',
+    color: '#666',
+    lineHeight: 20,
+  },
+  progressContainer: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  progressIcon: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

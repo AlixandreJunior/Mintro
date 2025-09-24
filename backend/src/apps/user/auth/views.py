@@ -1,8 +1,8 @@
-from rest_framework import status, permissions, mixins
-from rest_framework.generics import GenericAPIView, CreateAPIView
+from rest_framework import mixins, permissions, status
+from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from .serializers import LoginUserSerializer
 
@@ -20,13 +20,16 @@ class LoginView(mixins.CreateModelMixin, GenericAPIView):
         print(serializer.is_valid())
         serializer.is_valid(raise_exception=True)
 
-        user = serializer.validated_data['user']
+        user = serializer.validated_data["user"]
         refresh = RefreshToken.for_user(user)
 
-        return Response({
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
-        }, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class RefreshView(GenericAPIView):
@@ -36,36 +39,34 @@ class RefreshView(GenericAPIView):
         refresh_token = request.data.get("refresh")
 
         if not refresh_token:
-            return Response({"detail": "Token de atualização não fornecido."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Token de atualização não fornecido."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
             refresh = RefreshToken(refresh_token)
             access_token = str(refresh.access_token)
 
-            return Response({
-                "access": access_token,
-                "detail": "Token atualizado com sucesso."
-            }, status=status.HTTP_200_OK)
+            return Response(
+                {"access": access_token, "detail": "Token atualizado com sucesso."},
+                status=status.HTTP_200_OK,
+            )
 
         except TokenError as e:
-            return Response({"detail": f"Token inválido: {str(e)}"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"detail": f"Token inválido: {e!s}"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
 
 class LogoutView(CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        refresh_token = request.data.get("refresh")
-
-        if not refresh_token:
-            return Response({"detail": "Token de atualização não fornecido."}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-        except TokenError:
-            pass
-
-        return Response({"detail": "Logout realizado com sucesso."}, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": "Logout realizado com sucesso."}, status=status.HTTP_200_OK
+        )
 
 
 # Token Verify View
@@ -76,7 +77,10 @@ class VerifyView(mixins.RetrieveModelMixin, GenericAPIView):
         auth_header = request.headers.get("Authorization")
 
         if not auth_header or not auth_header.startswith("Bearer "):
-            return Response({"detail": "Cabeçalho de autenticação inválido."}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"detail": "Cabeçalho de autenticação inválido."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         token = auth_header.split(" ")[1]
 
@@ -84,4 +88,7 @@ class VerifyView(mixins.RetrieveModelMixin, GenericAPIView):
             AccessToken(token)
             return Response({"detail": "Token válido."}, status=status.HTTP_200_OK)
         except InvalidToken as e:
-            return Response({"detail": f"Token inválido: {str(e)}"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"detail": f"Token inválido: {e!s}"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
