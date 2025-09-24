@@ -1,4 +1,4 @@
-import { ExerciseLogWrite } from '@/src/types/health/exercise';
+import { ExerciseLogWrite } from '@/types/health/exercise';
 import api from '../api';
 
 export const registerExerciseLog = async (data: ExerciseLogWrite) => {

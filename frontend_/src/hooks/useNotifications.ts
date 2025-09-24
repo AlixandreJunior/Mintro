@@ -1,9 +1,10 @@
+// hooks/useNotifications.ts
 import { useEffect } from 'react';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type NotificationRecord = {
+export type NotificationRecord = {
   id: string;
   title: string;
   body: string;
@@ -63,14 +64,12 @@ export const useNotifications = () => {
 
     setupNotifications();
 
-    // Listener para quando a notificação for realmente recebida/disparada
     const subscription = Notifications.addNotificationReceivedListener(
       (notification) => {
         const { title, body } = notification.request.content;
         const id = notification.request.identifier;
         const date = new Date();
 
-        // Salva no histórico
         saveNotificationToHistory({
           id,
           title: title ?? '',
@@ -81,9 +80,7 @@ export const useNotifications = () => {
       }
     );
 
-    return () => {
-      subscription.remove();
-    };
+    return () => subscription.remove();
   }, []);
 
   const scheduleNotification = async (
@@ -94,14 +91,22 @@ export const useNotifications = () => {
   ) => {
     if (!Device.isDevice) return;
 
-    const triggerSeconds = (date.getTime() - Date.now()) / 1000;
-    if (triggerSeconds <= 0) return;
+    const seconds = (date.getTime() - Date.now()) / 1000;
+    if (seconds <= 0) return;
 
-    await Notifications.scheduleNotificationAsync({
-      content: { title, body, sound: 'default' },
-      //@ts-ignore
-      trigger: { seconds: triggerSeconds, repeats: false },
+    const trigger: Notifications.TimeIntervalTriggerInput = {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds,
+      repeats: false,
+    };
+
+    const id = await Notifications.scheduleNotificationAsync({
+      content: { title, body, sound: 'default', data: { type } },
+      trigger,
     });
+
+    saveNotificationToHistory({ id, title, body, date, type });
+    return id;
   };
 
   const scheduleDailyNotification = async (
@@ -113,11 +118,40 @@ export const useNotifications = () => {
   ) => {
     if (!Device.isDevice) return;
 
-    await Notifications.scheduleNotificationAsync({
-      content: { title, body, sound: 'default' },
+    const trigger: Notifications.CalendarNotificationTrigger = {
+      type: 'calendar',
+      dateComponents: {
+        hour: hour,
+        minute: minute,
+        isLeapMonth: false,
+      },
+      repeats: true,
+    };
+
+    const id = await Notifications.scheduleNotificationAsync({
+      content: { title, body, sound: 'default', data: { type } },
       //@ts-ignore
-      trigger: { type: 'calendar', hour, minute, repeats: true },
+      trigger,
     });
+
+    saveNotificationToHistory({ id, title, body, date: new Date(), type });
+    return id;
+  };
+
+  const cancelNotification = async (id: string) => {
+    await Notifications.cancelScheduledNotificationAsync(id);
+  };
+
+  const cancelAllNotifications = async () => {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+  };
+
+  const getScheduledNotifications = async () => {
+    return await Notifications.getAllScheduledNotificationsAsync();
+  };
+
+  const clearNotificationHistory = async () => {
+    await AsyncStorage.removeItem(NOTIFICATION_HISTORY_KEY);
   };
 
   const getNotificationHistory = async (): Promise<NotificationRecord[]> => {
@@ -133,6 +167,10 @@ export const useNotifications = () => {
   return {
     scheduleNotification,
     scheduleDailyNotification,
+    cancelNotification,
+    cancelAllNotifications,
+    getScheduledNotifications,
     getNotificationHistory,
+    clearNotificationHistory,
   };
 };

@@ -1,4 +1,4 @@
-import { ExerciseLog } from '@/src/types/health/exercise';
+import { ExerciseLog } from '@/types/health/exercise';
 import api from '../api';
 import {
   startOfWeek,

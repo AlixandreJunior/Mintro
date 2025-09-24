@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAccessToken(access);
     setRefreshToken(refresh);
     setIsAuthenticated(true);
-    router.replace('/(tabs)/mental');
+    router.replace('/(app)/(tabs)/mental');
   };
 
   const logout = async () => {
@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAccessToken(null);
     setRefreshToken(null);
     setIsAuthenticated(false);
-    router.replace('/auth/login');
+    router.replace('/(auth)/login');
   };
 
   useEffect(() => {

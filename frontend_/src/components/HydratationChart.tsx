@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { View } from 'react-native';
-import { useHydrationLogs } from '@/hooks/useHydratationLog';
 import Chart from '@/components/StepsChart';
+import { useHydration } from '@/hooks/useHydratationLog';
 
 interface HydrationChartProps {
   selectedDate: Date;
@@ -12,7 +12,7 @@ const HydrationChart: React.FC<HydrationChartProps> = ({
   selectedDate,
   selectedPeriod,
 }) => {
-  const { logs, loading, error } = useHydrationLogs(selectedDate);
+  const { logs, loading, error } = useHydration(selectedDate);
 
   const chartData = useMemo(() => {
     if (!logs) return [];

@@ -13,7 +13,7 @@ interface DiaryHistoricSectionProps {
 export const DiaryHistoricSection: React.FC<DiaryHistoricSectionProps> = ({
   initialDate,
 }) => {
-  const { getDiaryHistory } = useDiaryManager(initialDate);
+  const { getDiaryHistory } = useDiaryManager();
   const [adaptedEntries, setAdaptedEntries] = useState<AdaptedDiaryHistory[]>(
     []
   );

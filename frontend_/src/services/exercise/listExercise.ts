@@ -1,9 +1,8 @@
-import { Exercise } from '@/src/types/health/exercise';
 import api from '../api';
 
 export const getExerciseList = async () => {
   try {
-    const response = await api.get<Exercise[]>('health/exercise/');
+    const response = await api.get('health/exercise/');
 
     const data = response.data;
     return data;

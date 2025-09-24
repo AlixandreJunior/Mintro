@@ -1,9 +1,8 @@
 import api from '../api';
-import { Mindfulness } from '@/src/types/health/mindfulness';
 
 export const getMindfulnessList = async () => {
   try {
-    const response = await api.get<Mindfulness[]>('health/mindfulness/');
+    const response = await api.get('health/mindfulness/');
 
     const data = response.data;
     return data;

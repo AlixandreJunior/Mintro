@@ -1,24 +1,22 @@
-import React from 'react';
-import { View, StyleSheet, useWindowDimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, useWindowDimensions, Alert } from 'react-native';
 import { Mail, Lock } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { EntryFormCard } from '@/components/specific/EntryFormCard';
 import { EntryInput } from '@/components/ui/inputs/EntryInput';
-import { useLoginForm } from '@/hooks/forms/useLoginForm';
+import { useAuthForm } from '@/hooks/useAuth';
+
+const iconProps = { size: 20, color: '#9CA3AF', style: { marginRight: 12 } };
 
 const LoginForm = () => {
   const { height, width } = useWindowDimensions();
 
-  const {
-    email,
-    setEmail,
-    password,
-    setPassword,
-    showPassword,
-    togglePasswordVisibility,
-    error,
-    handleLogin,
-  } = useLoginForm();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+
+  const { handleLogin } = useAuthForm();
 
   return (
     <View
@@ -34,9 +32,11 @@ const LoginForm = () => {
         welcomeText="Bem-vindo de volta!"
         subtitleText="Entre na sua conta para continuar"
         error={error}
-        handleSubmit={handleLogin}
+        handleSubmit={() => {
+          handleLogin(email, password, setError);
+        }}
         textSubmit="Entrar"
-        handleBack={() => router.push('/auth/signup')}
+        handleBack={() => router.push('/(auth)/signup')}
         backText="Não tem uma conta?"
         backLink="Criar conta"
       >
@@ -57,7 +57,7 @@ const LoginForm = () => {
           placeholder="Digite sua senha"
           secureText={{
             showSecureText: showPassword,
-            setShowSecureText: togglePasswordVisibility,
+            setShowSecureText: () => setShowPassword((prev) => !prev),
           }}
           icon={<Lock {...iconProps} />}
         />
@@ -65,8 +65,6 @@ const LoginForm = () => {
     </View>
   );
 };
-
-const iconProps = { size: 20, color: '#9CA3AF', style: { marginRight: 12 } };
 
 const styles = StyleSheet.create({
   content: {

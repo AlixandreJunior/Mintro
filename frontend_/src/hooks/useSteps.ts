@@ -29,9 +29,9 @@ export const useSteps = (
     logs: ExerciseLog[];
   };
 
-  const [steps, setSteps] = useState<number>(0);
-  const [calories, setCalories] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [steps, setSteps] = useState(0);
+  const [calories, setCalories] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchSteps = async () => {
@@ -45,7 +45,7 @@ export const useSteps = (
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : 'Erro ao buscar steps';
-      console.error('Erro ao buscar steps:', message);
+      console.error(message);
       setError(message);
     } finally {
       setLoading(false);
@@ -56,7 +56,7 @@ export const useSteps = (
     fetchSteps();
   }, []);
 
-  const currentDayStats = useMemo(() => {
+  const mergedStats = useMemo(() => {
     let totalDistance = 0;
     let totalDurationMinutes = 0;
 
@@ -68,26 +68,14 @@ export const useSteps = (
       }
     });
 
-    return {
-      distance: totalDistance,
-      steps: Math.round(totalDistance * 1300),
-      kcal: Math.round(totalDurationMinutes * 5),
-    };
-  }, [exerciseLogs, date]);
-
-  const mergedStats = useMemo(() => {
-    if (loading) return currentDayStats;
-
     const sensorDistanceKm = (steps * STEP_LENGTH_METERS) / 1000;
 
     return {
-      distance: Number(
-        (currentDayStats.distance + sensorDistanceKm).toFixed(2)
-      ),
-      steps: currentDayStats.steps + steps,
-      kcal: currentDayStats.kcal + Math.round(calories),
+      distance: Number((totalDistance + sensorDistanceKm).toFixed(2)),
+      steps: Math.round(totalDistance * 1300) + steps,
+      kcal: Math.round(totalDurationMinutes * 5) + Math.round(calories),
     };
-  }, [steps, calories, loading, currentDayStats]);
+  }, [exerciseLogs, date, steps, calories]);
 
   const chartData = useMemo(() => {
     const now = new Date();

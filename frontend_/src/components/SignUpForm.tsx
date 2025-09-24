@@ -1,27 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { Lock, Mail } from 'lucide-react-native';
 
 import { EntryFormCard } from '@/components/specific/EntryFormCard';
 import { EntryInput } from '@/components/ui/inputs/EntryInput';
-import { useSignUpForm } from '@/hooks/forms/useSignUpForm';
+import { useAuthForm } from '@/hooks/useAuth';
+import { router } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 
 const SignUpForm = () => {
-  const {
-    name,
-    setName,
-    email,
-    setEmail,
-    password,
-    setPassword,
-    showPassword,
-    togglePasswordVisibility,
-    error,
-    handleSubmit,
-    handleBackToLogin,
-  } = useSignUpForm();
+  const { handleSignUp } = useAuthForm();
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   return (
     <View style={styles.content}>
@@ -29,9 +26,9 @@ const SignUpForm = () => {
         welcomeText="Criar nova conta!"
         subtitleText="Preencha os dados para começar"
         error={error}
-        handleSubmit={handleSubmit}
+        handleSubmit={() => handleSignUp(name, email, password, setError)}
         textSubmit="Criar conta"
-        handleBack={handleBackToLogin}
+        handleBack={() => router.push('/(auth)/login')}
         backText="Já tem uma conta?"
         backLink="Entrar"
       >

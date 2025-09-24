@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import FormHeader from '@/components/layout/FormHeader';
 import RegisterHydrationMainContent from '@/components/RegisterHydrationMainContent';
-import { useHydrationForm, VOLUMES } from '@/hooks/forms/useHydratationForm';
+import { useHydration, VOLUMES } from '@/hooks/useHydratationLog';
 
 const RegisterHydrationScreen = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -13,7 +13,7 @@ const RegisterHydrationScreen = () => {
   );
   const [isSaving, setIsSaving] = useState(false);
 
-  const { handleDateChange, handleSave } = useHydrationForm();
+  const { handleDateChange, handleSave } = useHydration(selectedDate);
 
   const handleQuantityChange = (volume: number, quantity: number) =>
     setQuantities((q) => ({ ...q, [volume]: quantity }));
@@ -23,14 +23,14 @@ const RegisterHydrationScreen = () => {
       <FormHeader
         title="Registrar Hidratação"
         onSavePress={() =>
-          handleSave({ quantities, customAmount, selectedDate }, setIsSaving)
+          handleSave({ quantities, customAmount, selectedDate })
         }
       />
       <View style={styles.container}>
         <RegisterHydrationMainContent
           customAmount={customAmount}
           handleDateChange={(event, date) =>
-            handleDateChange(event, date, setSelectedDate, setShowDatePicker)
+            handleDateChange(event, date, setShowDatePicker)
           }
           handleQuantityChange={handleQuantityChange}
           quantities={quantities}

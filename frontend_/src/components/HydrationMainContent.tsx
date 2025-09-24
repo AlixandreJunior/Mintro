@@ -2,10 +2,10 @@ import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { HydrationHistory } from '@/components/HydrationHistory';
 import { HydrationSummary } from '@/components/HydrationSummary';
 import { formatDateToISO } from '@/utils/formatDatetimeToISO';
-import { useHydrationLogs } from '@/hooks/useHydratationLog';
 import HydrationChart from '@/components/HydratationChart';
 import HydrationDateNavigator from '@/components/HydrationDateNavigator';
 import HydrationPeriodSelector from '@/components/HydrationPeriodSelector';
+import { useHydration } from '@/hooks/useHydratationLog';
 
 interface HydrationMainContentProps {
   selectedPeriod: 'day' | 'week' | 'month' | 'year';
@@ -22,7 +22,7 @@ const HydrationMainContent: React.FC<HydrationMainContentProps> = ({
   setSelectedPeriod,
   setSelectedDate,
 }) => {
-  const { logs, loading, error } = useHydrationLogs(selectedDate);
+  const { logs, loading, error } = useHydration(selectedDate);
   const total = logs.reduce((sum, { quantity = 0 }) => sum + quantity, 0);
 
   return (

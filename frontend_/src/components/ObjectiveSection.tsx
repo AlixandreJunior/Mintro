@@ -1,11 +1,11 @@
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import ObjectiveDisplayCard from './specific/ObjectiveCard';
 import { ActivityIndicator } from 'react-native-paper';
-import { useObjective } from '@/hooks/useObjective';
 import { router } from 'expo-router';
+import { useObjectiveManager } from '@/hooks/useObjective';
 
 export const ObjectiveSection = () => {
-  const { objectives, loading, error } = useObjective();
+  const { objectives, loading, error } = useObjectiveManager();
 
   return (
     <>

@@ -6,7 +6,7 @@ interface MainInputProps {
   labelText: string;
   value: any;
   keyboardType: KeyboardType;
-  onChangeText: (text: string) => void;
+  onChangeText: (text: string | number) => void;
   placeholder?: string;
 }
 
@@ -29,9 +29,10 @@ export const MainInput: React.FC<MainInputProps> = ({
         placeholder={placeholder ? placeholder : 'Opcional'}
         outlineStyle={styles.textInputOutline as ViewStyle}
         theme={{
-    fonts: {
-      regular: { fontFamily: 'Poppins_400Regular' },
-    }, }}
+          fonts: {
+            regular: { fontFamily: 'Poppins_400Regular' },
+          },
+        }}
       />
     </View>
   );

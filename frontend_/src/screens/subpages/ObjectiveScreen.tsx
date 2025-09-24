@@ -7,10 +7,10 @@ import {
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import ObjectiveModals from '@/components/ObjectiveModals';
-import { useObjectiveDetail } from '@/hooks/useObjectiveDetail';
 import { ObjectiveMainContent } from '@/components/ObjectiveMainContent';
 import { useState } from 'react';
 import { ObjectiveHeader } from '@/components/ObjectiveHeader';
+import { useObjectiveManager } from '@/hooks/useObjective';
 
 const { height } = Dimensions.get('window');
 
@@ -22,7 +22,7 @@ export default function ObjectiveDetailScreen(): React.JSX.Element {
   const [reminderTime, setReminderTime] = useState<string | null>(null);
   const [selectedRepeat, setSelectedRepeat] = useState<string | null>(null);
 
-  const { updating, objective, loading } = useObjectiveDetail(Number(id));
+  const { updating, objective, loading } = useObjectiveManager(Number(id));
 
   const closeModals = () => {
     setRepeatModalVisible(false);

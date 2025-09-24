@@ -16,16 +16,16 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!isAuthReady) return;
 
     const segment = segments[0] || '';
-    const publicRoutes = ['auth', ''];
+    const publicRoutes = ['(auth)', ''];
 
     const isPublic = publicRoutes.includes(segment);
 
     if (!isAuthenticated && !isPublic) {
-      router.replace('/auth/login');
+      router.replace('/(auth)/login');
     }
 
     if (isAuthenticated && isPublic) {
-      router.replace('/(tabs)/mental');
+      router.replace('/(app)/(tabs)/mental');
     }
   }, [isAuthReady, isAuthenticated, segments]);
 

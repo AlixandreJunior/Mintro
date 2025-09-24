@@ -39,7 +39,7 @@ export function useUserProfile() {
       setUser(null);
       const { logout } = useAuth();
       await logout();
-      router.push('/auth/login');
+      router.push('/(auth)/login');
     } catch (err: any) {
       setLogoutError(err.message || 'Erro ao fazer logout.');
       console.error('Erro no logout:', err);

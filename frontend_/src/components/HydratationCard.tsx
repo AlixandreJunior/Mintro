@@ -7,19 +7,18 @@ import {
 } from 'react-native';
 import { ProgressCircle } from './icons/ProgressCircle';
 import WaterDropIcon from './icons/WaterDropIcon';
-import { useHydrationLogs } from '@/hooks/useHydratationLog';
 import { router } from 'expo-router';
+import { useHydration } from '@/hooks/useHydratationLog';
 
 interface HydratationCardProps {
-  date: Date
+  date: Date;
 }
 
 const { width, height } = Dimensions.get('window');
 
-export const HydratationCard: React.FC<HydratationCardProps> = ({
-  date
-}) => {
-    const { totalHydrationToday, hydrationProgressPercentage } = useHydrationLogs(date)
+export const HydratationCard: React.FC<HydratationCardProps> = ({ date }) => {
+  const { totalHydrationToday, hydrationProgressPercentage } =
+    useHydration(date);
 
   return (
     <TouchableOpacity

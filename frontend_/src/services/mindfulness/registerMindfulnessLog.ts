@@ -2,7 +2,7 @@ import api from '../api';
 import {
   MindfulnessLog,
   MindfulnessLogWrite,
-} from '@/src/types/health/mindfulness';
+} from '@/types/health/mindfulness';
 
 export const registerMindfulnessLog = async (data: MindfulnessLogWrite) => {
   try {

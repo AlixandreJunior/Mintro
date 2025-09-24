@@ -1,5 +1,4 @@
 import api from '../api';
-import { MindfulnessLog } from '@/src/types/health/mindfulness';
 import {
   startOfWeek,
   endOfWeek,
@@ -11,10 +10,10 @@ import { ptBR } from 'date-fns/locale';
 
 type Period = 'week' | 'month';
 
-export const getMindfulnessList = async (
+export const getMindfulnessLogs = async (
   date: Date = new Date(),
   period: Period = 'month'
-): Promise<MindfulnessLog[]> => {
+) => {
   try {
     let startDate: string;
     let endDate: string;
@@ -33,15 +32,12 @@ export const getMindfulnessList = async (
       endDate = format(endOfMonth(date), 'yyyy-MM-dd');
     }
 
-    const response = await api.get<MindfulnessLog[]>(
-      'health/mindfulness/log/',
-      {
-        params: {
-          start_date: startDate,
-          end_date: endDate,
-        },
-      }
-    );
+    const response = await api.get('health/mindfulness/log/', {
+      params: {
+        start_date: startDate,
+        end_date: endDate,
+      },
+    });
 
     return response.data;
   } catch (error: any) {

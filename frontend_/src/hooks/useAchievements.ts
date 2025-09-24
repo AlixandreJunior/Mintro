@@ -13,65 +13,40 @@ export const useAchievements = () => {
   const [selectedAchievement, setSelectedAchievement] =
     useState<Achievement | null>(null);
   const [selectedLog, setSelectedLog] = useState<AchievementLog | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loadingCount, setLoadingCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAchievements = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getAchievements();
-      setAchievements(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const loading = loadingCount > 0;
 
-  const fetchAchievementDetail = useCallback(async (pk: number) => {
-    setLoading(true);
+  const fetchData = async <T>(
+    fetcher: () => Promise<T>,
+    setter: (data: T) => void
+  ) => {
+    setLoadingCount((c) => c + 1);
     setError(null);
     try {
-      const data = await getAchievementDetail(pk);
-      setSelectedAchievement(data);
-    } catch (err: any) {
-      setError(err.message);
+      const data = await fetcher();
+      setter(data);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro desconhecido';
+      setError(message);
     } finally {
-      setLoading(false);
+      setLoadingCount((c) => c - 1);
     }
-  }, []);
+  };
 
-  const fetchUserAchievements = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getUserAchievements();
-      setUserAchievements(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const fetchUserAchievementLogDetail = useCallback(async (pk: number) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getUserAchievementLogDetail(pk);
-      setSelectedLog(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchAchievements = () => fetchData(getAchievements, setAchievements);
+  const fetchUserAchievements = () =>
+    fetchData(getUserAchievements, setUserAchievements);
+  const fetchAchievementDetail = (pk: number) =>
+    fetchData(() => getAchievementDetail(pk), setSelectedAchievement);
+  const fetchUserAchievementLogDetail = (pk: number) =>
+    fetchData(() => getUserAchievementLogDetail(pk), setSelectedLog);
 
   useEffect(() => {
     fetchAchievements();
     fetchUserAchievements();
-  }, [fetchAchievements, fetchUserAchievements]);
+  }, []);
 
   return {
     achievements,

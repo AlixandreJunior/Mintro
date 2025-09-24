@@ -1,8 +1,8 @@
 import React, { FC, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import FormHeader from '@/components/layout/FormHeader';
-import { useObjectiveForm } from '@/hooks/forms/useObjectiveForm';
 import ObjectiveForm from '@/components/ObjectiveForm';
+import { useObjectiveManager } from '@/hooks/useObjective';
 
 const RegisterObjectiveScreen: FC = () => {
   const [selectedObjectiveId, setSelectedObjectiveId] = useState<string | null>(
@@ -14,14 +14,14 @@ const RegisterObjectiveScreen: FC = () => {
   const [remindersEnabled, setRemindersEnabled] = useState(false);
   const [reminderTime, setReminderTime] = useState('');
 
-  const { handleSave } = useObjectiveForm();
+  const { saveObjective } = useObjectiveManager();
 
   return (
     <View style={styles.container}>
       <FormHeader
         title="Criar Objetivo"
         onSavePress={() =>
-          handleSave({
+          saveObjective({
             selectedObjectiveId,
             selectedRepeat,
             remindersEnabled,

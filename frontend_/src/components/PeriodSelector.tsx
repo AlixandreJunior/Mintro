@@ -9,17 +9,15 @@ import {
 
 const { width, height } = Dimensions.get('window');
 
-type Options = 'week' | 'month' | 'year';
-
 interface Period {
-  key: Options;
+  key: 'week' | 'month' | 'year';
   label: string;
 }
 
 interface PeriodSelectorProps {
   periods: Period[];
-  selectedPeriod: Options;
-  onPeriodChange: (period: Options) => void;
+  selectedPeriod: 'week' | 'month' | 'year';
+  onPeriodChange: (period: 'week' | 'month' | 'year') => void;
 }
 
 export default function PeriodSelector({

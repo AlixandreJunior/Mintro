@@ -62,6 +62,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
         labelText="Título"
         keyboardType="default"
         value={title}
+        //@ts-ignore
         onChangeText={onChangeTitle}
         placeholder="Título"
       />
