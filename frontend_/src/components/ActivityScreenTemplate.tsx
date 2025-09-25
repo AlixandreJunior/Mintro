@@ -20,7 +20,9 @@ function ActivityScreenTemplate({ title, type, onAddPress }: Props) {
       <HeaderWithOptions
         title={title}
         onBackPress={handleBack}
-        options={[{ label: 'Excluir', onPress: () => console.log('Excluir') }]}
+        options={[
+          { label: 'Lembrete', onPress: () => console.log('Lembrete') },
+        ]}
       />
 
       <ActivityMainContent type={type} />

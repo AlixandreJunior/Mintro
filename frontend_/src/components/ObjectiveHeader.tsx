@@ -1,7 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import HeaderWithOptions from '@/components/layout/HeaderWithOptions';
-import { useObjective } from '@/hooks/useObjective';
-import { useObjectiveDetail } from '@/hooks/useObjectiveDetail';
+import { useObjectiveManager } from '@/hooks/useObjective';
 
 interface ObjectiveHeaderProps {
   setRepeatModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -13,7 +12,7 @@ export const ObjectiveHeader: React.FC<ObjectiveHeaderProps> = ({
   setRepeatModalVisible,
 }) => {
   const { id } = useLocalSearchParams();
-  const { handleDelete } = useObjective();
+  const { deleteById } = useObjectiveManager();
 
   return (
     <HeaderWithOptions
@@ -21,7 +20,7 @@ export const ObjectiveHeader: React.FC<ObjectiveHeaderProps> = ({
       options={[
         { label: 'Repetir', onPress: () => setRepeatModalVisible(true) },
         { label: 'Lembretes', onPress: () => setReminderModalVisible(true) },
-        { label: 'Excluir', onPress: () => handleDelete(Number(id)) },
+        { label: 'Excluir', onPress: () => deleteById(Number(id)) },
       ]}
       onBackPress={() => router.replace('/(app)/(tabs)/mental')}
     />

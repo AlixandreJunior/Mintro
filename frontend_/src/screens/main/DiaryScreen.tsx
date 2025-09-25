@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import Header from '@/components/layout/Header';
 import FloatingActionButton from '@/components/DiaryFloatingButton';
 import DateNavigator from '@/components/DateNavigator';
 import { ObjectiveSection } from '@/components/ObjectiveSection';
