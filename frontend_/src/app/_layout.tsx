@@ -1,3 +1,4 @@
+// RootLayout.tsx
 import React, { useEffect, useRef } from 'react';
 import { Slot } from 'expo-router';
 import {
@@ -14,11 +15,9 @@ import AuthGuard from '../components/AuthGuard';
 import * as NavigationBar from 'expo-navigation-bar';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { Accelerometer } from 'expo-sensors';
-import * as Notifications from 'expo-notifications';
 import { registerStepsLog } from '@/services/steps/registerSteps';
 import { getStepsList } from '@/services/steps/listSteps';
 
-// 🔹 Constantes da lógica de passos
 const UPDATE_INTERVAL_MS = 25;
 const MIN_STEP_INTERVAL_MS = 350;
 const WARMUP_MS = 1500;
@@ -27,18 +26,6 @@ const DYNAMIC_SMOOTH_ALPHA = 0.2;
 const UPPER_THRESHOLD_G = 0.22;
 const LOWER_THRESHOLD_G = 0.12;
 const SEND_INTERVAL_MS = 1 * 60 * 1000;
-
-// 🔹 Configura como as notificações vão aparecer
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowInForeground: true,
-    shouldShowList: true,
-  }),
-});
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -49,7 +36,6 @@ export default function RootLayout() {
     Poppins_700Bold,
   });
 
-  // 🔹 Refs para controle do sensor
   const localStepsRef = useRef(0);
   const lastStepTimeRef = useRef(0);
   const startTimeRef = useRef<number | null>(null);
@@ -59,7 +45,6 @@ export default function RootLayout() {
   const lastSendTimeRef = useRef<number | null>(null);
   const subscriptionRef = useRef<any>(null);
 
-  // 🔹 Inicializar accelerometer
   useEffect(() => {
     if (Platform.OS === 'web') {
       console.warn('Accelerometer não disponível no web');
@@ -100,7 +85,6 @@ export default function RootLayout() {
         armedRef.current = true;
       }
 
-      // Envio periódico para backend
       if (
         !lastSendTimeRef.current ||
         now - lastSendTimeRef.current >= SEND_INTERVAL_MS
@@ -135,55 +119,12 @@ export default function RootLayout() {
     };
   }, []);
 
-  // 🔹 Navigation bar oculta
   useEffect(() => {
     async function setNavigationBar() {
       await NavigationBar.setVisibilityAsync('hidden');
       await NavigationBar.setBehaviorAsync('overlay-swipe');
     }
     setNavigationBar();
-  }, []);
-
-  // 🔹 Permissão e agendamento de notificações
-  useEffect(() => {
-    const setupNotifications = async () => {
-      if (Platform.OS === 'web') return;
-
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-
-      if (finalStatus !== 'granted') {
-        console.warn('Permissão para notificações não concedida.');
-        return;
-      }
-
-      // 🔔 Notificação teste (10s depois de abrir)
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: '🚀 Teste de Notificação',
-          body: 'Se você recebeu isso, está tudo certo no Expo Go!',
-        },
-        //@ts-ignore
-        trigger: { seconds: 10 },
-      });
-
-      // 🔔 Notificação diária fixa (todo dia às 9h)
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: '☀️ Lembrete Diário',
-          body: 'Não esqueça de registrar seus objetivos hoje!',
-        },
-        //@ts-ignore
-        trigger: { hour: 9, minute: 0, repeats: true },
-      });
-    };
-
-    setupNotifications();
   }, []);
 
   if (!fontsLoaded) {
