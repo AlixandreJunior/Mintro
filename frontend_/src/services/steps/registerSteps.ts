@@ -8,6 +8,6 @@ export const registerStepsLog = async (data: any) => {
     if (error.response?.data?.detail) {
       throw new Error(error.response.data.detail);
     }
-    throw new Error('Erro ao tentar atualizar usuário.');
+    throw new Error('Erro ao tentar atualizar passos.');
   }
 };
