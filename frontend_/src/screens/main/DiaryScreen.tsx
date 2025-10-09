@@ -3,8 +3,8 @@ import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import FloatingActionButton from '@/components/DiaryFloatingButton';
 import DateNavigator from '@/components/DateNavigator';
-import { ObjectiveSection } from '@/components/ObjectiveSection';
-import { DiaryHistoricSection } from '@/components/DiaryHistoricSection';
+import ObjectiveSection from '@/components/ObjectiveSection';
+import DiaryHistoricSection from '@/components/DiaryHistoricSection';
 
 const DiaryScreen = () => {
   const [currentDate, setCurrentDate] = useState(new Date());

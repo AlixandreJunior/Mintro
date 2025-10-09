@@ -1,5 +1,5 @@
+// services/api.ts
 import axios, { AxiosRequestConfig, AxiosError } from 'axios';
-import Constants from 'expo-constants';
 
 const apiUrl = 'http://192.168.1.5:8000/api/';
 
@@ -10,6 +10,7 @@ const api = axios.create({
 
 console.log('API URL:', apiUrl);
 
+// 🔹 Handlers de autenticação
 let onLogout: (() => void) | null = null;
 let getTokens:
   | (() => Promise<{ access: string | null; refresh: string | null }>)
@@ -27,14 +28,32 @@ export const setAuthHandlers = (handlers: {
   saveTokens = handlers.saveTokens || null;
 };
 
-//@ts-ignore
+// 🔹 Handler global para conquistas
+let showAchievements: ((achievements: string[]) => void) | null = null;
+export const registerAchievementHandler = (
+  fn: (achievements: string[]) => void
+) => {
+  showAchievements = fn;
+};
+
+// 🔹 Interceptor de resposta
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Se vier unlocked_achievements, dispara o modal
+    if (response?.data?.unlocked_achievements && showAchievements) {
+      const achievements = response.data.unlocked_achievements;
+      if (Array.isArray(achievements) && achievements.length > 0) {
+        showAchievements(achievements);
+      }
+    }
+    return response;
+  },
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
 
+    // 🔹 Refresh token se receber 401
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -44,32 +63,27 @@ api.interceptors.response.use(
       }
 
       try {
-        // Pega refresh token atual
         const { refresh } = await getTokens();
-
         if (!refresh) {
           onLogout();
           return Promise.reject(error);
         }
 
-        // Faz o refresh no backend
         const res = await axios.post(`${apiUrl}refresh/`, { refresh });
-
         const newAccess = res.data.access;
         const newRefresh = res.data.refresh;
 
-        if (typeof saveTokens === 'function') {
+        if (saveTokens) {
           await saveTokens(newAccess, newRefresh);
         }
 
-        // Atualiza o header com o novo access token
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newAccess}`;
         }
 
         return api(originalRequest);
       } catch (e) {
-        onLogout();
+        onLogout?.();
         return Promise.reject(e);
       }
     }

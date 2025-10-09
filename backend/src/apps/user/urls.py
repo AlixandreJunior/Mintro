@@ -1,5 +1,6 @@
-from apps.user.views import achievement, user
 from django.urls import path
+
+from apps.user.views import achievement, reminder, user
 
 app_name = "user"
 
@@ -15,16 +16,35 @@ urlpatterns = [
         achievement.AchievementDetailView.as_view(),
         name="achievement_detail",
     ),
-    # Achievements do usuário (logs) - supondo que você tenha uma view para listar logs do usuário
     path(
         "achievements/user/",
         achievement.AchievementLogListView.as_view(),
         name="achievements_user",
     ),
-    # Log de achievement detalhe (se precisar)
     path(
         "achievements/user/<int:pk>/",
         achievement.AchievementLogDetailView.as_view(),
         name="achievement_log_detail",
+    ),
+    path("reminders/", reminder.ReminderListView.as_view(), name="reminder_list"),
+    path(
+        "reminders/create/",
+        reminder.ReminderCreateView.as_view(),
+        name="reminder_create",
+    ),
+    path(
+        "reminders/<int:pk>/",
+        reminder.ReminderDetailView.as_view(),
+        name="reminder_detail",
+    ),
+    path(
+        "reminders/<int:pk>/update/",
+        reminder.ReminderUpdateView.as_view(),
+        name="reminder_update",
+    ),
+    path(
+        "reminders/<int:pk>/delete/",
+        reminder.ReminderDeleteView.as_view(),
+        name="reminder_delete",
     ),
 ]
