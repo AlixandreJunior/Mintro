@@ -9,5 +9,5 @@ class StepLog(models.Model):
     date = models.DateField(auto_now_add=True)
     steps = models.PositiveIntegerField(default=0)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.user.username} - {self.date} - {self.steps} steps"

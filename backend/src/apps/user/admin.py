@@ -1,3 +1,3 @@
-from apps.user.admin.achievement import *
-from apps.user.admin.reminder import *
-from apps.user.admin.user import *
+from apps.user.admin import achievement, reminder, user
+
+__all__ = user, achievement, reminder

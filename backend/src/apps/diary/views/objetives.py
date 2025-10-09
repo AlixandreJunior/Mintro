@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import (
@@ -7,37 +8,42 @@ from rest_framework.generics import (
     RetrieveAPIView,
     UpdateAPIView,
 )
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 
 from apps.diary.models.objetives import Objective
 from apps.diary.serializers.objetives import (
-    ObjectiveReadSerializer,
-    ObjectiveWriteSerializer,
+    ObjectiveSerializer,
 )
+from utils.base_view import BaseView
 
 
-class ObjectiveListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = ObjectiveReadSerializer
+class BaseObjectiveView(BaseView):
+    serializer_class = ObjectiveSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = Objective.objects.filter(user=self.request.user)
-        status = self.request.GET.get("status")
-
-        if status:
-            queryset = queryset.filter(status=status)
 
         if not queryset:
-            raise NotFound("Objetivos não encontrados.")
+            error_message = "Objetivos não encontrados."
+            raise NotFound(error_message)
         return queryset
 
+    def get_object(self) -> Objective:
+        objective_id = self.kwargs.get("id")
+        try:
+            return Objective.objects.get(user=self.request.user, id=objective_id)
+        except Objective.DoesNotExist as e:
+            error_message = "Objetivo não encontrado."
+            raise NotFound(error_message) from e
 
-class ObjectiveCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = ObjectiveWriteSerializer
 
-    def create(self, request, *args, **kwargs):
+class ObjectiveListView(BaseObjectiveView, ListAPIView):
+    pass
+
+
+class ObjectiveCreateView(BaseObjectiveView, CreateAPIView):
+    def create(self, request: object, *args: object, **kwargs: object) -> Response:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -45,40 +51,17 @@ class ObjectiveCreateView(CreateAPIView):
             {"detail": "Objetivo criado com sucesso."}, status=status.HTTP_201_CREATED
         )
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: Serializer) -> None:
         serializer.save(user=self.request.user)
 
 
-class ObjectiveDetailView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = ObjectiveReadSerializer
-
-    def get_object(self):
-        id = self.kwargs.get("id")
-        try:
-            return Objective.objects.get(user=self.request.user, id=id)
-        except Objective.DoesNotExist:
-            raise NotFound("Objetivo não encontrado.")
+class ObjectiveDetailView(BaseObjectiveView, RetrieveAPIView):
+    pass
 
 
-class ObjectiveUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = ObjectiveWriteSerializer
-
-    def get_object(self):
-        id = self.kwargs.get("id")
-        try:
-            return Objective.objects.get(user=self.request.user, id=id)
-        except Objective.DoesNotExist:
-            raise NotFound("Objetivo não encontrado.")
+class ObjectiveUpdateView(BaseObjectiveView, UpdateAPIView):
+    pass
 
 
-class ObjectiveDeleteView(DestroyAPIView):
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        id = self.kwargs.get("id")
-        try:
-            return Objective.objects.get(user=self.request.user, id=id)
-        except Objective.DoesNotExist:
-            raise NotFound("Objetivo não encontrado.")
+class ObjectiveDeleteView(BaseObjectiveView, DestroyAPIView):
+    pass

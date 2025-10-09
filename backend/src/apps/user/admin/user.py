@@ -1,6 +1,7 @@
-from apps.user.models.user import User
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+
+from apps.user.models.user import User
 
 
 class UserAdmin(admin.ModelAdmin):

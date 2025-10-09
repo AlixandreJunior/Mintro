@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from rest_framework import serializers
 
 from apps.diary.models.diary import Activity, Diary
@@ -6,31 +8,14 @@ from apps.diary.models.diary import Activity, Diary
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ["id", "name"]
+        fields: ClassVar[list[str]] = ["id", "name"]
 
 
-class DiaryReadSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
-    activities = ActivitySerializer(many=True)
+class DiarySerializer(serializers.ModelSerializer):
+    # Para leitura: exibe dados completos das atividades
+    activities = ActivitySerializer(many=True, read_only=True)
 
-    class Meta:
-        model = Diary
-        fields = [
-            "id",
-            "user",
-            "title",
-            "content",
-            "datetime",
-            "mood",
-            "activities",
-            "photo",
-        ]
-        ordering = [
-            "-datetime",
-        ]
-
-
-class DiaryWriteSerializer(serializers.ModelSerializer):
+    # Para escrita: recebe apenas IDs
     activity = serializers.PrimaryKeyRelatedField(
         queryset=Activity.objects.all(),
         many=True,
@@ -39,13 +24,19 @@ class DiaryWriteSerializer(serializers.ModelSerializer):
         required=False,
     )
 
+    user = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = Diary
-        fields = [
+        fields: ClassVar[list[str]] = [
+            "id",
+            "user",
             "title",
             "content",
             "datetime",
             "mood",
-            "activity",
+            "activities",  # leitura
+            "activity",  # escrita
             "photo",
         ]
+        ordering: ClassVar[list[str]] = ["-datetime"]

@@ -1,5 +1,6 @@
-from apps.user.models.achievement import Achievement, AchievementLevel, AchievementLog
 from django.contrib import admin
+
+from apps.user.models.achievement import Achievement, AchievementLevel, AchievementLog
 
 
 @admin.register(Achievement)

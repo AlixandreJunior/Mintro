@@ -1,6 +1,7 @@
+from django.db import models
+
 from apps.diary.models.diary import Activity
 from apps.user.models import User
-from django.db import models
 
 
 class Objective(models.Model):
@@ -34,5 +35,5 @@ class Objective(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Objetivos de {self.user.username}"

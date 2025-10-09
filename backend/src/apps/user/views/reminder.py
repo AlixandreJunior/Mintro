@@ -31,6 +31,10 @@ class ReminderCreateView(BaseReminderView, generics.CreateAPIView):
     pass
 
 
+class ReminderDetailView(BaseReminderView, generics.RetrieveAPIView):
+    pass
+
+
 class ReminderUpdateView(BaseReminderView, generics.UpdateAPIView):
     pass
 

@@ -3,7 +3,7 @@ from typing import ClassVar
 
 from rest_framework import serializers
 
-from apps.user.models import Reminder
+from apps.user.models.reminder import Reminder
 
 
 class ReminderSerializer(serializers.ModelSerializer):

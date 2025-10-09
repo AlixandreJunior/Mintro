@@ -3,16 +3,21 @@ from django.db import models
 
 
 class UsersManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(
+        self, email: str, password: str | None = None, **extra_fields: object
+    ) -> any:
         if not email:
-            raise ValueError("O e-mail é obrigatório!")
+            error_message = "O e-mail é obrigatório!"
+            raise ValueError(error_message)
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(
+        self, email: str, password: str | None = None, **extra_fields: object
+    ) -> any:
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
@@ -32,5 +37,5 @@ class User(AbstractUser):
     groups = None
     user_permissions = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.username

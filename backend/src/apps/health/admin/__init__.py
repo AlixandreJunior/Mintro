@@ -1,4 +1,3 @@
-from .exercise import *
-from .hydratation import *
-from .mindfulness import *
-from .steps import *
+from apps.health.admin import exercise, hydratation, mindfulness, steps
+
+__all__ = exercise, hydratation, mindfulness, steps

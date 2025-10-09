@@ -1,5 +1,6 @@
-from apps.diary.models.objetives import Objective
 from django.contrib import admin
+
+from apps.diary.models.objetives import Objective
 
 
 @admin.register(Objective)

@@ -1,3 +1,6 @@
+from typing import ClassVar
+
+from django.db.models.query import QuerySet
 from rest_framework import status
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import (
@@ -7,35 +10,30 @@ from rest_framework.generics import (
     RetrieveAPIView,
     UpdateAPIView,
 )
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 
 from apps.diary.models.diary import Activity, Diary
 from apps.diary.serializers.diary import (
     ActivitySerializer,
-    DiaryReadSerializer,
-    DiaryWriteSerializer,
+    DiarySerializer,
 )
+from utils.base_view import BaseView
 from utils.check_achievement import check_narrador_da_propria_historia
 
 
-class ActivitiesListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = ActivitySerializer
+class BaseDiaryView(BaseView):
+    serializer_class = DiarySerializer
 
-    def get_queryset(self):
-        queryset = Activity.objects.all()
+    def get_object(self) -> Diary:
+        diary_id = self.kwargs.get("id")
+        try:
+            return Diary.objects.get(user=self.request.user, id=diary_id)
+        except Diary.DoesNotExist as e:
+            message = "Diário não encontrado."
+            raise NotFound(message) from e
 
-        if not queryset.exists():
-            raise NotFound("Atividades não encontradas.")
-        return queryset
-
-
-class DiaryListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = DiaryReadSerializer
-
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         user = self.request.user
         search = self.request.GET.get("search")
         month = self.request.GET.get("month")
@@ -53,49 +51,43 @@ class DiaryListView(ListAPIView):
                 queryset = queryset.filter(
                     datetime__month=month, datetime__year=year
                 ).order_by("-datetime")
-            except ValueError:
-                raise NotFound("Parâmetros de mês ou ano inválidos.")
+            except ValueError as e:
+                error_message = "Parâmetros de mês ou ano inválidos."
+                raise NotFound(error_message) from e
 
         if not queryset.exists():
-            raise NotFound("Diários não encontrados.")
+            error_message = "Diários não encontrados."
+            raise NotFound(error_message)
         return queryset
 
 
-class DiaryObjectView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = DiaryReadSerializer
+class ActivitiesListView(ListAPIView):
+    permission_classes = ClassVar[list[BasePermission]][IsAuthenticated]
+    serializer_class = ActivitySerializer
 
-    def get_object(self):
-        id = self.kwargs.get("id")
-        try:
-            return Diary.objects.get(user=self.request.user, id=id)
-        except Diary.DoesNotExist:
-            raise NotFound("Diário não encontrado.")
+    def get_queryset(self) -> QuerySet:
+        queryset = Activity.objects.all()
 
-
-class DiaryDeleteView(DestroyAPIView):
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        id = self.kwargs.get("id")
-        try:
-            return Diary.objects.get(user=self.request.user, id=id)
-        except Diary.DoesNotExist:
-            raise NotFound("Diário não encontrado.")
+        if not queryset.exists():
+            error_message = "Atividades não encontradas."
+            raise NotFound(error_message)
+        return queryset
 
 
-class DiaryUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = DiaryWriteSerializer
+class DiaryListView(BaseDiaryView, ListAPIView):
+    pass
 
-    def get_object(self):
-        id = self.kwargs.get("id")
-        try:
-            return Diary.objects.get(user=self.request.user, id=id)
-        except Diary.DoesNotExist:
-            raise NotFound("Diário não encontrado.")
 
-    def update(self, request, *args, **kwargs):
+class DiaryObjectView(BaseDiaryView, RetrieveAPIView):
+    pass
+
+
+class DiaryDeleteView(BaseDiaryView, DestroyAPIView):
+    pass
+
+
+class DiaryUpdateView(BaseDiaryView, UpdateAPIView):
+    def update(self, request: object, *args: object, **kwargs: object) -> Response:
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -105,11 +97,8 @@ class DiaryUpdateView(UpdateAPIView):
         )
 
 
-class DiaryCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = DiaryWriteSerializer
-
-    def create(self, request, *args, **kwargs):
+class DiaryCreateView(BaseDiaryView, CreateAPIView):
+    def create(self, request: object, *args: object, **kwargs: object) -> Response:
         serializer = self.get_serializer(data=request.data)
 
         try:
@@ -127,8 +116,3 @@ class DiaryCreateView(CreateAPIView):
             )
         except ValidationError as e:
             return Response({"detail": e.detail}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception:
-            return Response(
-                {"detail": "Erro interno no servidor."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
