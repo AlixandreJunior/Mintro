@@ -1,9 +1,17 @@
-from typing import ClassVar
+from typing import ClassVar, TypedDict
 
 from django.db import models
 from django.dispatch import receiver
 
 from apps.user.models.user import User
+
+type Level = tuple[int, str, str]
+
+
+class AchievementType(TypedDict):
+    name: str
+    description: str
+    levels: list[Level]
 
 
 class Achievement(models.Model):
@@ -59,7 +67,7 @@ class AchievementLog(models.Model):
 
 @receiver(models.signals.post_migrate)
 def create_initial_achievements(sender: object, **kwargs: object) -> None:
-    achievements: list[dict[str, object]] = [
+    achievements: list[AchievementType] = [
         {
             "name": "Bem-vindo ao Mintro",
             "description": "Avance no tempo de uso da conta.",
@@ -126,14 +134,11 @@ def grant_welcome_achievement(
     if created:
         try:
             achievement = Achievement.objects.get(name="Bem-vindo ao Mintro")
-            print("AAAAAA")
             level = AchievementLevel.objects.get(achievement=achievement, level=1)
-            print("BBBBBBBBB")
             if not AchievementLog.objects.filter(
                 user=instance, achievement_level=level
             ).exists():
                 AchievementLog.objects.create(user=instance, achievement_level=level)
-                print("CCCCCCcc")
         except Achievement.DoesNotExist:
             pass
         except AchievementLevel.DoesNotExist:

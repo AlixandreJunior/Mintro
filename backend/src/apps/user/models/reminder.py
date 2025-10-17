@@ -23,12 +23,12 @@ class Reminder(models.Model):
     content = models.CharField(max_length=256)
     date = models.DateField(default=timezone.now)
     deadline = models.DateField()
-    time = models.TimeField(default=timezone.now)
+    time = models.TimeField(auto_now_add=True)
     type = models.CharField(max_length=2, choices=TypeChoices.choices)
     is_daily = models.BooleanField(default=False)
 
 
 @receiver(models.signals.post_save, sender=Reminder)
-def delete_expired_reminders(sender: Reminder, **kwargs: any) -> None:
+def delete_expired_reminders(sender: Reminder, **kwargs: object) -> None:
     now = timezone.now().date()
     Reminder.objects.filter(deadline__isnull=False, deadline__lt=now).delete()

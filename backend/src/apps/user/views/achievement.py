@@ -4,22 +4,8 @@ from rest_framework.generics import (
     RetrieveAPIView,
 )
 
-from apps.user.models.achievement import Achievement, AchievementLog
-from apps.user.serializers.achievements import (
-    AchievementLogSerializer,
-    AchievementSerializer,
-)
-from utils.base_view import BaseView
-
-
-class BaseAchievementView(BaseView):
-    serializer_class = AchievementSerializer
-    model = Achievement
-
-
-class BaseAchievementLogView(BaseView):
-    serializer_class = AchievementLogSerializer
-    model = AchievementLog
+from apps.user.models.achievement import AchievementLog
+from utils.base_view import BaseAchievementLogView, BaseAchievementView
 
 
 class AchievementDetailView(BaseAchievementView, RetrieveAPIView):

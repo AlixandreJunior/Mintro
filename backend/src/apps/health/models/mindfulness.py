@@ -2,7 +2,7 @@ from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
 
-from apps.user.models import User
+from apps.user.models.user import User
 
 
 class Mindfulness(models.Model):
@@ -35,11 +35,11 @@ class MindfulnessLog(models.Model):
     datetime = models.DateTimeField(default=timezone.now)
 
     def __str__(self) -> str:
-        return f"Registro de Midnfullnes de {self.user.username} em {self.created_at}"
+        return f"Registro de Midnfullnes de {self.user.username} em {self.datetime}"
 
 
 @receiver(models.signals.post_migrate)
-def create_default_mindfulness(sender: any, **kwargs: object) -> None:
+def create_default_mindfulness(sender: object, **kwargs: object) -> None:
     default_mindfulness = [
         {"name": "Meditação Guiada"},
         {"name": "Respiração Consciente"},
