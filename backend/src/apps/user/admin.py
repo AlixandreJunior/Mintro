@@ -1,3 +1,3 @@
-from apps.user.admin import achievement, reminder, user
+from backend.src.apps.user import admin
 
-__all__ = user, achievement, reminder
+__all__ = ("admin",)

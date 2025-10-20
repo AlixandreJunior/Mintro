@@ -1,9 +1,8 @@
+from backend.src.apps.user.models.user import User
+from backend.src.utils.choices import ReminderTypeChoices
 from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
-
-from apps.user.models.user import User
 
 
 class Reminder(models.Model):
@@ -11,20 +10,13 @@ class Reminder(models.Model):
         verbose_name = "Reminder"
         verbose_name_plural = "Reminders"
 
-    class TypeChoices(models.TextChoices):
-        Hydration = "HD", _("Hydration")
-        Exercise = "EX", _("Exercise")
-        Mindfulness = "MD", _("Mindfulness")
-        Diary = "DR", _("Diary")
-        Others = "OT", _("Others")
-
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=56)
     content = models.CharField(max_length=256)
     date = models.DateField(default=timezone.now)
     deadline = models.DateField()
     time = models.TimeField(auto_now_add=True)
-    type = models.CharField(max_length=2, choices=TypeChoices.choices)
+    type = models.CharField(max_length=2, choices=ReminderTypeChoices.choices)
     is_daily = models.BooleanField(default=False)
 
 

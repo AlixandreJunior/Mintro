@@ -1,10 +1,9 @@
+from backend.src.utils.base_view import BaseUserView
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
-
-from utils.base_view import BaseUserView
 
 
 class UserObjectView(BaseUserView, RetrieveAPIView):
@@ -14,7 +13,7 @@ class UserObjectView(BaseUserView, RetrieveAPIView):
 class UserCreateView(BaseUserView, CreateAPIView):
     permission_classes = (AllowAny,)
 
-    def create(self, request: Request, *args: any, **kwargs: any) -> Response:
+    def create(self, request: Request, *args: object, **kwargs: object) -> Response:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

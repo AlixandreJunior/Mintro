@@ -1,13 +1,15 @@
-from __future__ import annotations
+from typing import TYPE_CHECKING
 
+from backend.src.apps.diary.models.diary import Diary
+from backend.src.apps.health.models.exercise import ExerciseLog
+from backend.src.apps.health.models.mindfulness import MindfulnessLog
+from backend.src.utils.manager import UsersManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.manager import RelatedManager
 
-from apps.diary.models.diary import Diary
-from apps.health.models.exercise import ExerciseLog
-from apps.health.models.mindfulness import MindfulnessLog
-from utils.manager import UsersManager
+if TYPE_CHECKING:
+    from django.db.models.manager import RelatedManager  # noqa: TC004
 
 
 class User(AbstractUser):

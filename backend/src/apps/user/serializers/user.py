@@ -1,9 +1,7 @@
-from typing import ClassVar, override
-
+from backend.src.apps.user.models.user import User
 from django.contrib.auth import password_validation
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
-
-from apps.user.models.user import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -13,8 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
     mindfulness_registers = serializers.SerializerMethodField()
     exercises_registers = serializers.SerializerMethodField()
 
-    @override
-    class Meta:
+    class Meta(serializers.ModelSerializer.Meta):
         model = User
         fields = (
             "id",
@@ -26,10 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
             "exercises_registers",
             "created_at",
         )
-        extra_kwargs: ClassVar[dict[str, dict[str, bool]]] = {
-            "id": {"read_only": True},
-            "created_at": {"read_only": True},
-        }
+        read_only_fields = ("id", "created_at")
 
     def get_diarys_registers(self, obj: User) -> int:
         return obj.diary_set.count()
@@ -43,7 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_password(self, value: str) -> str:
         try:
             password_validation.validate_password(value, self.instance)
-        except serializers.ValidationError as e:
+        except ValidationError as e:
             raise serializers.ValidationError({"password": list(e.messages)}) from e
         return value
 
