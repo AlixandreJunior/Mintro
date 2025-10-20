@@ -41,5 +41,4 @@ urlpatterns = [
     ),
     path("steps/", steps.StepLogListView.as_view(), name="steps_list"),
     path("steps/register/", steps.StepLogRegisterView.as_view(), name="steps_register"),
-    path("steps/detail/", steps.StepLogDetailView.as_view(), name="steps_detail"),
 ]

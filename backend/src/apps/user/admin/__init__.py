@@ -1,2 +1,3 @@
-from .achievement import *
-from .user import *
+from . import achievement, reminder, user
+
+__all__ = ["achievement", "reminder", "user"]

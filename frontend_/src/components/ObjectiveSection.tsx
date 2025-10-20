@@ -4,7 +4,7 @@ import { ActivityIndicator } from 'react-native-paper';
 import { router } from 'expo-router';
 import { useObjectiveManager } from '@/hooks/useObjective';
 
-export const ObjectiveSection = () => {
+const ObjectiveSection = () => {
   const { objectives, loading, error } = useObjectiveManager();
 
   return (
@@ -64,3 +64,5 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
+
+export default ObjectiveSection;

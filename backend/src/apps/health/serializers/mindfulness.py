@@ -1,22 +1,39 @@
-from apps.health.models.mindfulness import Mindfulness, MindfulnessLog
+from typing import ClassVar
+
 from rest_framework import serializers
+
+from apps.health.models.mindfulness import Mindfulness, MindfulnessLog
 
 
 class MindfulnessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mindfulness
-        fields = ["id", "name", "type"]
+        fields: ClassVar[list[str]] = ["id", "name", "type"]
 
 
-class MindfulnessLogReadSerializer(serializers.ModelSerializer):
-    mindfulness = MindfulnessSerializer()
+class MindfulnessLogSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+    mindfulness = MindfulnessSerializer(read_only=True)
 
     class Meta:
         model = MindfulnessLog
-        fields = ["id", "user", "mindfulness", "duration", "description", "datetime"]
+        fields: ClassVar[list[str]] = [
+            "id",
+            "user",
+            "mindfulness",
+            "duration",
+            "description",
+            "datetime",
+        ]
+        read_only_fields: ClassVar[list[str]] = [
+            "id",
+            "user",
+            "mindfulness",
+            "datetime",
+        ]
 
-
-class MindfulnessLogWriteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MindfulnessLog
-        fields = ["mindfulness", "duration", "datetime"]
+    def create(self, validated_data: object) -> any:
+        mindfulness = validated_data.pop("mindfulness", None)
+        if mindfulness is not None:
+            validated_data["mindfulness_id"] = mindfulness.id
+        return super().create(validated_data)

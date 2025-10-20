@@ -6,11 +6,13 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import ObjectiveModals from '@/components/ObjectiveModals';
-import { ObjectiveMainContent } from '@/components/ObjectiveMainContent';
 import { useState } from 'react';
 import { ObjectiveHeader } from '@/components/ObjectiveHeader';
+import { ObjectiveMainContent } from '@/components/ObjectiveMainContent';
+import ObjectiveModals from '@/components/ObjectiveModals';
+import DailyReminderModal from '@/components/DailyReminderModal';
 import { useObjectiveManager } from '@/hooks/useObjective';
+import { useNotifications } from '@/hooks/useNotifications';
 
 const { height } = Dimensions.get('window');
 
@@ -19,10 +21,12 @@ export default function ObjectiveDetailScreen(): React.JSX.Element {
 
   const [isRepeatModalVisible, setRepeatModalVisible] = useState(false);
   const [isReminderModalVisible, setReminderModalVisible] = useState(false);
+
   const [reminderTime, setReminderTime] = useState<string | null>(null);
   const [selectedRepeat, setSelectedRepeat] = useState<string | null>(null);
 
   const { updating, objective, loading } = useObjectiveManager(Number(id));
+  const { scheduleDailyNotification } = useNotifications();
 
   const closeModals = () => {
     setRepeatModalVisible(false);
@@ -69,14 +73,10 @@ export default function ObjectiveDetailScreen(): React.JSX.Element {
         setRepeatModalVisible={setRepeatModalVisible}
       />
       <ObjectiveMainContent objective={objective} />
+
+      {/* Modal de repetição / reminder antigo */}
       <ObjectiveModals
-        visibleModal={
-          isReminderModalVisible
-            ? 'reminder'
-            : isRepeatModalVisible
-            ? 'repeat'
-            : null
-        }
+        visibleModal={isRepeatModalVisible ? 'repeat' : null}
         reminder={reminderTime}
         repeat={selectedRepeat?.replace('x', '')}
         updating={updating}

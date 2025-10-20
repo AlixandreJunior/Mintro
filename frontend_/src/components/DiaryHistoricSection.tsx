@@ -10,7 +10,7 @@ interface DiaryHistoricSectionProps {
   initialDate: Date;
 }
 
-export const DiaryHistoricSection: React.FC<DiaryHistoricSectionProps> = ({
+const DiaryHistoricSection: React.FC<DiaryHistoricSectionProps> = ({
   initialDate,
 }) => {
   const { getDiaryHistory } = useDiaryManager();
@@ -72,3 +72,5 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 });
+
+export default DiaryHistoricSection;

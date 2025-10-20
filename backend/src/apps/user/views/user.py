@@ -1,38 +1,35 @@
-from rest_framework.generics import RetrieveAPIView, CreateAPIView, UpdateAPIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
+from rest_framework.permissions import AllowAny
+from rest_framework.request import Request
+from rest_framework.response import Response
 
-from apps.user.serializers.user import UserReadSerializer, UserWriteSerializer
+from utils.base_view import BaseUserView
 
-class UserObjectView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = UserReadSerializer
 
-    def get_object(self):
-        return self.request.user
+class UserObjectView(BaseUserView, RetrieveAPIView):
+    pass
 
-class UserCreateView(CreateAPIView):
-    permission_classes = [AllowAny]
-    serializer_class = UserWriteSerializer
 
-    def create(self, request, *args, **kwargs):
+class UserCreateView(BaseUserView, CreateAPIView):
+    permission_classes = (AllowAny,)
+
+    def create(self, request: Request, *args: any, **kwargs: any) -> Response:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response("Usuario criado com sucesso.", status=status.HTTP_201_CREATED)
 
-class UserUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = UserWriteSerializer
 
-    def get_object(self):
-        return self.request.user
-
-    def partial_update(self, request, *args, **kwargs):
-        instance = self.get_object()  
+class UserUpdateView(BaseUserView, UpdateAPIView):
+    def partial_update(
+        self, request: Request, *args: object, **kwargs: object
+    ) -> Response:
+        instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
-        return Response({'detail': "Dados atualizados com sucesso."}, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": "Dados atualizados com sucesso."}, status=status.HTTP_200_OK
+        )

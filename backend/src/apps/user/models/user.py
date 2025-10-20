@@ -1,22 +1,13 @@
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from __future__ import annotations
+
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.manager import RelatedManager
 
-
-class UsersManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError("O e-mail é obrigatório!")
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
-        extra_fields.setdefault("is_active", True)
-        return self.create_user(email, password, **extra_fields)
+from apps.diary.models.diary import Diary
+from apps.health.models.exercise import ExerciseLog
+from apps.health.models.mindfulness import MindfulnessLog
+from utils.manager import UsersManager
 
 
 class User(AbstractUser):
@@ -28,9 +19,13 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
+    diary_set: RelatedManager[Diary]
+    mindfulnesslog_set: RelatedManager[MindfulnessLog]
+    exerciselog_set: RelatedManager[ExerciseLog]
+
     objects = UsersManager()
     groups = None
     user_permissions = None
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.username

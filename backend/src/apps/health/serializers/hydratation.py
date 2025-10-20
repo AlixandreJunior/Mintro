@@ -1,5 +1,8 @@
-from apps.health.models.hydratation import HydrationLog
+from typing import ClassVar
+
 from rest_framework import serializers
+
+from apps.health.models.hydratation import HydrationLog
 
 
 class HydrationLogSerializer(serializers.ModelSerializer):
@@ -7,4 +10,4 @@ class HydrationLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HydrationLog
-        fields = ["id", "user", "quantity", "date"]
+        fields: ClassVar[list[str]] = ["id", "user", "quantity", "date"]

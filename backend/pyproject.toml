@@ -4,7 +4,7 @@ version = "0.1.0"
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Alixandre Junior", email = "alixandreonetojunior@gmail.com" }]
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 dependencies = [
     "asgiref==3.8.1",
     "colorama==0.4.6",
@@ -14,6 +14,7 @@ dependencies = [
     "django-cors-headers==4.7.0",
     "djangorestframework==3.15.2",
     "djangorestframework-simplejwt==5.5.0",
+    "djangorestframework-types>=0.9.0",
     "dotenv==0.9.9",
     "drf-extra-fields==3.7.0",
     "filetype==1.2.0",
@@ -106,7 +107,7 @@ known-first-party = ["config"]
 # ============================
 [tool.pyright]
 typeCheckingMode = "strict"
-pythonVersion = "3.12"
+pythonVersion = "3.13"
 include = ["src", 'tests']
 exclude = [
     "**/venv",
@@ -118,6 +119,7 @@ exclude = [
 ]
 venv = ".venv"
 venvPath = "."
+extraPaths = ["."]
 executionEnvironments = [{ root = "src" }]
 
 # ============================

@@ -1,12 +1,12 @@
-import { View } from "react-native"
-import { Slot} from "expo-router"
-import Header from "@/components/layout/Header"
+import { View } from 'react-native';
+import { Slot } from 'expo-router';
+import Header from '@/components/layout/Header';
 
-export default function TabLayout() {
+export default function Layout() {
   return (
     <View style={{ flex: 1 }}>
-      <Header/>
-      <Slot/>
+      <Header />
+      <Slot />
     </View>
-  )
+  );
 }

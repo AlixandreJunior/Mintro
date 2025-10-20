@@ -1,39 +1,25 @@
-from apps.user.models.achievement import Achievement, AchievementLog
-from apps.user.serializers.achievements import (
-    AchievementLogSerializer,
-    AchievementSerializer,
-)
+from django.db.models.query import QuerySet
 from rest_framework.generics import (
-    CreateAPIView,
-    DestroyAPIView,
     ListAPIView,
     RetrieveAPIView,
-    UpdateAPIView,
 )
-from rest_framework.permissions import IsAuthenticated
+
+from apps.user.models.achievement import AchievementLog
+from utils.base_view import BaseAchievementLogView, BaseAchievementView
 
 
-class AchievementDetailView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = AchievementSerializer
-    queryset = Achievement.objects.all()
-    lookup_field = "pk"
-
-class AchievementLogDetailView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = AchievementLogSerializer
-    queryset = AchievementLog.objects.all()
-    lookup_field = "pk"
-
-class AchievementListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = AchievementSerializer
-    queryset = Achievement.objects.all()
+class AchievementDetailView(BaseAchievementView, RetrieveAPIView):
+    pass
 
 
-class AchievementLogListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = AchievementLogSerializer
+class AchievementLogDetailView(BaseAchievementLogView, RetrieveAPIView):
+    pass
 
-    def get_queryset(self):
+
+class AchievementListView(BaseAchievementView, ListAPIView):
+    pass
+
+
+class AchievementLogListView(BaseAchievementLogView, ListAPIView):
+    def get_queryset(self) -> QuerySet:
         return AchievementLog.objects.filter(user=self.request.user)

@@ -1,19 +1,21 @@
-from apps.health.models.hydratation import HydrationLog
-from apps.health.serializers.hydratation import HydrationLogSerializer
+from django.db.models.query import QuerySet
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import CreateAPIView, ListAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
+
+from apps.health.models.hydratation import HydrationLog
+from apps.health.serializers.hydratation import HydrationLogSerializer
+from utils.base_view import BaseView
 from utils.check_achievement import check_gole_a_gole
 
 
-class HydratationLogListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
+class BaseHydrationView(BaseView):
     serializer_class = HydrationLogSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         date_str = self.request.GET.get("date")
         queryset = HydrationLog.objects.filter(user=self.request.user)
 
@@ -21,23 +23,26 @@ class HydratationLogListView(ListAPIView):
             try:
                 date = timezone.datetime.strptime(date_str, "%Y-%m-%d").date()
                 queryset = queryset.filter(date=date)
-            except ValueError:
-                raise NotFound("Formato de data inválido. Use YYYY-MM-DD.")
+            except ValueError as e:
+                message = "Formato de data inválido. Use YYYY-MM-DD."
+                raise NotFound(message) from e
 
         if not queryset.exists():
-            raise NotFound("Registros de Hidratação não encontrados.")
+            message = "Registros de Hidratação não encontrados."
+            raise NotFound(message)
 
         return queryset
 
 
-class HydratationLogRegisterView(CreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = HydrationLogSerializer
+class HydratationLogListView(BaseHydrationView, ListAPIView):
+    pass
 
-    def perform_create(self, serializer):
+
+class HydratationLogRegisterView(BaseHydrationView, CreateAPIView):
+    def perform_create(self, serializer: Serializer) -> None:
         serializer.save(user=self.request.user)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request: object, *args: object, **kwargs: object) -> Response:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

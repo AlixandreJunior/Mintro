@@ -1,6 +1,17 @@
-from apps.user.models.user import User
+from typing import ClassVar, TypedDict
+
 from django.db import models
 from django.dispatch import receiver
+
+from apps.user.models.user import User
+
+type Level = tuple[int, str, str]
+
+
+class AchievementType(TypedDict):
+    name: str
+    description: str
+    levels: list[Level]
 
 
 class Achievement(models.Model):
@@ -11,7 +22,7 @@ class Achievement(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(help_text="Descrição geral da conquista.")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -21,7 +32,7 @@ class AchievementLevel(models.Model):
         verbose_name_plural = "Achievement Levels"
         unique_together = ("achievement", "level")
 
-    LEVEL_CHOICES = [
+    LEVEL_CHOICES: ClassVar[list[tuple[int, str]]] = [
         (1, "Fácil"),
         (2, "Intermediário"),
         (3, "Difícil"),
@@ -36,7 +47,7 @@ class AchievementLevel(models.Model):
     )
     description = models.TextField(help_text="Descrição específica deste nível.")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.achievement.name} - Nível {self.level}"
 
 
@@ -50,13 +61,13 @@ class AchievementLog(models.Model):
     achievement_level = models.ForeignKey(AchievementLevel, on_delete=models.CASCADE)
     date_awarded = models.DateField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.user.username} - {self.achievement_level}"
 
 
 @receiver(models.signals.post_migrate)
-def create_initial_achievements(sender, **kwargs):
-    ACHIEVEMENTS = [
+def create_initial_achievements(sender: object, **kwargs: object) -> None:
+    achievements: list[AchievementType] = [
         {
             "name": "Bem-vindo ao Mintro",
             "description": "Avance no tempo de uso da conta.",
@@ -102,8 +113,8 @@ def create_initial_achievements(sender, **kwargs):
         },
     ]
 
-    for ach in ACHIEVEMENTS:
-        achievement_obj, created = Achievement.objects.get_or_create(
+    for ach in achievements:
+        achievement_obj = Achievement.objects.get_or_create(
             name=ach["name"],
             defaults={"description": ach["description"]},
         )
@@ -117,14 +128,18 @@ def create_initial_achievements(sender, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=User)
-def grant_welcome_achievement(sender, instance, created, **kwargs):
+def grant_welcome_achievement(
+    sender: object, instance: object, created: object, **kwargs: object
+) -> None:
     if created:
         try:
             achievement = Achievement.objects.get(name="Bem-vindo ao Mintro")
-            level = achievement.levels.get(level=1)
+            level = AchievementLevel.objects.get(achievement=achievement, level=1)
             if not AchievementLog.objects.filter(
                 user=instance, achievement_level=level
             ).exists():
                 AchievementLog.objects.create(user=instance, achievement_level=level)
         except Achievement.DoesNotExist:
+            pass
+        except AchievementLevel.DoesNotExist:
             pass

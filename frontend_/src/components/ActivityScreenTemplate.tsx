@@ -13,15 +13,9 @@ interface Props {
 }
 
 function ActivityScreenTemplate({ title, type, onAddPress }: Props) {
-  const handleBack = () => router.back();
-
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderWithOptions
-        title={title}
-        onBackPress={handleBack}
-        options={[{ label: 'Excluir', onPress: () => console.log('Excluir') }]}
-      />
+      <HeaderWithOptions title={title} onBackPress={() => router.back()} />
 
       <ActivityMainContent type={type} />
 

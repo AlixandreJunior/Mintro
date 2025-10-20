@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { FloatingActionButton } from '@/components/FloatingButtonAction';
 import HydrationHeader from '@/components/HydrationHeader';
 import HydrationMainContent from '@/components/HydrationMainContent';
+import DailyReminderModal from '@/components/DailyReminderModal';
 
 const HydrationScreen = () => {
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -15,15 +16,25 @@ const HydrationScreen = () => {
     'day' | 'week' | 'month' | 'year'
   >('day');
 
+  const [reminderModalVisible, setReminderModalVisible] = useState(false);
+  const [reminderTime, setReminderTime] = useState<string | null>(null);
+
+  const handleReminderChange = (time: string | null) => {
+    setReminderTime(time);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <HydrationHeader />
+      <HydrationHeader
+        onOpenReminderModal={() => setReminderModalVisible(true)}
+      />
       <HydrationMainContent
         selectedDate={selectedDate}
         selectedPeriod={selectedPeriod}
         setSelectedDate={setSelectedDate}
         setSelectedPeriod={setSelectedPeriod}
       />
+
       <FloatingActionButton
         onPress={() => router.push('/hydratation/register')}
       />
