@@ -1,8 +1,9 @@
-from backend.src.apps.user.models.user import User
-from backend.src.utils.choices import ReminderTypeChoices
 from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
+
+from apps.user.models.user import User
+from utils.choices import ReminderTypeChoices
 
 
 class Reminder(models.Model):

@@ -2,7 +2,7 @@ from django.db.models.query import QuerySet
 from django.utils.dateparse import parse_date
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
@@ -11,14 +11,13 @@ from apps.health.serializers.exercise import (
     ExerciseLogSerializer,
     ExerciseSerializer,
 )
-from utils.base_view import BaseView
 from utils.check_achievement import check_foco_total
 
 
-class BaseExerciseLogView(BaseView):
+class BaseExerciseLogView(GenericAPIView):
     serializer_class = ExerciseLogSerializer
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[ExerciseLog]:
         queryset = ExerciseLog.objects.filter(user=self.request.user)
         start_date = self.request.GET.get("start_date")
         end_date = self.request.GET.get("end_date")
@@ -34,7 +33,7 @@ class BaseExerciseLogView(BaseView):
         return queryset
 
 
-class ExerciseListView(BaseView, ListAPIView):
+class ExerciseListView(ListAPIView):
     serializer_class = ExerciseSerializer
 
     def get_queryset(self) -> QuerySet:

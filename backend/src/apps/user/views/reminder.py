@@ -1,5 +1,6 @@
-from backend.src.utils.base_view import BaseReminderView
 from rest_framework import generics
+
+from utils.base_view import BaseReminderView
 
 
 class ReminderListView(BaseReminderView, generics.ListAPIView):

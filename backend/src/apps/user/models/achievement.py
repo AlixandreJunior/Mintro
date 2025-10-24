@@ -1,11 +1,12 @@
-from backend.src.apps.user.models.user import User
-from backend.src.utils.choices import AchievementLevelChoices
-from backend.src.utils.signals_callable import (
+from django.db import models
+from django.dispatch import receiver
+
+from apps.user.models.user import User
+from utils.choices import AchievementLevelChoices
+from utils.signals_callable import (
     create_initial_achievements,
     grant_welcome_achievement,
 )
-from django.db import models
-from django.dispatch import receiver
 
 
 class Achievement(models.Model):

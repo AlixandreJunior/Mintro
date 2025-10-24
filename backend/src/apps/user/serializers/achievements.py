@@ -1,13 +1,14 @@
-from backend.src.apps.user.models.achievement import (
+from rest_framework import serializers
+
+from apps.user.models.achievement import (
     Achievement,
     AchievementLevel,
     AchievementLog,
 )
-from rest_framework import serializers
 
 
 class AchievementLevelSerializer(serializers.ModelSerializer):
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:  # type: ignore
         model = AchievementLevel
         fields = (
             "id",
@@ -22,7 +23,7 @@ class AchievementLevelSerializer(serializers.ModelSerializer):
 class AchievementSerializer(serializers.ModelSerializer):
     levels = AchievementLevelSerializer(many=True, read_only=True)
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:  # type: ignore
         model = Achievement
         fields = (
             "id",
@@ -36,7 +37,7 @@ class AchievementSerializer(serializers.ModelSerializer):
 class AchievementLogSerializer(serializers.ModelSerializer):
     achievement_level = AchievementLevelSerializer(read_only=True)
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:  # type: ignore
         model = AchievementLog
         fields = (
             "id",

@@ -1,7 +1,8 @@
-from backend.src.apps.user.models.user import User
 from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
+
+from apps.user.models.user import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -11,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
     mindfulness_registers = serializers.SerializerMethodField()
     exercises_registers = serializers.SerializerMethodField()
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta:  # type: ignore
         model = User
         fields = (
             "id",

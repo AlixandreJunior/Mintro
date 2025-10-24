@@ -8,6 +8,6 @@ from apps.health.models.hydratation import HydrationLog
 class HydrationLogSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
 
-    class Meta:
+    class Meta:  # type: ignore
         model = HydrationLog
         fields: ClassVar[list[str]] = ["id", "user", "quantity", "date"]

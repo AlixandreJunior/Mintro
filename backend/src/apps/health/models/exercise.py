@@ -41,7 +41,7 @@ class ExerciseLog(models.Model):
 
 
 @receiver(models.signals.post_migrate)
-def create_default_exercises(sender: any, **kwargs: object) -> None:
+def create_default_exercises(sender: object, **kwargs: object) -> None:
     default_exercises = [
         {"name": "Corrida", "type": Exercise.TypeChoices.AEROBICO, "is_distance": True},
         {

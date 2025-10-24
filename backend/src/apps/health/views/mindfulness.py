@@ -2,7 +2,7 @@ from django.db.models.query import QuerySet
 from django.utils.dateparse import parse_date
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
@@ -11,14 +11,13 @@ from apps.health.serializers.mindfulness import (
     MindfulnessLogSerializer,
     MindfulnessSerializer,
 )
-from utils.base_view import BaseView
 from utils.check_achievement import check_zen_total
 
 
-class BaseMindfulnessLogView(BaseView):
+class BaseMindfulnessLogView(GenericAPIView):
     serializer_class = MindfulnessLogSerializer
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[MindfulnessLog]:
         queryset = MindfulnessLog.objects.filter(user=self.request.user)
         start_date = self.request.GET.get("start_date")
         end_date = self.request.GET.get("end_date")
@@ -34,10 +33,10 @@ class BaseMindfulnessLogView(BaseView):
         return queryset
 
 
-class MindfulnessListView(BaseView, ListAPIView):
+class MindfulnessListView(ListAPIView):
     serializer_class = MindfulnessSerializer
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[Mindfulness]:
         queryset = Mindfulness.objects.all()
 
         if not queryset:

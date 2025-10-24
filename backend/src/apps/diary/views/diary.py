@@ -1,4 +1,4 @@
-from typing import ClassVar
+from typing import TYPE_CHECKING, cast
 
 from django.db.models.query import QuerySet
 from rest_framework import status
@@ -10,62 +10,26 @@ from rest_framework.generics import (
     RetrieveAPIView,
     UpdateAPIView,
 )
-from rest_framework.permissions import BasePermission, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 
-from apps.diary.models.diary import Activity, Diary
+from apps.diary.models.diary import Activity
 from apps.diary.serializers.diary import (
     ActivitySerializer,
-    DiarySerializer,
 )
-from utils.base_view import BaseView
+from utils.base_view import BaseDiaryView
 from utils.check_achievement import check_narrador_da_propria_historia
 
-
-class BaseDiaryView(BaseView):
-    serializer_class = DiarySerializer
-
-    def get_object(self) -> Diary:
-        diary_id = self.kwargs.get("id")
-        try:
-            return Diary.objects.get(user=self.request.user, id=diary_id)
-        except Diary.DoesNotExist as e:
-            message = "Diário não encontrado."
-            raise NotFound(message) from e
-
-    def get_queryset(self) -> QuerySet:
-        user = self.request.user
-        search = self.request.GET.get("search")
-        month = self.request.GET.get("month")
-        year = self.request.GET.get("year")
-
-        queryset = Diary.objects.filter(user=user)
-
-        if search:
-            queryset = queryset.filter(title__icontains=search)
-
-        if month and year:
-            try:
-                month = int(month)
-                year = int(year)
-                queryset = queryset.filter(
-                    datetime__month=month, datetime__year=year
-                ).order_by("-datetime")
-            except ValueError as e:
-                error_message = "Parâmetros de mês ou ano inválidos."
-                raise NotFound(error_message) from e
-
-        if not queryset.exists():
-            error_message = "Diários não encontrados."
-            raise NotFound(error_message)
-        return queryset
+if TYPE_CHECKING:
+    from apps.user.models.user import User
 
 
 class ActivitiesListView(ListAPIView):
-    permission_classes = ClassVar[list[BasePermission]][IsAuthenticated]
+    permission_classes = (IsAuthenticated,)
     serializer_class = ActivitySerializer
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[Activity]:
         queryset = Activity.objects.all()
 
         if not queryset.exists():
@@ -87,7 +51,7 @@ class DiaryDeleteView(BaseDiaryView, DestroyAPIView):
 
 
 class DiaryUpdateView(BaseDiaryView, UpdateAPIView):
-    def update(self, request: object, *args: object, **kwargs: object) -> Response:
+    def update(self, request: Request, *args: object, **kwargs: object) -> Response:
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -98,14 +62,16 @@ class DiaryUpdateView(BaseDiaryView, UpdateAPIView):
 
 
 class DiaryCreateView(BaseDiaryView, CreateAPIView):
-    def create(self, request: object, *args: object, **kwargs: object) -> Response:
+    def create(self, request: Request, *args: object, **kwargs: object) -> Response:
         serializer = self.get_serializer(data=request.data)
 
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
 
-            unlocked_achievements = check_narrador_da_propria_historia(request.user)
+            unlocked_achievements = check_narrador_da_propria_historia(
+                cast("User", request.user)
+            )
 
             return Response(
                 {

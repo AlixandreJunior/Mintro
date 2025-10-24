@@ -1,9 +1,10 @@
-from backend.src.utils.base_view import BaseUserView
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
+
+from utils.base_view import BaseUserView
 
 
 class UserObjectView(BaseUserView, RetrieveAPIView):

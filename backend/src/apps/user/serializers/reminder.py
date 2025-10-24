@@ -1,15 +1,16 @@
 from datetime import date
 
-from backend.src.apps.user.models.reminder import Reminder
 from django.utils import timezone
 from rest_framework import serializers
+
+from apps.user.models.reminder import Reminder
 
 
 class ReminderSerializer(serializers.ModelSerializer):
     type_display = serializers.CharField(source="get_type_display", read_only=True)
     user_id = serializers.PrimaryKeyRelatedField(source="user", read_only=True)
 
-    class Meta(serializers.ModelSerializer.Meta):
+    class Meta: #type: ignore
         model = Reminder
         fields = (
             "id",
