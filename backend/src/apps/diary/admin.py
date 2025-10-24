@@ -1,3 +1,3 @@
-from apps.diary.admin import diary, objetive
+from apps.diary.admin import diary, objective
 
-__all__ = ["diary", "objetive"]
+__all__ = ["diary", "objective"]

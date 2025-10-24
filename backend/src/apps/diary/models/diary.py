@@ -28,7 +28,7 @@ class Diary(models.Model):
     content = models.TextField()
     datetime = models.DateTimeField(default=timezone.now)
     mood = models.CharField(max_length=20, choices=DiaryMoodChoices.choices)
-    activities = models.ManyToManyField(Activity, blank=True)
+    activities = models.ManyToManyField(Activity, blank=True)  # type: ignore
     photo = models.ImageField(upload_to="diary/photos/", null=True, blank=True)
 
     def __str__(self) -> str:
@@ -39,4 +39,4 @@ class Diary(models.Model):
 def create_default_activities(
     sender: object, app_config: object, **kwargs: object
 ) -> None:
-    create_achievements(sender, app_config, **kwargs)
+    create_achievements(sender, **kwargs)

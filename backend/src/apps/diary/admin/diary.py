@@ -6,7 +6,7 @@ from apps.diary.models.diary import Activity, Diary
 @admin.register(Activity)
 class ActivityAdmin(admin.ModelAdmin):  # type: ignore
     list_display = ("id", "name")
-    search_fields = "name"
+    search_fields = ("name",)
 
 
 @admin.register(Diary)

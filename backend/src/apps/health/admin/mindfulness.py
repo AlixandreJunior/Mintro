@@ -6,8 +6,8 @@ from apps.health.models.mindfulness import Mindfulness, MindfulnessLog
 @admin.register(Mindfulness)
 class MindfulnessAdmin(admin.ModelAdmin):  # type: ignore
     list_display = ("id", "name", "type")
-    list_filter = "type"
-    search_fields = "name"
+    list_filter = ("type",)
+    search_fields = ("name",)
 
 
 @admin.register(MindfulnessLog)

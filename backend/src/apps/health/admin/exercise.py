@@ -7,7 +7,7 @@ from apps.health.models.exercise import Exercise, ExerciseLog
 class ExerciseAdmin(admin.ModelAdmin):  # type: ignore
     list_display = ("id", "name", "type", "is_distance")
     list_filter = ("type", "is_distance")
-    search_fields = "name"
+    search_fields = ("name",)
 
 
 @admin.register(ExerciseLog)

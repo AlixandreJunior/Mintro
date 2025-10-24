@@ -4,8 +4,6 @@ from django.apps import apps
 from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
 
-from apps.diary.models.diary import Activity
-
 type Level = tuple[int, str, str]
 
 
@@ -114,6 +112,8 @@ def welcome_achievement(
 
 
 def create_activities(sender: object, app_config: object, **kwargs: object) -> None:
+    Activity = apps.get_model("diary", "Activity")
+
     default_activities = [
         "Família",
         "Amigos",

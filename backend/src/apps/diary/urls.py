@@ -1,10 +1,10 @@
-from django.urls import path
+from django.urls import URLPattern, path
 
 from apps.diary.views import diary, objetives
 
 app_name = "diary"
 
-urlpatterns = [
+urlpatterns: list[URLPattern] = [
     path("diary/", diary.DiaryListView.as_view(), name="diary_list"),
     path(
         "diary/detail/<int:id>/", diary.DiaryObjectView.as_view(), name="diary_object"
