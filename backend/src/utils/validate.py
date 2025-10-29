@@ -6,10 +6,12 @@ from apps.diary.models.objetives import Objective
 
 
 def validate_objective_limits(
-    objectives: QuerySet[Objective], activity: Activity | None
+    objectives: QuerySet[Objective], activity: Activity | None, max_objectives: int
 ) -> None:
-    if objectives.count() >= 3:
-        raise ValidationError({"activity": "Máximo de 3 objetivos ativos."})
+    if objectives.count() >= max_objectives:
+        raise ValidationError(
+            {"activity": f"Máximo de {max_objectives} objetivo(s) ativos."}
+        )
     if objectives.filter(activity=activity).exists():
         raise ValidationError(
             {"activity": "Você já possui um objetivo com essa atividade."}

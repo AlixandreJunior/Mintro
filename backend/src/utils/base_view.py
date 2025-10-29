@@ -1,10 +1,12 @@
-from typing import override
+from typing import cast, override
 
 from django.db.models.query import QuerySet
 from django.forms import ValidationError
 from rest_framework import permissions
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import GenericAPIView
+from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 
 from apps.diary.models.diary import Activity, Diary
@@ -22,7 +24,22 @@ from apps.user.serializers.reminder import ReminderSerializer
 from apps.user.serializers.user import UserSerializer
 
 
-class BaseUserView(GenericAPIView):
+class BaseView(GenericAPIView):
+    success_message: str | None = None
+
+    def finalize_response(
+        self, request: Request, response: Response, *args: object, **kwargs: object
+    ) -> Response:
+        if 200 <= response.status_code < 300 and self.success_message:
+            if isinstance(response.data, dict):
+                data = cast("dict[str, object]", request.data)
+                data.setdefault("detail", self.success_message)
+            else:
+                response.data = {"detail": self.success_message}
+        return super().finalize_response(request, response, *args, **kwargs)
+
+
+class BaseUserView(BaseView):
     model = User
     serializer_class = UserSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -33,7 +50,7 @@ class BaseUserView(GenericAPIView):
         return self.model.objects.get(id=user_id)
 
 
-class BaseAchievementView(GenericAPIView):
+class BaseAchievementView(BaseView):
     serializer_class = AchievementSerializer
     model = Achievement
 
@@ -47,7 +64,7 @@ class BaseAchievementView(GenericAPIView):
         return self.model.objects.all()
 
 
-class BaseAchievementLogView(GenericAPIView):
+class BaseAchievementLogView(BaseView):
     serializer_class = AchievementLogSerializer
     model = AchievementLog
 
@@ -61,13 +78,14 @@ class BaseAchievementLogView(GenericAPIView):
         return self.model.objects.filter(user=self.request.user)
 
 
-class BaseReminderView(GenericAPIView):
+class BaseReminderView(BaseView):
+    model = Reminder
     serializer_class = ReminderSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     @override
     def get_queryset(self) -> QuerySet[Reminder]:
-        return Reminder.objects.filter(user=self.request.user).order_by(
+        return self.model.objects.filter(user=self.request.user).order_by(
             "deadline", "time"
         )
 
@@ -75,29 +93,24 @@ class BaseReminderView(GenericAPIView):
         serializer.save(user=self.request.user)
 
 
-class BaseActivityView(GenericAPIView):
+class BaseActivityView(BaseView):
     model = Activity
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ActivitySerializer
-    queryset = Activity.objects.all()
+    permission_classes = (permissions.IsAuthenticated,)
 
     @override
     def get_queryset(self) -> QuerySet[Activity]:
-        if not self.queryset:
+        queryset = self.model.objects.all()
+        if not queryset:
             msg = "Nenhuma atividade encontrada."
             raise NotFound(msg)
         return super().get_queryset()
 
 
-class BaseDiaryView(GenericAPIView):
-    """
-    View base para manipulação de Diários.
-    Filtra por usuário autenticado e permite busca por título, mês e ano.
-    """
-
+class BaseDiaryView(BaseView):
     model = Diary
     serializer_class = DiarySerializer
-    lookup_field = "id"
+    permission_classes = (permissions.IsAuthenticated,)
 
     @override
     def get_queryset(self) -> QuerySet[Diary]:
@@ -110,7 +123,7 @@ class BaseDiaryView(GenericAPIView):
             self.model.objects.filter(user=user)
             .select_related("user")
             .prefetch_related("activities")
-            .order_by("-datetime")
+            .order_by("-created_at")
         )
 
         if search:
@@ -118,9 +131,9 @@ class BaseDiaryView(GenericAPIView):
 
         try:
             if month:
-                queryset = queryset.filter(datetime__month=int(month))
+                queryset = queryset.filter(created_at__month=int(month))
             if year:
-                queryset = queryset.filter(datetime__year=int(year))
+                queryset = queryset.filter(created_at__year=int(year))
         except ValueError as e:
             msg = "Os parâmetros de mês e ano devem ser números inteiros."
 
@@ -137,22 +150,32 @@ class BaseDiaryView(GenericAPIView):
             msg = "Diário não encontrado."
             raise NotFound(msg) from e
 
+    def perform_create(self, serializer: BaseSerializer) -> None:
+        serializer.save(user=self.request.user)
 
-class BaseObjectiveView(GenericAPIView):
+
+class BaseObjectiveView(BaseView):
+    model = Objective
     serializer_class = ObjectiveSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
+    @override
     def get_queryset(self) -> QuerySet[Objective]:
-        queryset = Objective.objects.filter(user=self.request.user)
+        queryset = self.model.objects.filter(user=self.request.user)
 
         if not queryset:
             error_message = "Objetivos não encontrados."
             raise NotFound(error_message)
         return queryset
 
+    @override
     def get_object(self) -> Objective:
         objective_id = self.kwargs.get("id")
         try:
-            return Objective.objects.get(user=self.request.user, id=objective_id)
-        except Objective.DoesNotExist as e:
+            return self.model.objects.get(user=self.request.user, id=objective_id)
+        except self.model.DoesNotExist as e:
             error_message = "Objetivo não encontrado."
             raise NotFound(error_message) from e
+
+    def perform_create(self, serializer: BaseSerializer) -> None:
+        serializer.save(user=self.request.user)
