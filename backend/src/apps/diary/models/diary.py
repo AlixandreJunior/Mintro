@@ -1,3 +1,5 @@
+from typing import Self
+
 from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
@@ -22,17 +24,32 @@ class Diary(models.Model):
     class Meta:
         verbose_name = "Diário"
         verbose_name_plural = "Diários"
+        ordering = ("-created_at",)
+        indexes = (
+            models.Index(fields=["user", "created_at"]),
+            models.Index(fields=["mood"]),
+        )
+
+    def upload_diary_photo(self, instance: Self, filename: str) -> str:
+        return (
+            f"diary/photos/{instance.user.pk}/{instance.created_at:%Y/%m/%d}/{filename}"
+        )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     content = models.TextField()
-    datetime = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now, db_index=True)
     mood = models.CharField(max_length=20, choices=DiaryMoodChoices.choices)
     activities = models.ManyToManyField(Activity, blank=True)  # type: ignore
     photo = models.ImageField(upload_to="diary/photos/", null=True, blank=True)
 
     def __str__(self) -> str:
-        return f"Diário de {self.user.username} em {self.datetime.strftime('%d/%m/%Y')}"
+        return (
+            f"Diário de {self.user.username} em {self.created_at.strftime('%d/%m/%Y')}"
+        )
+
+    def __repr__(self) -> str:
+        return f"<Diary id={self.pk} user={self.user} title={self.title!r}>"
 
 
 @receiver(models.signals.post_migrate)

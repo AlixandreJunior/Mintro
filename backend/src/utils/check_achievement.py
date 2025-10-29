@@ -5,6 +5,7 @@ from apps.health.models.exercise import ExerciseLog
 from apps.health.models.hydratation import HydrationLog
 from apps.health.models.mindfulness import MindfulnessLog
 from apps.user.models.achievement import Achievement, AchievementLog
+from apps.user.models.user import User
 
 
 def grant_achievement_level(
@@ -67,7 +68,7 @@ def check_zen_total(user: AbstractUser) -> None:
     grant_achievement_level(user, "Zen Total", progress_count=total_mindfulness)
 
 
-def check_narrador_da_propria_historia(user: AbstractUser) -> None:
+def check_narrador_da_propria_historia(user: User) -> None:
     total_diary = Diary.objects.filter(user=user).count()
     grant_achievement_level(
         user, "Narrador da própria história", progress_count=total_diary

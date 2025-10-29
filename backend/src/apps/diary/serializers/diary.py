@@ -11,15 +11,13 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 class DiarySerializer(serializers.ModelSerializer):
     activities = ActivitySerializer(many=True, read_only=True)
-    activity = serializers.PrimaryKeyRelatedField(
+    activities_ids = serializers.StringRelatedField(
         queryset=Activity.objects.all(),
         many=True,
         write_only=True,
         source="activities",
         required=False,
     )
-
-    user = serializers.StringRelatedField(read_only=True)
 
     class Meta:  # type: ignore
         model = Diary
@@ -31,7 +29,7 @@ class DiarySerializer(serializers.ModelSerializer):
             "datetime",
             "mood",
             "activities",
-            "activity",
+            "activities_ids",
             "photo",
         )
-        ordering = ("-datetime",)
+        read_only_fields = ("user",)

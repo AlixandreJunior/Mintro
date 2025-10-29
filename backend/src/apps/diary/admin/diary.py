@@ -11,8 +11,8 @@ class ActivityAdmin(admin.ModelAdmin):  # type: ignore
 
 @admin.register(Diary)
 class DiaryAdmin(admin.ModelAdmin):  # type: ignore
-    list_display = ("id", "user", "title", "mood", "datetime")
-    list_filter = ("mood", "datetime")
+    list_display = ("id", "user", "title", "mood", "created_at")
+    list_filter = ("mood", "created_at")
     search_fields = ("title", "content", "user__username")
     autocomplete_fields = ("user", "activities")
-    date_hierarchy = "datetime"
+    date_hierarchy = "created_at"

@@ -1,14 +1,15 @@
 from typing import override
 
 from django.db.models.query import QuerySet
+from django.forms import ValidationError
 from rest_framework import permissions
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import GenericAPIView
 from rest_framework.serializers import BaseSerializer
 
-from apps.diary.models.diary import Diary
+from apps.diary.models.diary import Activity, Diary
 from apps.diary.models.objetives import Objective
-from apps.diary.serializers.diary import DiarySerializer
+from apps.diary.serializers.diary import ActivitySerializer, DiarySerializer
 from apps.diary.serializers.objetives import ObjectiveSerializer
 from apps.user.models.achievement import Achievement, AchievementLog
 from apps.user.models.reminder import Reminder
@@ -74,43 +75,67 @@ class BaseReminderView(GenericAPIView):
         serializer.save(user=self.request.user)
 
 
+class BaseActivityView(GenericAPIView):
+    model = Activity
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = ActivitySerializer
+    queryset = Activity.objects.all()
+
+    @override
+    def get_queryset(self) -> QuerySet[Activity]:
+        if not self.queryset:
+            msg = "Nenhuma atividade encontrada."
+            raise NotFound(msg)
+        return super().get_queryset()
+
+
 class BaseDiaryView(GenericAPIView):
+    """
+    View base para manipulação de Diários.
+    Filtra por usuário autenticado e permite busca por título, mês e ano.
+    """
+
+    model = Diary
     serializer_class = DiarySerializer
+    lookup_field = "id"
 
-    def get_object(self) -> Diary:
-        diary_id = self.kwargs.get("id")
-        try:
-            return Diary.objects.get(user=self.request.user, id=diary_id)
-        except Diary.DoesNotExist as e:
-            message = "Diário não encontrado."
-            raise NotFound(message) from e
-
+    @override
     def get_queryset(self) -> QuerySet[Diary]:
         user = self.request.user
-        search = self.request.GET.get("search")
-        month = self.request.GET.get("month")
-        year = self.request.GET.get("year")
+        search = self.request.query_params.get("search")
+        month = self.request.query_params.get("month")
+        year = self.request.query_params.get("year")
 
-        queryset = Diary.objects.filter(user=user)
+        queryset = (
+            self.model.objects.filter(user=user)
+            .select_related("user")
+            .prefetch_related("activities")
+            .order_by("-datetime")
+        )
 
         if search:
             queryset = queryset.filter(title__icontains=search)
 
-        if month and year:
-            try:
-                month = int(month)
-                year = int(year)
-                queryset = queryset.filter(
-                    datetime__month=month, datetime__year=year
-                ).order_by("-datetime")
-            except ValueError as e:
-                error_message = "Parâmetros de mês ou ano inválidos."
-                raise NotFound(error_message) from e
+        try:
+            if month:
+                queryset = queryset.filter(datetime__month=int(month))
+            if year:
+                queryset = queryset.filter(datetime__year=int(year))
+        except ValueError as e:
+            msg = "Os parâmetros de mês e ano devem ser números inteiros."
 
-        if not queryset.exists():
-            error_message = "Diários não encontrados."
-            raise NotFound(error_message)
+            raise ValidationError(msg) from e
+
         return queryset
+
+    @override
+    def get_object(self) -> Diary:
+        diary_id = self.kwargs.get(self.lookup_field)
+        try:
+            return self.model.objects.get(user=self.request.user, id=diary_id)
+        except self.model.DoesNotExist as e:
+            msg = "Diário não encontrado."
+            raise NotFound(msg) from e
 
 
 class BaseObjectiveView(GenericAPIView):

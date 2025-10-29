@@ -1,8 +1,5 @@
 from typing import TYPE_CHECKING, cast
 
-from django.db.models.query import QuerySet
-from rest_framework import status
-from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
@@ -13,72 +10,60 @@ from rest_framework.generics import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.serializers import BaseSerializer
 
-from apps.diary.models.diary import Activity
-from apps.diary.serializers.diary import (
-    ActivitySerializer,
-)
-from utils.base_view import BaseDiaryView
+from utils.base_view import BaseActivityView, BaseDiaryView
 from utils.check_achievement import check_narrador_da_propria_historia
 
 if TYPE_CHECKING:
     from apps.user.models.user import User
 
 
-class ActivitiesListView(ListAPIView):
+class ActivitiesListView(BaseActivityView, ListAPIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = ActivitySerializer
-
-    def get_queryset(self) -> QuerySet[Activity]:
-        queryset = Activity.objects.all()
-
-        if not queryset.exists():
-            error_message = "Atividades não encontradas."
-            raise NotFound(error_message)
-        return queryset
 
 
 class DiaryListView(BaseDiaryView, ListAPIView):
-    pass
+    permission_classes = (IsAuthenticated,)
 
 
 class DiaryObjectView(BaseDiaryView, RetrieveAPIView):
-    pass
+    permission_classes = (IsAuthenticated,)
 
 
 class DiaryDeleteView(BaseDiaryView, DestroyAPIView):
-    pass
+    permission_classes = (IsAuthenticated,)
+
+    def destroy(self, request: Request, *args: object, **kwargs: object) -> Response:
+        response = super().destroy(request, *args, **kwargs)
+        response.data = {"detail": "Diário excluído com sucesso."}
+        return response
 
 
 class DiaryUpdateView(BaseDiaryView, UpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+
     def update(self, request: Request, *args: object, **kwargs: object) -> Response:
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(
-            {"detail": "Diario atualizado com sucesso."}, status=status.HTTP_200_OK
-        )
+        response = super().update(request, *args, **kwargs)
+        response.data = {"detail": "Diário atualizado com sucesso."}
+        return response
 
 
 class DiaryCreateView(BaseDiaryView, CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def perform_create(self, serializer: BaseSerializer) -> None:
+        serializer.save(user=self.request.user)
+
     def create(self, request: Request, *args: object, **kwargs: object) -> Response:
-        serializer = self.get_serializer(data=request.data)
+        response = super().create(request, *args, **kwargs)
+        user = cast("User", request.user)
 
-        try:
-            serializer.is_valid(raise_exception=True)
-            serializer.save(user=request.user)
+        unlocked_achievements = check_narrador_da_propria_historia(user)
 
-            unlocked_achievements = check_narrador_da_propria_historia(
-                cast("User", request.user)
-            )
+        response.data = {
+            "detail": "Diário criado com sucesso.",
+            "unlocked_achievements": unlocked_achievements,
+        }
 
-            return Response(
-                {
-                    "detail": "Diário criado com sucesso.",
-                    "unlocked_achievements": unlocked_achievements,
-                },
-                status=status.HTTP_201_CREATED,
-            )
-        except ValidationError as e:
-            return Response({"detail": e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        return response
