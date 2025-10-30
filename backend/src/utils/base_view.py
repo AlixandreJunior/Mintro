@@ -1,4 +1,4 @@
-from typing import cast, override
+from typing import override
 
 from django.db.models.query import QuerySet
 from django.forms import ValidationError
@@ -32,8 +32,7 @@ class BaseView(GenericAPIView):
     ) -> Response:
         if 200 <= response.status_code < 300 and self.success_message:
             if isinstance(response.data, dict):
-                data = cast("dict[str, object]", request.data)
-                data.setdefault("detail", self.success_message)
+                response.data.setdefault("detail", self.success_message)  # type: ignore
             else:
                 response.data = {"detail": self.success_message}
         return super().finalize_response(request, response, *args, **kwargs)
@@ -134,6 +133,11 @@ class BaseDiaryView(BaseView):
                 queryset = queryset.filter(created_at__month=int(month))
             if year:
                 queryset = queryset.filter(created_at__year=int(year))
+
+            if not queryset:
+                msg = "Diários não encontrados."
+                raise NotFound(msg)
+
         except ValueError as e:
             msg = "Os parâmetros de mês e ano devem ser números inteiros."
 
@@ -143,7 +147,7 @@ class BaseDiaryView(BaseView):
 
     @override
     def get_object(self) -> Diary:
-        diary_id = self.kwargs.get(self.lookup_field)
+        diary_id = self.kwargs.get("id")
         try:
             return self.model.objects.get(user=self.request.user, id=diary_id)
         except self.model.DoesNotExist as e:

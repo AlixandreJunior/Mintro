@@ -11,7 +11,7 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 class DiarySerializer(serializers.ModelSerializer):
     activities = ActivitySerializer(many=True, read_only=True)
-    activities_ids = serializers.StringRelatedField(
+    activities_ids = serializers.PrimaryKeyRelatedField(
         queryset=Activity.objects.all(),
         many=True,
         write_only=True,
@@ -26,7 +26,7 @@ class DiarySerializer(serializers.ModelSerializer):
             "user",
             "title",
             "content",
-            "datetime",
+            "created_at",
             "mood",
             "activities",
             "activities_ids",

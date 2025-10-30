@@ -1,5 +1,3 @@
-from typing import Self
-
 from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
@@ -28,11 +26,6 @@ class Diary(models.Model):
         indexes = (
             models.Index(fields=["user", "created_at"]),
             models.Index(fields=["mood"]),
-        )
-
-    def upload_diary_photo(self, instance: Self, filename: str) -> str:
-        return (
-            f"diary/photos/{instance.user.pk}/{instance.created_at:%Y/%m/%d}/{filename}"
         )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
