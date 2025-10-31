@@ -15,6 +15,11 @@ class BaseAPITestCase(APITestCase, UserMixin):
     def setUp(self) -> None:
         self.user = self.make_user_auth()
 
+    def make_payload(self, **overrides: object) -> dict[str, object]:
+        payload: dict[str, object] = {}
+        payload.update(**overrides)
+        return payload
+
     def request(
         self,
         method: str,
@@ -22,14 +27,12 @@ class BaseAPITestCase(APITestCase, UserMixin):
         data: dict[str, object] | None = None,
         **kwargs: dict[str, object],
     ) -> Response:
-        """Método universal para requisições HTTP."""
         client_method = getattr(self.client, method.lower())
         return client_method(url, data or {}, format=kwargs.get("format", "json"))
 
     def get(
         self, url_name: str, *args: object, **kwargs: dict[str, object]
     ) -> Response:
-        """Shortcut para GET usando reverse."""
         url = reverse(url_name, args=args or ())
         return self.request("get", url)
 

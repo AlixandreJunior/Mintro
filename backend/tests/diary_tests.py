@@ -1,16 +1,15 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.test import APITestCase
 
-from apps.diary.models.diary import Diary
-from utils.usermixin import UserMixin
+from apps.diary.models.diary import Activity, Diary
+from utils.base_tests import BaseAPITestCase
 
 
-class DiaryTests(APITestCase, UserMixin):
+class DiaryTests(BaseAPITestCase):
     def setUp(self):
-        self.user = self.make_user_auth()
+        super().setUp()
 
         base_time = timezone.make_aware(timezone.datetime(2000, 1, 1))
         self.diary = Diary.objects.create(
@@ -21,31 +20,35 @@ class DiaryTests(APITestCase, UserMixin):
             mood="Excelente",
         )
 
-    def request(
-        self, method: str, url: str, data: dict[str, object] | None = None
-    ) -> Response:
-        method = method.lower()
-        client = getattr(self.client, method)
-        return client(url, data or {}, format="json")
+        self.urls = {
+            "list": reverse("diary:diary:list"),
+            "create": reverse("diary:diary:create"),
+            "detail": reverse("diary:diary:detail", args=[self.diary.pk]),
+            "update": reverse("diary:diary:update", args=[self.diary.pk]),
+            "delete": reverse("diary:diary:delet", args=[self.diary.pk]),
+        }
 
-    def assert_response(
-        self, response: Response, expected_status: int, detail: str | None = None
-    ):
-        self.assertEqual(response.status_code, expected_status)
-        if detail is not None:
-            self.assertEqual(response.json().get("detail"), detail)
+    def test_diary_list_ordering(self):
+        Diary.objects.create(
+            user=self.user, title="Novo Diário", content="Teste", mood="Bom"
+        )
+        response = self.get("diary:diary:list")
+        self.assert_response(response, status.HTTP_200_OK)
+        data = response.json()
+        self.assertGreaterEqual(data[0]["created_at"], data[-1]["created_at"])
 
     def test_unauthorized_access(self):
         self.client.logout()
 
-        urls = [
-            ("get", reverse("diary:diary:list")),
-            ("get", reverse("diary:diary:detail", args=[self.diary.pk])),
-            ("post", reverse("diary:diary:create")),
-            ("patch", reverse("diary:diary:update", args=[self.diary.pk])),
+        endpoints = [
+            ("get", self.urls["list"]),
+            ("get", self.urls["detail"]),
+            ("post", self.urls["create"]),
+            ("patch", self.urls["update"]),
+            ("delete", self.urls["delete"]),
         ]
 
-        for method, url in urls:
+        for method, url in endpoints:
             with self.subTest(method=method, url=url):
                 response = self.request(method, url)
                 self.assert_response(
@@ -55,68 +58,113 @@ class DiaryTests(APITestCase, UserMixin):
                 )
 
     def test_get_diary_list_success(self):
-        url = reverse("diary:diary:list")
-        response = self.request("get", url)
+        response = self.get("diary:diary:list")
         self.assert_response(response, status.HTTP_200_OK)
 
     def test_get_diary_list_not_found(self):
         self.diary.delete()
-        url = reverse("diary:diary:list")
-        response = self.request("get", url)
-        print(response.json())
+        response = self.get("diary:diary:list")
         self.assert_response(
             response, status.HTTP_404_NOT_FOUND, "Diários não encontrados."
         )
 
     def test_get_diary_object_success(self):
-        url = reverse("diary:diary:detail", args=[self.diary.pk])
-        response = self.request("get", url)
+        response = self.get("diary:diary:detail", self.diary.pk)
         self.assert_response(response, status.HTTP_200_OK)
 
     def test_get_diary_object_not_found(self):
-        url = reverse("diary:diary:detail", args=[99999])
-        response = self.request("get", url)
+        response = self.get("diary:diary:detail", 99999)
+        self.assert_response(
+            response, status.HTTP_404_NOT_FOUND, "Diário não encontrado."
+        )
+
+    def test_delete_diary_success(self):
+        response = self.delete(self.urls["delete"])
+        self.assert_response(response, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Diary.objects.filter(pk=self.diary.pk).exists())
+
+    def test_delete_diary_not_found(self):
+        response = self.delete(self.urls["delete"])
         self.assert_response(
             response, status.HTTP_404_NOT_FOUND, "Diário não encontrado."
         )
 
     def test_patch_diary_update_success(self):
-        url = reverse("diary:diary:update", args=[self.diary.pk])
-        payload: dict[str, object] = {"content": "Sinto que estou sendo testado"}
-        response = self.request("patch", url, payload)
-        print(response.json())
+        payload = self.make_payload(content="Sinto que estou sendo testado")
+        response = self.patch("diary:diary:update", payload, self.diary.pk)
+        self.assert_response(
+            response, status.HTTP_200_OK, "Diário atualizado com sucesso."
+        )
+
+    def test_patch_diary_update_multiple_fields(self):
+        payload = self.make_payload(title="Novo título", content="Novo conteúdo")
+        response = self.patch("diary:diary:update", payload, self.diary.pk)
         self.assert_response(
             response, status.HTTP_200_OK, "Diário atualizado com sucesso."
         )
 
     def test_patch_diary_update_not_found(self):
-        url = reverse("diary:diary:update", args=[99999])
-        payload: dict[str, object] = {"content": ""}
-        response = self.request("patch", url, payload)
+        payload = self.make_payload(content="")
+        response = self.patch("diary:diary:update", payload, 99999)
         self.assert_response(
             response, status.HTTP_404_NOT_FOUND, "Diário não encontrado."
         )
 
     def test_post_diary_create_success(self):
-        url = reverse("diary:diary:create")
-        payload: dict[str, object] = {
-            "title": "Um dia Estranho",
-            "content": "Sinto que estou sendo testado",
-            "mood": "Excelente",
-        }
-        response = self.request("post", url, payload)
+        payload = self.make_payload(
+            title="Um dia Estranho",
+            content="Sinto que estou sendo testado",
+            mood="Excelente",
+        )
+        response = self.post("diary:diary:create", payload)
         self.assert_response(
             response, status.HTTP_201_CREATED, "Diário criado com sucesso."
         )
 
-    def test_post_diary_create_fail_blank(self):
-        url = reverse("diary:diary:create")
-        payload: dict[str, object] = {"title": "Um dia Estranho", "content": ""}
-        response = self.request("post", url, payload)
+    from django.core.files.uploadedfile import SimpleUploadedFile
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("content", response.json())
-        self.assertEqual(
-            response.json()["content"][0],
-            "Este campo não pode ser em branco.",
+    def test_post_diary_with_activity_and_photo(self):
+        # Supondo que exista Activity model
+        activity = Activity.objects.create(name="Leitura")
+        payload = self.make_payload(
+            content="Conteúdo",
+            title="Título",
         )
+        payload["activities_ids"] = [activity.pk]
+        payload["photo"] = SimpleUploadedFile(
+            "photo.jpg", b"file_content", content_type="image/jpeg"
+        )
+
+        response = self.post("diary:diary:create", payload)
+        self.assert_response(response, status.HTTP_201_CREATED)
+        self.assertContains(response, "activities")
+
+    def test_post_diary_title_too_long(self):
+        payload = self.make_payload(title="A" * 300)  # ultrapassa 255 chars
+        response = self.post("diary:diary:create", payload)
+        self.assert_response(response, status.HTTP_400_BAD_REQUEST)
+        self.assert_field_error(
+            response,
+            "title",
+            "Certifique-se de que este campo tenha no máximo 255 caracteres.",
+        )
+
+    def test_post_diary_invalid_mood(self):
+        payload = self.make_payload(mood="Horrivel")
+        response = self.post("diary:diary:create", payload)
+        self.assert_response(response, status.HTTP_400_BAD_REQUEST)
+        self.assert_field_error(response, "mood", '"Horrivel" não é um escolha válido.')
+
+    def test_post_diary_create_fail_blank(self):
+        payload = self.make_payload(title="Um dia Estranho", content="")
+        response = self.post("diary:diary:create", payload)
+        self.assert_response(response, status.HTTP_400_BAD_REQUEST)
+        self.assert_field_error(
+            response, "content", "Este campo não pode ser em branco."
+        )
+
+    def test_user_cannot_update_another_users_diary(self):
+        self.make_user_not_auth(username="other")
+        payload = self.make_payload(content="Alteração indevida")
+        response = self.patch("diary:diary:update", payload, self.diary.pk)
+        self.assert_response(response, status.HTTP_403_FORBIDDEN)
