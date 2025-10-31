@@ -14,6 +14,7 @@ User = get_user_model()
 class BaseAPITestCase(APITestCase, UserMixin):
     def setUp(self) -> None:
         self.user = self.make_user_auth()
+        self.user_not_auth = self.make_user_not_auth()
 
     def make_payload(self, **overrides: object) -> dict[str, object]:
         payload: dict[str, object] = {}
@@ -25,9 +26,10 @@ class BaseAPITestCase(APITestCase, UserMixin):
         method: str,
         url: str,
         data: dict[str, object] | None = None,
-        **kwargs: dict[str, object],
+        **kwargs: object,
     ) -> Response:
         client_method = getattr(self.client, method.lower())
+        print(kwargs.get("format"))
         return client_method(url, data or {}, format=kwargs.get("format", "json"))
 
     def get(
@@ -41,7 +43,7 @@ class BaseAPITestCase(APITestCase, UserMixin):
         url_name: str,
         data: dict[str, object],
         *args: object,
-        **kwargs: dict[str, object],
+        **kwargs: object,
     ) -> Response:
         url = reverse(url_name, args=args or ())
         return self.request("post", url, data, **kwargs)
@@ -73,7 +75,7 @@ class BaseAPITestCase(APITestCase, UserMixin):
         return self.request("delete", url)
 
     def assert_response(
-        self, response: Response, expected_status: int, detail: str | None = None
+        self, response: Response, expected_status: int | str, detail: str | None = None
     ) -> None:
         self.assertEqual(
             response.status_code,

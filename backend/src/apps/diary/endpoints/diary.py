@@ -9,5 +9,5 @@ urlpatterns: list[URLPattern] = [
     path("create/", diary.DiaryCreateView.as_view(), name="create"),
     path("detail/<int:id>/", diary.DiaryObjectView.as_view(), name="detail"),
     path("update/<int:id>/", diary.DiaryUpdateView.as_view(), name="update"),
-    path("delete/<int:id>/", diary.DiaryDeleteView.as_view(), name="delet"),
+    path("delete/<int:id>/", diary.DiaryDeleteView.as_view(), name="delete"),
 ]
