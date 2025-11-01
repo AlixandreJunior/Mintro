@@ -29,7 +29,6 @@ class BaseAPITestCase(APITestCase, UserMixin):
         **kwargs: object,
     ) -> Response:
         client_method = getattr(self.client, method.lower())
-        print(kwargs.get("format"))
         return client_method(url, data or {}, format=kwargs.get("format", "json"))
 
     def get(
@@ -53,7 +52,7 @@ class BaseAPITestCase(APITestCase, UserMixin):
         url_name: str,
         data: dict[str, object],
         *args: object,
-        **kwargs: dict[str, object],
+        **kwargs: object,
     ) -> Response:
         url = reverse(url_name, args=args or ())
         return self.request("patch", url, data, **kwargs)
