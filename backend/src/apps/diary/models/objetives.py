@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db import models
 
 from apps.diary.models.diary import Activity
@@ -6,6 +8,8 @@ from utils.choices import ObjectiveRepeatChoices
 
 
 class Objective(models.Model):
+    _cached_diary_dates: list[date] | None = None
+
     class Meta:
         verbose_name = "Objetivo"
         verbose_name_plural = "Objetivos"

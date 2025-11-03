@@ -6,6 +6,9 @@ from rest_framework.generics import (
     UpdateAPIView,
 )
 
+from apps.diary.serializers.objetives import (
+    ObjectiveDetailSerializer,
+)
 from utils.base_view import BaseObjectiveView
 
 
@@ -14,6 +17,7 @@ class ObjectiveListView(BaseObjectiveView, ListAPIView):
 
 
 class ObjectiveDetailView(BaseObjectiveView, RetrieveAPIView):
+    serializer_class = ObjectiveDetailSerializer
     pass
 
 
@@ -26,4 +30,4 @@ class ObjectiveUpdateView(BaseObjectiveView, UpdateAPIView):
 
 
 class ObjectiveDeleteView(BaseObjectiveView, DestroyAPIView):
-    success_message = "Objetivo excluído com sucesso."
+    pass

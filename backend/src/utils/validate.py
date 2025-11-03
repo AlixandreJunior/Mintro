@@ -9,10 +9,8 @@ def validate_objective_limits(
     objectives: QuerySet[Objective], activity: Activity | None, max_objectives: int
 ) -> None:
     if objectives.count() >= max_objectives:
-        raise ValidationError(
-            {"activity": f"Máximo de {max_objectives} objetivo(s) ativos."}
-        )
+        msg = f"Máximo de {max_objectives} objetivo(s) ativos."
+        raise ValidationError(msg)
     if objectives.filter(activity=activity).exists():
-        raise ValidationError(
-            {"activity": "Você já possui um objetivo com essa atividade."}
-        )
+        msg = "Você já possui um objetivo com essa atividade."
+        raise ValidationError(msg)

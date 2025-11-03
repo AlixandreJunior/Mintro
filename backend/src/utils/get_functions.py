@@ -5,16 +5,9 @@ from apps.diary.models.diary import Diary
 from apps.diary.models.objetives import Objective
 
 
-def get_diary_dates(obj: Objective) -> list[date]:
-    diaries = Diary.objects.filter(
-        user=obj.user, activities=obj.activity, datetime__gte=obj.created_at
-    ).order_by("datetime")
-    return sorted({d.datetime.date() for d in diaries})
-
-
 def success_rate_average(obj: Objective) -> float:
     diaries = Diary.objects.filter(user=obj.user, activities=obj.activity).order_by(
-        "datetime"
+        "created_at"
     )
 
     repeat_target = 0
@@ -33,7 +26,7 @@ def success_rate_average(obj: Objective) -> float:
 
     weeks: dict[tuple[int, int], int] = defaultdict(int)
     for diary in diaries:
-        d = diary.datetime.date()
+        d = diary.created_at.date()
         week_key = d.isocalendar()[:2]
         weeks[week_key] += 1
 
