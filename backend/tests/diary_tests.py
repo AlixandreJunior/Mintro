@@ -222,7 +222,9 @@ class DiaryTests(BaseAPITestCase):
         self.client.force_authenticate(self.user_not_auth)
         payload = self.make_payload(content="Alteração indevida")
         response = self.patch(self.update_url, payload, self.diary.pk)
-        self.assert_response(response, status.HTTP_403_FORBIDDEN)
+        self.assert_response(
+            response, status.HTTP_404_NOT_FOUND, "Diário não encontrado."
+        )
 
     # =================== DELETE ===================
     def test_delete_diary_success(self):
@@ -230,10 +232,12 @@ class DiaryTests(BaseAPITestCase):
         self.assert_response(response, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Diary.objects.filter(pk=self.diary.pk).exists())
 
-    def test_delete_diary_other_user_forbidden(self):
+    def test_delete_diary_other_user(self):
         self.client.force_authenticate(self.user_not_auth)
         response = self.delete(self.delete_url, self.diary.pk)
-        self.assert_response(response, status.HTTP_403_FORBIDDEN)
+        self.assert_response(
+            response, status.HTTP_404_NOT_FOUND, "Diário não encontrado."
+        )
 
     def test_delete_diary_not_found(self):
         response = self.delete(self.delete_url, 99999)

@@ -149,8 +149,7 @@ class BaseDiaryView(BaseView):
     def get_object(self) -> Diary:
         diary_id = self.kwargs.get("id")
         try:
-            obj = self.model.objects.get(id=diary_id)
-            self.check_object_permissions(self.request, obj)
+            obj = self.model.objects.get(id=diary_id, user=self.request.user)
             return obj
         except self.model.DoesNotExist as e:
             msg = "Diário não encontrado."

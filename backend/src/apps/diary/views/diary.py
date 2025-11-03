@@ -10,7 +10,6 @@ from rest_framework.generics import (
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from apps.diary.permissions import IsDiaryOwner
 from utils.base_view import BaseActivityView, BaseDiaryView
 from utils.check_achievement import check_narrador_da_propria_historia
 
@@ -27,17 +26,14 @@ class DiaryListView(BaseDiaryView, ListAPIView):
 
 
 class DiaryObjectView(BaseDiaryView, RetrieveAPIView):
-    permission_classes = (IsDiaryOwner,)
     pass
 
 
 class DiaryDeleteView(BaseDiaryView, DestroyAPIView):
-    permission_classes = (IsDiaryOwner,)
-    success_message = "Diário excluído com sucesso."
+    pass
 
 
 class DiaryUpdateView(BaseDiaryView, UpdateAPIView):
-    permission_classes = (IsDiaryOwner,)
     success_message = "Diário atualizado com sucesso."
 
 
