@@ -1,8 +1,11 @@
+from django.contrib.auth.models import AbstractUser
+
 from apps.diary.models.diary import Diary
 from apps.health.models.exercise import ExerciseLog
 from apps.health.models.hydratation import HydrationLog
 from apps.health.models.mindfulness import MindfulnessLog
 from apps.user.models.achievement import Achievement, AchievementLog
+from apps.user.models.user import User
 
 
 def grant_achievement_level(
@@ -37,7 +40,7 @@ def _create_log_if_not_exists(user, achievement_level):
         AchievementLog.objects.create(user=user, achievement_level=achievement_level)
 
 
-def check_bem_vindo_mintro(user):
+def check_bem_vindo_mintro(user: AbstractUser) -> None:
     try:
         achievement = Achievement.objects.get(name="Bem-vindo ao Mintro")
         level = achievement.levels.get(level=1)
@@ -46,12 +49,12 @@ def check_bem_vindo_mintro(user):
         pass
 
 
-def check_foco_total(user):
+def check_foco_total(user: AbstractUser) -> None:
     total_exercises = ExerciseLog.objects.filter(user=user).count()
     grant_achievement_level(user, "Foco Total", progress_count=total_exercises)
 
 
-def check_gole_a_gole(user):
+def check_gole_a_gole(user: AbstractUser) -> None:
     total_water = HydrationLog.objects.filter(user=user).count()
     grant_achievement_level(user, "Gole a Gole", progress_count=total_water)
 
@@ -60,12 +63,12 @@ def check_passos_consciencia(user, steps_today):
     grant_achievement_level(user, "Passos de Consciência", progress_today=steps_today)
 
 
-def check_zen_total(user):
+def check_zen_total(user: AbstractUser) -> None:
     total_mindfulness = MindfulnessLog.objects.filter(user=user).count()
     grant_achievement_level(user, "Zen Total", progress_count=total_mindfulness)
 
 
-def check_narrador_da_propria_historia(user):
+def check_narrador_da_propria_historia(user: User) -> None:
     total_diary = Diary.objects.filter(user=user).count()
     grant_achievement_level(
         user, "Narrador da própria história", progress_count=total_diary

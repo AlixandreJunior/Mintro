@@ -1,13 +1,14 @@
-from __future__ import annotations
+from typing import TYPE_CHECKING
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
-from django.db.models.manager import RelatedManager
 
-from apps.diary.models.diary import Diary
-from apps.health.models.exercise import ExerciseLog
-from apps.health.models.mindfulness import MindfulnessLog
-from utils.manager import UsersManager
+if TYPE_CHECKING:
+    from django.db.models.manager import Manager
+
+    from apps.diary.models.diary import Diary
+    from apps.health.models.exercise import ExerciseLog
+    from apps.health.models.mindfulness import MindfulnessLog
 
 
 class User(AbstractUser):
@@ -19,11 +20,11 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
-    diary_set: RelatedManager[Diary]
-    mindfulnesslog_set: RelatedManager[MindfulnessLog]
-    exerciselog_set: RelatedManager[ExerciseLog]
+    diary_set: "Manager[Diary]"
+    mindfulnesslog_set: "Manager[MindfulnessLog]"
+    exerciselog_set: "Manager[ExerciseLog]"
 
-    objects = UsersManager()
+    objects = UserManager["User"]()
     groups = None
     user_permissions = None
 

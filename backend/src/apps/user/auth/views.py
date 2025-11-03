@@ -1,5 +1,6 @@
-from rest_framework import mixins, permissions, status
-from rest_framework.generics import CreateAPIView, GenericAPIView
+from rest_framework import permissions, status
+from rest_framework.generics import CreateAPIView, RetrieveAPIView
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
@@ -7,15 +8,11 @@ from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from .serializers import LoginUserSerializer
 
 
-# Login View
-class LoginView(mixins.CreateModelMixin, GenericAPIView):
+class LoginView(CreateAPIView):
     serializer_class = LoginUserSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = (permissions.AllowAny,)
 
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
-    def create(self, request, *args, **kwargs):
+    def create(self, request: Request, *args: object, **kwargs: object) -> Response:
         serializer = self.get_serializer(data=request.data)
         print(serializer.is_valid())
         serializer.is_valid(raise_exception=True)
@@ -32,8 +29,8 @@ class LoginView(mixins.CreateModelMixin, GenericAPIView):
         )
 
 
-class RefreshView(GenericAPIView):
-    permission_classes = [permissions.AllowAny]
+class RefreshView(CreateAPIView):
+    permission_classes = (permissions.AllowAny,)
 
     def post(self, request, *args, **kwargs):
         refresh_token = request.data.get("refresh")
@@ -61,19 +58,18 @@ class RefreshView(GenericAPIView):
 
 
 class LogoutView(CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = (permissions.IsAuthenticated,)
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request: Request, *args: object, **kwargs: object) -> Response:
         return Response(
             {"detail": "Logout realizado com sucesso."}, status=status.HTTP_200_OK
         )
 
 
-# Token Verify View
-class VerifyView(mixins.RetrieveModelMixin, GenericAPIView):
-    permission_classes = [permissions.AllowAny]
+class VerifyView(RetrieveAPIView):
+    permission_classes = (permissions.AllowAny,)
 
-    def get(self, request, *args, **kwargs):
+    def retrieve(self, request: Request, *args: object, **kwargs: object) -> Response:
         auth_header = request.headers.get("Authorization")
 
         if not auth_header or not auth_header.startswith("Bearer "):

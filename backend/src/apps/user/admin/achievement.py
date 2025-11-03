@@ -4,14 +4,14 @@ from apps.user.models.achievement import Achievement, AchievementLevel, Achievem
 
 
 @admin.register(Achievement)
-class AchievementAdmin(admin.ModelAdmin):
+class AchievementAdmin(admin.ModelAdmin):  # type: ignore
     list_display = ("name", "description")
     search_fields = ("name", "description")
     ordering = ("name",)
 
 
 @admin.register(AchievementLevel)
-class AchievementLevelAdmin(admin.ModelAdmin):
+class AchievementLevelAdmin(admin.ModelAdmin):  # type: ignore
     list_display = ("achievement", "level", "condition", "description")
     list_filter = ("level", "achievement")
     search_fields = ("achievement__name", "condition", "description")
@@ -19,7 +19,7 @@ class AchievementLevelAdmin(admin.ModelAdmin):
 
 
 @admin.register(AchievementLog)
-class AchievementLogAdmin(admin.ModelAdmin):
+class AchievementLogAdmin(admin.ModelAdmin):  # type: ignore
     list_display = ("user", "achievement_level", "date_awarded")
     list_filter = (
         "achievement_level__achievement",

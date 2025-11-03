@@ -1,10 +1,16 @@
-from apps.user.auth.views import LoginView, LogoutView, RefreshView, VerifyView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import URLPattern, URLResolver, include, path
 
-urlpatterns = [
+from apps.user.auth.views import (
+    LoginView,
+    LogoutView,
+    RefreshView,
+    VerifyView,
+)
+
+urlpatterns: list[URLResolver | URLPattern] = [
     path("admin/", admin.site.urls),
     path("api/diary/", include("apps.diary.urls")),
     path("api/health/", include("apps.health.urls")),

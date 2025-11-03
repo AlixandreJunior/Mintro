@@ -2,20 +2,19 @@ from django.db.models.query import QuerySet
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from apps.health.models.hydratation import HydrationLog
 from apps.health.serializers.hydratation import HydrationLogSerializer
-from utils.base_view import BaseView
 from utils.check_achievement import check_gole_a_gole
 
 
-class BaseHydrationView(BaseView):
+class BaseHydrationView(GenericAPIView):
     serializer_class = HydrationLogSerializer
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[HydrationLog]:
         date_str = self.request.GET.get("date")
         queryset = HydrationLog.objects.filter(user=self.request.user)
 

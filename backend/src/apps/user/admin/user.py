@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.user.models.user import User
 
 
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(admin.ModelAdmin):  # type: ignore
     model = User
     list_display = (
         "id",

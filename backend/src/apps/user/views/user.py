@@ -14,7 +14,7 @@ class UserObjectView(BaseUserView, RetrieveAPIView):
 class UserCreateView(BaseUserView, CreateAPIView):
     permission_classes = (AllowAny,)
 
-    def create(self, request: Request, *args: any, **kwargs: any) -> Response:
+    def create(self, request: Request, *args: object, **kwargs: object) -> Response:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

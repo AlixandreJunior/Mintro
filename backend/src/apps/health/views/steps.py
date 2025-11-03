@@ -2,16 +2,15 @@ from django.db.models.query import QuerySet
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from apps.health.models.steps import StepLog
 from apps.health.serializers.steps import StepLogSerializer
-from utils.base_view import BaseView
 
 
-class BaseStepsView(BaseView):
+class BaseStepsView(GenericAPIView):
     serializer_class = StepLogSerializer
 
     def get_queryset(self) -> QuerySet:

@@ -1,51 +1,53 @@
-from typing import ClassVar
-
 from rest_framework import serializers
 
-from apps.user.models.achievement import Achievement, AchievementLevel, AchievementLog
+from apps.user.models.achievement import (
+    Achievement,
+    AchievementLevel,
+    AchievementLog,
+)
 
 
 class AchievementLevelSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta:  # type: ignore
         model = AchievementLevel
-        fields: ClassVar[list[str]] = [
+        fields = (
             "id",
             "achievement",
             "level",
             "condition",
             "description",
-        ]
-        read_only_fields: ClassVar[list[str]] = ["id", "achievement"]
+        )
+        read_only_fields = "id", "achievement"
 
 
 class AchievementSerializer(serializers.ModelSerializer):
     levels = AchievementLevelSerializer(many=True, read_only=True)
 
-    class Meta:
+    class Meta:  # type: ignore
         model = Achievement
-        fields: ClassVar[list[str]] = [
+        fields = (
             "id",
             "name",
             "description",
             "levels",
-        ]
-        read_only_fields: ClassVar[list[str]] = ["id"]
+        )
+        read_only_fields = ("id",)
 
 
 class AchievementLogSerializer(serializers.ModelSerializer):
     achievement_level = AchievementLevelSerializer(read_only=True)
 
-    class Meta:
+    class Meta:  # type: ignore
         model = AchievementLog
-        fields: ClassVar[list[str]] = [
+        fields = (
             "id",
             "user",
             "achievement_level",
             "date_awarded",
-        ]
-        read_only_fields: ClassVar[list[str]] = [
+        )
+        read_only_fields = (
             "id",
             "user",
             "achievement_level",
             "date_awarded",
-        ]
+        )
