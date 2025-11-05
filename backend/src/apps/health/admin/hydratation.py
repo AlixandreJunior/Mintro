@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.health.models.hydratation import HydrationLog
+from apps.health.models.hydration import HydrationLog
 
 
 @admin.register(HydrationLog)

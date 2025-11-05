@@ -33,3 +33,17 @@ class ObjectiveRepeatChoices(models.TextChoices):
     ONE_TIME = "1x", "1 Vez"
     THREE_TIMES = "3x", "2 Vezes"
     FIVE_TIMES = "5x", "3 Vezes"
+
+
+class ExerciseTypeChoices(models.TextChoices):
+    FORCA = "Força", "Força"
+    FLEXIBILIDADE = "Flexibilidade", "Flexibilidade"
+    AEROBICO = "Aeróbico", "Aeróbico"
+    RESISTENCIA = "Resistência", "Resistência"
+
+
+class MindfulnessTypeChoices(models.TextChoices):
+    RESPIRACAO_CONSCIENTE = "Respiração Consciente", "Respiração Consciente"
+    MEDITACAO_MINDFULNESS = "Meditação Mindfulness", "Meditação Mindfulness"
+    CONSCIENCIA_EMOCIONAL = "Consciência Emocional", "Consciência Emocional"
+    ATIVIDADES_COTIDIANAS = "Atenção nas Atividades", "Atenção nas Atividades"

@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from apps.health.models.hydratation import HydrationLog
+from apps.health.models.hydration import HydrationLog
 from utils.usermixin import UserMixin
 
 

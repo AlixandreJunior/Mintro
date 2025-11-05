@@ -64,7 +64,7 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    "apps.user.auth.authentication.EmailBackend "
+    "apps.user.authentication.EmailBackend ",
     "django.contrib.auth.backends.ModelBackend",
 ]
 

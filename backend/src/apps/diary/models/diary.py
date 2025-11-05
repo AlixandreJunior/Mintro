@@ -9,6 +9,12 @@ from utils.validate_type_img import validate_image_type
 
 
 class Activity(models.Model):
+    """Representa uma atividade associável a um diário.
+
+    Attributes:
+        name (str): Nome da atividade.
+    """
+
     class Meta:
         verbose_name = "Atividade"
         verbose_name_plural = "Atividades"
@@ -16,10 +22,23 @@ class Activity(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self) -> str:
+        """Retorna a representação em string da atividade."""
         return f"{self.name}"
 
 
 class Diary(models.Model):
+    """Modelo que representa o diário de um usuário.
+
+    Attributes:
+        user (User): Usuário ao qual o diário pertence.
+        title (str): Título do diário.
+        content (str): Conteúdo textual do diário.
+        created_at (datetime): Data e hora de criação.
+        mood (str): Humor do usuário, baseado em `DiaryMoodChoices`.
+        activities (ManyToManyField): Atividades relacionadas ao diário.
+        photo (ImageField): Imagem opcional associada ao diário.
+    """
+
     class Meta:
         verbose_name = "Diário"
         verbose_name_plural = "Diários"
@@ -43,11 +62,13 @@ class Diary(models.Model):
     )
 
     def __str__(self) -> str:
+        """Retorna uma representação legível do diário."""
         return (
             f"Diário de {self.user.username} em {self.created_at.strftime('%d/%m/%Y')}"
         )
 
     def __repr__(self) -> str:
+        """Retorna uma representação detalhada do objeto para debug."""
         return f"<Diary id={self.pk} user={self.user} title={self.title!r}>"
 
 
@@ -55,6 +76,13 @@ class Diary(models.Model):
 def create_default_activities(
     sender: object, app_config: object, **kwargs: object
 ) -> None:
+    """Cria conquistas padrão após a execução de migrações.
+
+    Args:
+        sender (object): O remetente do sinal.
+        app_config (object): Configuração do aplicativo.
+        **kwargs (object): Argumentos adicionais.
+    """
     create_achievements(sender, **kwargs)
 
 
@@ -62,6 +90,13 @@ def create_default_activities(
 def delete_diary_photo_on_delete(
     sender: object, instance: Diary, **kwargs: object
 ) -> None:
+    """Remove a foto associada a um diário quando ele é deletado.
+
+    Args:
+        sender (object): O remetente do sinal.
+        instance (Diary): Instância de diário deletada.
+        **kwargs (object): Argumentos adicionais.
+    """
     if instance.photo:
         instance.photo.delete(save=False)
 
@@ -70,6 +105,13 @@ def delete_diary_photo_on_delete(
 def delete_old_diary_photo_on_change(
     sender: object, instance: Diary, **kwargs: object
 ) -> None:
+    """Remove a foto antiga se uma nova imagem for carregada durante a atualização.
+
+    Args:
+        sender (object): O remetente do sinal.
+        instance (Diary): Instância de diário sendo atualizada.
+        **kwargs (object): Argumentos adicionais.
+    """
     if not instance.pk:
         return
 

@@ -4,6 +4,7 @@ from apps.diary.views import diary
 
 app_name = "diary"
 
+#: Rotas relacionadas às operações sobre o diário do usuário.
 urlpatterns: list[URLPattern] = [
     path("", diary.DiaryListView.as_view(), name="list"),
     path("create/", diary.DiaryCreateView.as_view(), name="create"),

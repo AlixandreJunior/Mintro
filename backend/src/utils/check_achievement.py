@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 
 from apps.diary.models.diary import Diary
 from apps.health.models.exercise import ExerciseLog
-from apps.health.models.hydratation import HydrationLog
+from apps.health.models.hydration import HydrationLog
 from apps.health.models.mindfulness import MindfulnessLog
 from apps.user.models.achievement import Achievement, AchievementLog
 from apps.user.models.user import User

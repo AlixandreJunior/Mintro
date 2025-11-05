@@ -1,44 +1,19 @@
-from django.urls import path
+"""Módulo principal de roteamento do aplicativo Health.
 
-from apps.health.views import exercise, hydratation, mindfulness, steps
+Inclui e organiza as rotas dos submódulos de saúde:
+- Hidratação
+- Passos
+- Exercícios
+- Mindfulness
+"""
+
+from django.urls import URLPattern, URLResolver, include, path
 
 app_name = "health"
 
-urlpatterns = [
-    path(
-        "hydratation/",
-        hydratation.HydratationLogListView.as_view(),
-        name="hydratation_list",
-    ),  #
-    path(
-        "hydratation/register/",
-        hydratation.HydratationLogRegisterView.as_view(),
-        name="hydratation_register",
-    ),  #
-    path("exercise/", exercise.ExerciseListView.as_view(), name="exercise_list"),  #
-    path(
-        "exercise/log/", exercise.ExerciseLogView.as_view(), name="exercise_log_list"
-    ),  #
-    path(
-        "exercise/log/register/",
-        exercise.ExerciseLogRegisterView.as_view(),
-        name="exercise_log_register",
-    ),  #
-    path(
-        "mindfulness/",
-        mindfulness.MindfulnessListView.as_view(),
-        name="mindfulness_list",
-    ),
-    path(
-        "mindfulness/log/",
-        mindfulness.MindfulnessLogListView.as_view(),
-        name="mindfulness_log_list",
-    ),
-    path(
-        "mindfulness/log/register/",
-        mindfulness.MindfulnessLogRegisterView.as_view(),
-        name="mindfulness_log_register",
-    ),
-    path("steps/", steps.StepLogListView.as_view(), name="steps_list"),
-    path("steps/register/", steps.StepLogRegisterView.as_view(), name="steps_register"),
+urlpatterns: list[URLPattern | URLResolver] = [
+    path("hydration/", include("apps.health.endpoints.hydration")),
+    path("step/", include("apps.health.endpoints.steps")),
+    path("exercise/", include("apps.health.endpoints.exercise")),
+    path("mindfulness/", include("apps.health.endpoints.mindfulness")),
 ]

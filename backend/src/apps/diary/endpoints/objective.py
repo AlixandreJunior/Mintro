@@ -4,6 +4,7 @@ from apps.diary.views import objetives
 
 app_name = "objective"
 
+#: Rotas relacionadas às operações sobre objetivos do diário.
 urlpatterns: list[URLPattern] = [
     path("", objetives.ObjectiveListView.as_view(), name="list"),
     path("create/", objetives.ObjectiveCreateView.as_view(), name="create"),

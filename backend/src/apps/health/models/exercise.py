@@ -1,23 +1,24 @@
 from django.db import models
-from django.dispatch import receiver
 from django.utils import timezone
 
 from apps.user.models import User
+from utils.choices import ExerciseTypeChoices
 
 
 class Exercise(models.Model):
-    class TypeChoices(models.TextChoices):
-        FORCA = "Força", "Força"
-        FLEXIBILIDADE = "Flexibilidade", "Flexibilidade"
-        AEROBICO = "Aeróbico", "Aeróbico"
-        RESISTENCIA = "Resistência", "Resistência"
+    """
+    Representa um tipo de exercício físico disponível no sistema,
+    como corrida, caminhada ou musculação.
+    Cada exercício possui um tipo (ex: aeróbico, anaeróbico)
+    e pode ou não estar associado a uma medida de distância.
+    """
 
     class Meta:
         verbose_name = "Exercise"
         verbose_name_plural = "Exercises"
 
     name = models.CharField(max_length=255)
-    type = models.CharField(max_length=20, choices=TypeChoices.choices)
+    type = models.CharField(max_length=20, choices=ExerciseTypeChoices.choices)
     is_distance = models.BooleanField(default=False)
 
     def __str__(self) -> str:
@@ -25,6 +26,12 @@ class Exercise(models.Model):
 
 
 class ExerciseLog(models.Model):
+    """
+    Armazena um registro de execução de um exercício realizado por um usuário.
+    Inclui informações como duração, distância (quando aplicável),
+    descrição e data/hora da atividade.
+    """
+
     class Meta:
         verbose_name = "Registro de Exercircio"
         verbose_name_plural = "Registros de Exercircio"
@@ -38,36 +45,3 @@ class ExerciseLog(models.Model):
 
     def __str__(self) -> str:
         return f"Registro de Exercircio de {self.user.username}"
-
-
-@receiver(models.signals.post_migrate)
-def create_default_exercises(sender: object, **kwargs: object) -> None:
-    default_exercises = [
-        {"name": "Corrida", "type": Exercise.TypeChoices.AEROBICO, "is_distance": True},
-        {
-            "name": "Caminhada",
-            "type": Exercise.TypeChoices.AEROBICO,
-            "is_distance": True,
-        },
-        {"name": "Treino", "type": Exercise.TypeChoices.FORCA, "is_distance": False},
-        {"name": "Natação", "type": Exercise.TypeChoices.AEROBICO, "is_distance": True},
-        {
-            "name": "Bicicleta",
-            "type": Exercise.TypeChoices.AEROBICO,
-            "is_distance": True,
-        },
-        {
-            "name": "Esporte",
-            "type": Exercise.TypeChoices.AEROBICO,
-            "is_distance": False,
-        },
-    ]
-
-    for exercise_data in default_exercises:
-        Exercise.objects.get_or_create(
-            name=exercise_data["name"],
-            defaults={
-                "type": exercise_data["type"],
-                "is_distance": exercise_data["is_distance"],
-            },
-        )
