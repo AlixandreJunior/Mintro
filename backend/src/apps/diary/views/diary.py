@@ -1,5 +1,3 @@
-from typing import TYPE_CHECKING, cast
-
 from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
@@ -7,14 +5,8 @@ from rest_framework.generics import (
     RetrieveAPIView,
     UpdateAPIView,
 )
-from rest_framework.request import Request
-from rest_framework.response import Response
 
-from utils.base_views.diary import BaseActivityView, BaseDiaryView
-from utils.check_achievement import check_narrador_da_propria_historia
-
-if TYPE_CHECKING:
-    from apps.user.models.user import User
+from core.views.diary.diary import BaseActivityView, BaseDiaryView
 
 
 class ActivitiesListView(BaseActivityView, ListAPIView):
@@ -75,8 +67,6 @@ class DiaryUpdateView(BaseDiaryView, UpdateAPIView):
         - UpdateAPIView: Implementa o método PUT/PATCH.
     """
 
-    success_message = "Diário atualizado com sucesso."
-
 
 class DiaryCreateView(BaseDiaryView, CreateAPIView):
     """
@@ -86,31 +76,6 @@ class DiaryCreateView(BaseDiaryView, CreateAPIView):
         - BaseDiaryView: Define permissões e lógica de criação.
         - CreateAPIView: Fornece o método POST padrão.
 
-    Sobrescreve:
-        - create(): adiciona lógica personalizada de conquistas desbloqueadas após a
-        criação do diário.
     """
 
-    def create(self, request: Request, *args: object, **kwargs: object) -> Response:
-        """
-        Cria um novo diário e verifica conquistas desbloqueadas.
-
-        Args:
-            request (Request): Objeto de requisição contendo dados do diário.
-            *args (object): Argumentos posicionais adicionais.
-            **kwargs (object): Argumentos nomeados adicionais.
-
-        Returns:
-            Response: Resposta contendo mensagem de sucesso e conquistas desbloqueadas.
-        """
-        response = super().create(request, *args, **kwargs)
-        user = cast("User", request.user)
-
-        unlocked_achievements = check_narrador_da_propria_historia(user)
-
-        response.data = {
-            "detail": "Diário criado com sucesso.",
-            "unlocked_achievements": unlocked_achievements,
-        }
-
-        return response
+    pass

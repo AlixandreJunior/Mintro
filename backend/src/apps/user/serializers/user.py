@@ -87,7 +87,7 @@ class UserSerializer(serializers.ModelSerializer):
         try:
             password_validation.validate_password(value, self.instance)
         except ValidationError as e:
-            raise serializers.ValidationError({"password": list(e.messages)}) from e
+            raise serializers.ValidationError(list(e.messages)) from e
         return value
 
     def create(self, validated_data: dict[str, str]) -> User:

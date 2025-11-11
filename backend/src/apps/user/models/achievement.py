@@ -1,7 +1,12 @@
+from typing import TYPE_CHECKING
+
 from django.db import models
 
 from apps.user.models.user import User
 from utils.choices import AchievementLevelChoices
+
+if TYPE_CHECKING:
+    from django.db.models.manager import Manager
 
 
 class Achievement(models.Model):
@@ -22,6 +27,8 @@ class Achievement(models.Model):
 
     name = models.CharField(max_length=100)
     description = models.TextField()
+
+    levels: "Manager[AchievementLevel]"
 
     def __str__(self) -> str:
         """Retorna o nome da conquista como representação textual."""

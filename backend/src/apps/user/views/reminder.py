@@ -1,6 +1,6 @@
 from rest_framework import generics
 
-from utils.base_views.user import BaseReminderView
+from core.views.user.reminder import BaseReminderView
 
 
 class ReminderListView(BaseReminderView, generics.ListAPIView):
@@ -64,7 +64,7 @@ class ReminderUpdateView(BaseReminderView, generics.UpdateAPIView):
         - Endpoint: /api/reminders/<id>/
         - Método: PUT ou PATCH
         - Corpo esperado: campos a serem atualizados.
-        - Retorna: os dados atualizados do lembrete.
+        - Retorna: Uma mensagem de Sucesso
     """
 
     pass
@@ -81,7 +81,6 @@ class ReminderDeleteView(BaseReminderView, generics.DestroyAPIView):
     Uso:
         - Endpoint: /api/reminders/<id>/
         - Método: DELETE
-        - Retorna: uma mensagem de confirmação após exclusão bem-sucedida.
     """
 
     pass

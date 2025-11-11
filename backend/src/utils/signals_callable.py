@@ -75,7 +75,10 @@ def create_initial_achievements(sender: object, **kwargs: object) -> None:
 
 
 def grant_welcome_achievement(
-    sender: object, instance: object, created: bool, **kwargs: object
+    sender: object,
+    instance: object,
+    created: bool,  # noqa: FBT001
+    **kwargs: object,
 ) -> None:
     if not created:
         return
@@ -106,7 +109,10 @@ def create_achievements(sender: object, **kwargs: object) -> None:
 
 @receiver(post_save, sender=lambda: apps.get_model("user", "User"))
 def welcome_achievement(
-    sender: object, instance: object, created: bool, **kwargs: object
+    sender: object,
+    instance: object,
+    created: bool,  # noqa: FBT001
+    **kwargs: object,
 ) -> None:
     grant_welcome_achievement(sender, instance, created, **kwargs)
 

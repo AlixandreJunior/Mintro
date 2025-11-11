@@ -4,12 +4,12 @@ from django.db.models.query import QuerySet
 from django.forms import ValidationError
 from rest_framework import permissions
 from rest_framework.exceptions import NotFound
+from rest_framework.serializers import BaseSerializer
 
 from apps.diary.models.diary import Activity, Diary
-from apps.diary.models.objetives import Objective
 from apps.diary.serializers.diary import ActivitySerializer, DiarySerializer
-from apps.diary.serializers.objetives import ObjectiveSerializer
-from utils.base_views.base import BaseView
+from core.check_achievement import check_narrador_da_propria_historia
+from core.views.base import BaseView
 
 
 class BaseActivityView(BaseView):
@@ -30,6 +30,12 @@ class BaseDiaryView(BaseView):
     model = Diary
     serializer_class = DiarySerializer
     permission_classes = (permissions.IsAuthenticated,)
+    achivement_check = staticmethod(check_narrador_da_propria_historia)
+    create_message = "Diário criado com sucesso."
+    update_message = "Diário atualizado com sucesso."
+
+    def perform_create(self, serializer: BaseSerializer) -> None:
+        serializer.save(user=self.request.user)
 
     @override
     def get_queryset(self) -> QuerySet[Diary]:
@@ -68,34 +74,9 @@ class BaseDiaryView(BaseView):
     @override
     def get_object(self) -> Diary:
         diary_id = self.kwargs.get("id")
-        obj = self.model.objects.get(id=diary_id, user=self.request.user)
 
-        if self.model.DoesNotExist:
-            msg = "Diário não encontrado."
-            raise NotFound(msg)
-
-        return obj
-
-
-class BaseObjectiveView(BaseView):
-    model = Objective
-    serializer_class = ObjectiveSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-
-    @override
-    def get_queryset(self) -> QuerySet[Objective]:
-        queryset = self.model.objects.filter(user=self.request.user)
-
-        if not queryset:
-            error_message = "Objetivos não encontrados."
-            raise NotFound(error_message)
-        return queryset
-
-    @override
-    def get_object(self) -> Objective:
-        objective_id = self.kwargs.get("id")
         try:
-            return self.model.objects.get(user=self.request.user, id=objective_id)
+            return self.model.objects.get(id=diary_id, user=self.request.user)
         except self.model.DoesNotExist as e:
-            error_message = "Objetivo não encontrado."
-            raise NotFound(error_message) from e
+            msg = "Diário não encontrado."
+            raise NotFound(msg) from e

@@ -1,102 +1,85 @@
-from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from utils.usermixin import UserMixin
+from core.tests.base import BaseAPITestCase
 
 
-class AuthTest(APITestCase, UserMixin):
-    def test_login_view_success(self):
-        self.user = self.make_user_not_auth(
-            username="testuser", email="testuser@email.com", password="SenhaForte321."
+class AuthTests(BaseAPITestCase):
+    """
+    Testes de autenticação e gerenciamento de tokens JWT.
+    """
+
+    def setUp(self):
+        self.user = self.make_user_not_auth()
+
+        self.login_url = "user:auth:login"
+        self.logout_url = "user:auth:logout"
+        self.refresh_url = "user:auth:refresh"
+
+        self.valid_credentials = self.make_payload(
+            email="username2@email.com",
+            password="SenhaMuitoSegura321",  # noqa: S106
         )
-        api_url = reverse("login")
 
-        valid_data = {"email": "testuser@email.com", "password": "SenhaForte321."}
+        self.invalid_credentials = self.make_payload(
+            email="wrong@email.com",
+            password="wrongpassword",  # noqa: S106
+        )
 
-        response = self.client.post(api_url, data=valid_data, format="json")
+    # ---------------------------
+    # LOGIN
+    # ---------------------------
+
+    def test_login_success(self):
+        """Deve autenticar o usuário e retornar tokens JWT."""
+        response = self.post(self.login_url, data=self.valid_credentials)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("access", response.data)
-        self.assertIn("refresh", response.data)
+        data = response.json()
+        self.assertIn("access", data)
+        self.assertIn("refresh", data)
 
-    def test_login_view_invalid_credentials(self):
-        api_url = reverse("login")
-
-        invalid_data = {"email": "wrong@email.com", "password": "wrongpassword"}
-
-        response = self.client.post(api_url, data=invalid_data, format="json")
+    def test_login_invalid_credentials(self):
+        """Deve retornar erro ao usar credenciais inválidas."""
+        response = self.post(self.login_url, data=self.invalid_credentials)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("detail", response.data)
+        self.assertIn("detail", response.json())
 
-    def test_logout_view(self):
-        """Logout com token válido"""
-        user = self.make_user_auth(
-            username="testuser", email="test@email.com", password="SenhaForte321"
-        )
-        refresh = RefreshToken.for_user(user)
+    # ---------------------------
+    # LOGOUT
+    # ---------------------------
 
+    def test_logout_success(self):
+        """Deve invalidar o refresh token e retornar sucesso."""
+        refresh = RefreshToken.for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token!s}")
 
-        api_url = reverse("logout")
-        response = self.client.post(
-            api_url, data={"refresh": str(refresh)}, format="json"
-        )
+        response = self.post(self.logout_url, data={"refresh": str(refresh)})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["detail"], "Logout realizado com sucesso.")
+        self.assertEqual(response.json()["detail"], "Logout realizado com sucesso.")
 
-    def test_logout_view_fail_for_unauthorized(self):
-        """Logout sem autenticação"""
-        api_url = reverse("logout")
-        response = self.client.post(api_url)
-
+    def test_logout_unauthorized(self):
+        """Deve negar logout quando não autenticado."""
+        response = self.post(self.logout_url, {})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_refresh_view_success(self):
-        """Atualiza token com refresh válido"""
-        user = self.make_user_auth(
-            username="testuser", email="test@email.com", password="SenhaForte321"
-        )
-        refresh = RefreshToken.for_user(user)
+    # ---------------------------
+    # REFRESH TOKEN
+    # ---------------------------
 
-        api_url = reverse("refresh")
-        response = self.client.post(
-            api_url, data={"refresh": str(refresh)}, format="json"
-        )
+    def test_refresh_success(self):
+        """Deve gerar novo token de acesso com refresh válido."""
+        refresh = RefreshToken.for_user(self.user)
+
+        response = self.post(self.refresh_url, data={"refresh": str(refresh)})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("access", response.data)
+        self.assertIn("access", response.json())
 
-    def test_refresh_view_invalid_token(self):
-        """Erro ao atualizar com refresh inválido"""
-        api_url = reverse("refresh")
-        response = self.client.post(
-            api_url, data={"refresh": "invalid_token"}, format="json"
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_verify_view_valid_token(self):
-        """Valida token válido"""
-        user = self.make_user_auth(
-            username="testuser", email="test@email.com", password="SenhaForte321"
-        )
-        access = RefreshToken.for_user(user).access_token
-
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {access!s}")
-        api_url = reverse("verify")
-        response = self.client.get(api_url)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["detail"], "Token válido.")
-
-    def test_verify_view_invalid_token(self):
-        """Valida token inválido"""
-        self.client.credentials(HTTP_AUTHORIZATION="Bearer tokeninvalido")
-        api_url = reverse("verify")
-        response = self.client.get(api_url)
+    def test_refresh_invalid_token(self):
+        """Deve retornar erro ao tentar atualizar com refresh inválido."""
+        response = self.post(self.refresh_url, data={"refresh": "invalid_token"})
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

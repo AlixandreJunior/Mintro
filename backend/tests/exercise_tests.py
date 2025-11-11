@@ -1,111 +1,119 @@
-from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
 
 from apps.health.models.exercise import Exercise, ExerciseLog
-from utils.usermixin import UserMixin
+from core.tests.base import BaseAPITestCase
 
 
-class ExerciseTests(APITestCase, UserMixin):
-    def setUp(self):
-        self.user = self.make_user_auth()
+class ExerciseTests(BaseAPITestCase):
+    """Testes para endpoints de exercícios e registros de exercícios."""
 
-        Exercise.objects.all().delete()
-        ExerciseLog.objects.all().delete()
+    def setUp(self) -> None:
+        super().setUp()
+        # URLs nomeadas conforme o padrão do app
+        self.exercise_list_url = "health:exercise:list"
+        self.exercise_log_list_url = "health:exercise:log_list"
+        self.exercise_log_register_url = "health:exercise:log_register"
 
-        self.exercises = [
-            Exercise.objects.create(name="Alongamento Matinal", type="Flexibilidade"),
-            Exercise.objects.create(name="Corrida", type="Aeróbico"),
-        ]
+        # Dados iniciais
+        self.exercise = Exercise.objects.create(
+            name="Alongamento Matinal",
+            type="Flexibilidade",
+        )
 
-        self.exercise_logs = [
-            ExerciseLog.objects.create(
-                user=self.user,
-                exercise=self.exercises[0],
-                duration=15,
-                description="Fiz um alongamento bem relaxante.",
-            ),
-            ExerciseLog.objects.create(
-                user=self.user,
-                exercise=self.exercises[1],
-                duration=15,
-                description="Fiz uma corrida bem intensa.",
-            ),
-        ]
+        self.log = ExerciseLog.objects.create(
+            user=self.user,
+            exercise=self.exercise,
+            duration=15,
+            description="Fiz um alongamento bem relaxante.",
+        )
 
-    def test_unauthorized_access(self):
-        self.client.logout()
-        urls = [
-            {"url": reverse("health:exercise_list"), "method": "get"},
-            {"url": reverse("health:exercise_log_list"), "method": "get"},
-            {
-                "url": reverse("health:exercise_log_register"),
-                "method": "post",
-                "data": {"exercise": self.exercises[0].pk, "duration": 10},
-            },
-        ]
+    # ------------------------------
+    #   Testes de exercícios
+    # ------------------------------
+    def test_get_exercise_list_success(self) -> None:
+        """Deve retornar lista de exercícios com sucesso."""
+        response = self.get(self.exercise_list_url)
 
-        for item in urls:
-            response = (
-                self.client.get(item["url"])
-                if item["method"] == "get"
-                else self.client.post(item["url"], data=item.get("data", {}))
-            )
-            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-            self.assertEqual(
-                response.json().get("detail"),
-                "As credenciais de autenticação não foram fornecidas.",
-            )
-
-    def test_get_exercise_list_success(self):
-        url = reverse("health:exercise_list")
-        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.json()), 2)
-        self.assertEqual(response.json()[0].get("id"), self.exercises[0].pk)
+        data = response.json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["id"], self.exercise.pk)
+        self.assertEqual(data[0]["name"], "Alongamento Matinal")
 
-    def test_get_exercise_list_not_found(self):
-        url = reverse("health:exercise_list")
+    def test_get_exercise_list_not_found(self) -> None:
+        """Deve retornar 404 se não houver exercícios cadastrados."""
         Exercise.objects.all().delete()
-        response = self.client.get(url)
+
+        response = self.get(self.exercise_list_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.json().get("detail"), "Exercícios não encontrados.")
 
-    def test_get_exercise_log_list_success(self):
-        url = reverse("health:exercise_log_list")
-        response = self.client.get(url)
+    # ------------------------------
+    #   Testes de registros
+    # ------------------------------
+    def test_get_exercise_log_list_success(self) -> None:
+        """Deve retornar lista de registros do usuário."""
+        response = self.get(self.exercise_log_list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.json()), 2)
-        self.assertEqual(response.json()[0].get("id"), self.exercise_logs[0].pk)
+        self.assertEqual(response.json()[0]["id"], self.log.pk)
+        self.assertEqual(response.json()[0]["exercise"]["name"], "Alongamento Matinal")
 
-    def test_get_exercise_log_list_not_found(self):
-        url = reverse("health:exercise_log_list")
+    def test_get_exercise_log_list_not_found(self) -> None:
+        """Deve retornar 404 se não houver registros de exercícios."""
         ExerciseLog.objects.all().delete()
-        response = self.client.get(url)
+
+        response = self.get(self.exercise_log_list_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
-            response.json().get("detail"), "Registros de Exercícios não encontrados."
+            response.json().get("detail"),
+            "Registros de Exercícios não encontrados.",
         )
 
-    def test_post_exercise_log_create_success(self):
-        url = reverse("health:exercise_log_register")
+    def test_post_exercise_log_create_success(self) -> None:
+        """Deve criar um registro de exercício com sucesso."""
         ExerciseLog.objects.all().delete()
-        payload = {"exercise": self.exercises[0].pk, "duration": 10}
+        payload = self.make_payload(exercise_id=self.exercise.pk, duration=10)
 
-        response = self.client.post(url, data=payload)
+        response = self.post(self.exercise_log_register_url, data=payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
             response.json().get("detail"),
-            "Registro de exercícios registrado com sucesso.",
+            "Registro Criado com sucesso.",
         )
 
-    def test_post_exercise_log_create_fail_blank(self):
-        url = reverse("health:exercise_log_register")
+        # Garante que o registro foi realmente criado
+        self.assertTrue(ExerciseLog.objects.filter(user=self.user).exists())
+
+    def test_post_exercise_log_create_fail_blank(self) -> None:
+        """Deve retornar erro 400 se campos obrigatórios estiverem ausentes."""
         ExerciseLog.objects.all().delete()
-        payload = {}
+        response = self.post(self.exercise_log_register_url, data={})
 
-        response = self.client.post(url, data=payload)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            response.json().get("exercise")[0], "Este campo é obrigatório."
+        data = response.json()
+        self.assertIn("exercise_id", data)
+        self.assertEqual(data["exercise_id"][0], "Este campo é obrigatório.")
+
+    # ------------------------------
+    #   Testes de autenticação
+    # ------------------------------
+    # =================== AUTENTICAÇÃO ===================
+    def test_unauthorized_access(self):
+        self.client.logout()
+        payload = self.make_payload(
+            title="Título de teste", content="Conteúdo de teste", mood="Excelente"
         )
+
+        endpoints: list[tuple[str, str, tuple[object, ...]]] = [
+            ("get", self.exercise_list_url, ()),
+            ("get", self.exercise_log_list_url, ()),
+            ("post", self.exercise_log_register_url, (payload,)),
+        ]
+        for method, url_name, args in endpoints:
+            with self.subTest(method=method, url=url_name):
+                response = getattr(self, method)(url_name, *args)
+                self.assert_response(
+                    response,
+                    status.HTTP_401_UNAUTHORIZED,
+                    "As credenciais de autenticação não foram fornecidas.",
+                )

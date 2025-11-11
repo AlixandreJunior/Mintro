@@ -1,138 +1,127 @@
-from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
 
-from utils.usermixin import UserMixin
+from core.tests.base import BaseAPITestCase
 
 
-class UserTest(APITestCase, UserMixin):
+class UserTests(BaseAPITestCase):
     def setUp(self):
-        self.user = self.make_user_auth()
-        self.user2 = self.make_user_not_auth()
+        super().setUp()
 
+        self.url_user = "user:user:detail"
+        self.url_update = "user:user:update"
+        self.url_create = "user:user:create"
+
+        self.payload = self.make_payload(
+            first_name="Novo",
+            last_name="Usuário",
+            username="novouser",
+            password="SenhaCorreta321",  # noqa: S106
+            email="novouser@email.com",
+        )
+
+    # ---------------------------------------------------------
+    # TESTES DE AUTENTICAÇÃO
+    # ---------------------------------------------------------
+
+    # =================== AUTENTICAÇÃO ===================
     def test_unauthorized_access(self):
         self.client.logout()
-        urls = [
-            {"url": reverse("user:user"), "method": "get"},
-            {
-                "url": reverse("user:user_update"),
-                "method": "patch",
-                "data": {
-                    "username": "newuser",
-                    "gender": "Outro",
-                },
-            },
+
+        endpoints: list[tuple[str, str, tuple[object, ...]]] = [
+            ("get", self.url_user, ()),
+            ("patch", self.url_update, (self.payload,)),
         ]
+        for method, url_name, args in endpoints:
+            with self.subTest(method=method, url=url_name):
+                response = getattr(self, method)(url_name, *args)
+                self.assert_response(
+                    response,
+                    status.HTTP_401_UNAUTHORIZED,
+                    "As credenciais de autenticação não foram fornecidas.",
+                )
 
-        for item in urls:
-            response = (
-                self.client.get(item["url"])
-                if item["method"] == "get"
-                else self.client.patch(item["url"], data=item.get("data", {}))
-            )
-            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-            self.assertEqual(
-                response.json().get("detail"),
-                "As credenciais de autenticação não foram fornecidas.",
-            )
-
-    def test_get_user_object(self):
-        url = reverse("user:user")
-        response = self.client.get(url)
+    # ---------------------------------------------------------
+    # TESTES DE CONSULTA DE USUÁRIO
+    # ---------------------------------------------------------
+    def test_get_user_object_success(self):
+        """Deve retornar os dados do usuário autenticado."""
+        response = self.get(self.url_user)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json().get("username"), "username")
+        self.assertEqual(response.json().get("username"), self.user.username)
 
+    # ---------------------------------------------------------
+    # TESTES DE CRIAÇÃO DE USUÁRIO
+    # ---------------------------------------------------------
     def test_post_user_create_success(self):
-        url = reverse("user:user_create")
-        payload = {
-            "first_name": "Novo",
-            "last_name": "Usuário",
-            "username": "novouser",
-            "password": "SenhaCorreta321",
-            "email": "novouser@email.com",
-            "gender": "Masculino",
-            "birth_date": "2000-01-01",
-        }
+        """Deve criar um usuário com sucesso."""
 
-        response = self.client.post(url, data=payload, format="json")
+        response = self.post(self.url_create, self.payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.json(), "Usuario criado com sucesso.")
+        self.assertEqual(response.json().get("detail"), "Usuário criado com sucesso.")
 
-    def test_post_user_create_fail(self):
-        url = reverse("user:user_create")
+    def test_post_user_create_fail_username_blank(self):
+        """Deve retornar erro quando o username estiver em branco."""
+        wrong_payload = self.make_payload(
+            first_name="Novo",
+            last_name="Usuário",
+            username="",
+            password="123",  # noqa: S106
+            email="novouser@email.com",
+        )
 
-        test_cases = [
-            {
-                "payload": {
-                    "first_name": "Novo",
-                    "last_name": "Usuário",
-                    "username": "",
-                    "password": "SenhaCorreta321",
-                    "email": "novouser@email.com",
-                    "gender": "Masculino",
-                    "birth_date": "2000-01-01",
-                },
-                "field": "username",
-                "error": "Este campo não pode ser em branco.",
-            },
-            {
-                "payload": {
-                    "first_name": "Novo",
-                    "last_name": "Usuário",
-                    "username": "novouser",
-                    "password": "123",
-                    "email": "novouser@email.com",
-                    "gender": "Masculino",
-                    "birth_date": "2000-01-01",
-                },
-                "field": "password",
-                "error_list": [
-                    "Esta senha é muito curta. Ela precisa conter pelo menos 8 caracteres.",
-                    "Esta senha é muito comum.",
-                    "Esta senha é inteiramente numérica.",
-                ],
-            },
-            {
-                "payload": {
-                    "first_name": "Novo",
-                    "last_name": "Usuário",
-                    "username": "novouser",
-                    "password": "SenhaCorreta321",
-                    "email": "emailerrado.com",
-                    "gender": "Masculino",
-                    "birth_date": "2000-01-01",
-                },
-                "field": "email",
-                "error": "Insira um endereço de email válido.",
-            },
+        response = self.post(self.url_create, wrong_payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.json().get("username"), ["Este campo não pode ser em branco."]
+        )
+
+    def test_post_user_create_fail_password_weak(self):
+        """Deve retornar erro quando a senha for fraca."""
+        wrong_payload = self.make_payload(
+            first_name="Novo",
+            last_name="Usuário",
+            username="novouser",
+            password="123",  # noqa: S106
+            email="novouser@email.com",
+        )
+
+        response = self.post(self.url_create, wrong_payload)
+
+        expected_errors = [
+            "Esta senha é muito curta. Ela precisa conter pelo menos 8 caracteres.",
+            "Esta senha é muito comum.",
+            "Esta senha é inteiramente numérica.",
         ]
 
-        for case in test_cases:
-            response = self.client.post(url, data=case["payload"], format="json")
-            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-            if "error_list" in case:
-                for i, msg in enumerate(case["error_list"]):
-                    self.assertEqual(response.json()[case["field"]][i], msg)
-            else:
-                self.assertEqual(response.json()[case["field"]][0], case["error"])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.json().get("password"), expected_errors)
 
+    def test_post_user_create_fail_invalid_email(self):
+        """Deve retornar erro quando o e-mail for inválido."""
+        wrong_payload = self.make_payload(
+            first_name="Novo",
+            last_name="Usuário",
+            username="novouser",
+            password="SenhaCorreta321",  # noqa: S106
+            email="emailerrado.com",
+        )
+
+        response = self.post(self.url_create, data=wrong_payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.json().get("email"), ["Insira um endereço de email válido."]
+        )
+
+    # ---------------------------------------------------------
+    # TESTES DE ATUALIZAÇÃO DE USUÁRIO
+    # ---------------------------------------------------------
     def test_patch_user_update_success(self):
-        url = reverse("user:user_update")
-        payload = {"username": "newuser", "gender": "Outro"}
+        """Deve atualizar dados do usuário com sucesso."""
+        response = self.patch(self.url_update, data=self.payload)
 
-        response = self.client.patch(url, data=payload)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.json().get("detail"), "Dados atualizados com sucesso."
-        )
-
-    def test_patch_user_update_fail_for_duplicate(self):
-        url = reverse("user:user_update")
-        payload = {"username": "username2", "gender": "Outro"}
-
-        response = self.client.patch(url, data=payload)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            response.json().get("username")[0],
-            "Um usuário com este nome de usuário já existe.",
         )

@@ -5,7 +5,7 @@ from rest_framework import serializers
 from apps.diary.models.diary import Activity, Diary
 from apps.diary.models.objetives import Objective
 from apps.diary.serializers.diary import ActivitySerializer
-from utils.calculate import (
+from utils.get_functions import (
     best_streak,
     conclusion_count,
     streak,

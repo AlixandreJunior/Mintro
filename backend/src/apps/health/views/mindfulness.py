@@ -12,20 +12,12 @@ Classes:
     MindfulnessLogRegisterView: Cria novos registros e verifica conquistas associadas.
 """
 
-from typing import TYPE_CHECKING, cast
-
 from rest_framework.generics import CreateAPIView, ListAPIView
-from rest_framework.request import Request
-from rest_framework.response import Response
 
-from utils.base_views.health import BaseMindfulnessLogView
-from utils.check_achievement import check_zen_total
-
-if TYPE_CHECKING:
-    from apps.user.models.user import User
+from core.views.health.mindfulness import BaseMindfulnessLogView, BaseMindfulnessView
 
 
-class MindfulnessListView(BaseMindfulnessLogView, ListAPIView):
+class MindfulnessListView(BaseMindfulnessView, ListAPIView):
     """Lista todas as práticas de Mindfulness disponíveis.
 
     Esta view retorna as opções de práticas de Mindfulness cadastradas no sistema,
@@ -63,26 +55,4 @@ class MindfulnessLogRegisterView(BaseMindfulnessLogView, CreateAPIView):
         desbloqueadas.
     """
 
-    def create(self, request: Request, *args: object, **kwargs: object) -> Response:
-        """Cria um novo registro de Mindfulness e verifica conquistas desbloqueadas.
-
-        Args:
-            request (Request): Objeto da requisição contendo os dados da prática
-            registrada.
-            *args (object): Argumentos adicionais passados à superclasse.
-            **kwargs (object): Parâmetros adicionais de rota.
-
-        Returns:
-            Response: Resposta com uma mensagem de sucesso e, se aplicável,
-                uma lista de conquistas desbloqueadas.
-        """
-        response = super().create(request, *args, **kwargs)
-        user = cast("User", request.user)
-
-        unlocked_achievements = check_zen_total(user)
-        response.data = {
-            "detail": "Registro de Mindfulness criado com sucesso.",
-            "unlocked_achievements": unlocked_achievements,
-        }
-
-        return response
+    pass

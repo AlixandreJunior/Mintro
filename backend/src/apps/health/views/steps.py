@@ -2,7 +2,7 @@ from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from utils.base_views.health import BaseStepsView
+from core.views.health.step import BaseStepsView
 
 
 class StepLogListView(BaseStepsView, ListAPIView):

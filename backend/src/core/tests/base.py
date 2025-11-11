@@ -6,7 +6,7 @@ from django.urls import reverse
 from rest_framework.response import Response
 from rest_framework.test import APITestCase
 
-from utils.usermixin import UserMixin
+from core.tests.mixins.user import UserMixin
 
 User = get_user_model()
 

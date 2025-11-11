@@ -7,7 +7,7 @@ from rest_framework.generics import (
 )
 
 from apps.diary.serializers.objetives import ObjectiveDetailSerializer
-from utils.base_views.diary import BaseObjectiveView
+from core.views.diary.objective import BaseObjectiveView
 
 
 class ObjectiveListView(BaseObjectiveView, ListAPIView):

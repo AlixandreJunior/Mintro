@@ -1,6 +1,6 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
-from utils.base_views.user import BaseAchievementLogView, BaseAchievementView
+from core.views.user.achievements import BaseAchievementLogView, BaseAchievementView
 
 
 class AchievementDetailView(BaseAchievementView, RetrieveAPIView):

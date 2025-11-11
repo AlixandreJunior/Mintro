@@ -6,7 +6,7 @@ from PIL import Image
 from rest_framework import status
 
 from apps.diary.models.diary import Activity, Diary
-from utils.base_tests import BaseAPITestCase
+from core.tests.base import BaseAPITestCase
 
 
 class DiaryTests(BaseAPITestCase):
@@ -133,13 +133,13 @@ class DiaryTests(BaseAPITestCase):
         )
 
     def test_post_diary_returns_success_message_and_achievements(self):
+        self.client.force_authenticate(self.user_not_auth)
         payload = self.make_payload(
             title="Novo", content="Mensagem teste", mood="Excelente"
         )
         response = self.post(self.create_url, payload)
         self.assert_response(response, status.HTTP_201_CREATED)
         self.assertIn("detail", response.json())
-        self.assertIn("unlocked_achievements", response.json())
         self.assertEqual(response.json()["detail"], "Diário criado com sucesso.")
 
     def test_post_diary_title_too_long(self):

@@ -7,12 +7,12 @@ from apps.user.views.achievement import (
     AchievementLogListView,
 )
 
-app_name = "achievement"
+app_name = "achievements"
 
 #: Define as rotas relacionadas a conquistas (Achievements)
 urlpatterns = [
-    path("", AchievementListView.as_view(), name="achievements"),
-    path("detail/<int:pk>/", AchievementDetailView.as_view(), name="detail"),
-    path("user/", AchievementLogListView.as_view(), name="user"),
-    path("user/<int:pk>/", AchievementLogDetailView.as_view(), name="log_detail"),
+    path("", AchievementListView.as_view(), name="list"),
+    path("detail/<int:id>/", AchievementDetailView.as_view(), name="detail"),
+    path("user/", AchievementLogListView.as_view(), name="user_list"),
+    path("user/<int:id>/", AchievementLogDetailView.as_view(), name="user_detail"),
 ]

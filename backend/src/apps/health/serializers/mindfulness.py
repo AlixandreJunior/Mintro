@@ -28,8 +28,12 @@ class MindfulnessLogSerializer(serializers.ModelSerializer):
     pois são definidos automaticamente pelo sistema.
     """
 
-    user = serializers.StringRelatedField(read_only=True)
     mindfulness = MindfulnessSerializer(read_only=True)
+    mindfulness_id = serializers.PrimaryKeyRelatedField(
+        source="mindfulness",  # mapeia para o campo real do modelo
+        queryset=Mindfulness.objects.all(),
+        write_only=True,
+    )
 
     class Meta:  # type: ignore
         model = MindfulnessLog
@@ -37,6 +41,7 @@ class MindfulnessLogSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "mindfulness",
+            "mindfulness_id",
             "duration",
             "description",
             "datetime",

@@ -4,40 +4,41 @@ from apps.health.models.exercise import Exercise, ExerciseLog
 
 
 class ExerciseSerializer(serializers.ModelSerializer):
-    """
-    Serializador responsável por converter instâncias do modelo Exercise
-    em representações JSON e vice-versa.
-
-    Inclui os campos básicos que descrevem o exercício, como nome, tipo e
-    se está relacionado a uma medição de distância.
-    """
+    """Serializador simples para exibir informações de exercícios."""
 
     class Meta:  # type: ignore
         model = Exercise
-        fields = ("id", "name", "type", "is_distance")
+        fields = ("id", "name", "type")
 
 
 class ExerciseLogSerializer(serializers.ModelSerializer):
     """
     Serializador responsável por lidar com os registros de exercícios (ExerciseLog).
-    Converte os dados do modelo para JSON e valida entradas vindas da API.
 
-    O campo 'user' e o campo 'exercise' são somente leitura,
-    exibindo as informações do usuário e do exercício de forma aninhada.
+    - Em requisições GET: o campo `exercise` retorna um objeto detalhado
+      com informações do exercício (id, name, type).
+    - Em requisições POST/PUT: o campo `exercise` aceita apenas o ID do exercício.
+
+    O campo `user` e o campo `datetime` são somente leitura.
     """
 
-    user = serializers.StringRelatedField(read_only=True)
     exercise = ExerciseSerializer(read_only=True)
+    exercise_id = serializers.PrimaryKeyRelatedField(
+        source="exercise",  # mapeia para o campo real do modelo
+        queryset=Exercise.objects.all(),
+        write_only=True,
+    )
 
     class Meta:  # type: ignore
         model = ExerciseLog
         fields = (
             "id",
             "user",
-            "exercise",
+            "exercise",  # exibido nos GET
+            "exercise_id",  # usado nos POST/PUT
             "duration",
             "distance",
             "description",
             "datetime",
         )
-        read_only_fields = ("id", "user", "exercise", "datetime")
+        read_only_fields = ("id", "user", "datetime")

@@ -1,9 +1,7 @@
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny
-from rest_framework.request import Request
-from rest_framework.response import Response
 
-from utils.base_views.user import BaseUserView
+from core.views.user.user import BaseUserView
 
 
 class UserObjectView(BaseUserView, RetrieveAPIView):
@@ -42,12 +40,6 @@ class UserCreateView(BaseUserView, CreateAPIView):
 
     permission_classes = (AllowAny,)
 
-    def create(self, request: Request, *args: object, **kwargs: object) -> Response:
-        """Cria um novo usuário e retorna uma mensagem de confirmação."""
-        response = super().create(request, *args, **kwargs)
-        response.data = {"detail": "Usuário criado com sucesso."}
-        return response
-
 
 class UserUpdateView(BaseUserView, UpdateAPIView):
     """
@@ -63,11 +55,4 @@ class UserUpdateView(BaseUserView, UpdateAPIView):
         - Retorna: mensagem de sucesso após atualização.
     """
 
-    def partial_update(
-        self, request: Request, *args: object, **kwargs: object
-    ) -> Response:
-        """Atualiza parcialmente os dados do usuário e retorna uma mensagem de
-        confirmação."""
-        response = super().partial_update(request, *args, **kwargs)
-        response.data = {"detail": "Dados atualizados com sucesso."}
-        return response
+    pass

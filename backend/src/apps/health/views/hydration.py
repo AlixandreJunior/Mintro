@@ -15,8 +15,8 @@ from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from utils.base_views.health import BaseHydrationView
-from utils.check_achievement import check_gole_a_gole
+from core.views.health.hydration import BaseHydrationView
+from core.check_achievement import check_gole_a_gole
 
 if TYPE_CHECKING:
     from apps.user.models.user import User
