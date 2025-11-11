@@ -1,70 +1,58 @@
-from django.db.models.query import QuerySet
-from django.utils.dateparse import parse_date
-from rest_framework import status
-from rest_framework.exceptions import NotFound
-from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
-from rest_framework.response import Response
-from rest_framework.serializers import Serializer
+"""Views relacionadas às práticas de Mindfulness.
 
-from apps.health.models.mindfulness import Mindfulness, MindfulnessLog
-from apps.health.serializers.mindfulness import (
-    MindfulnessLogSerializer,
-    MindfulnessSerializer,
-)
-from utils.check_achievement import check_zen_total
+Este módulo define as views responsáveis por listar e registrar logs de Mindfulness
+(realizações de práticas meditativas, respiração consciente, etc.) associadas aos
+usuários.
+Após o registro de uma nova prática, o sistema verifica se novas conquistas foram
+desbloqueadas.
 
+Classes:
+    MindfulnessListView: Lista todas as práticas de Mindfulness disponíveis.
+    MindfulnessLogListView: Lista os registros de Mindfulness do usuário autenticado.
+    MindfulnessLogRegisterView: Cria novos registros e verifica conquistas associadas.
+"""
 
-class BaseMindfulnessLogView(GenericAPIView):
-    serializer_class = MindfulnessLogSerializer
+from rest_framework.generics import CreateAPIView, ListAPIView
 
-    def get_queryset(self) -> QuerySet[MindfulnessLog]:
-        queryset = MindfulnessLog.objects.filter(user=self.request.user)
-        start_date = self.request.GET.get("start_date")
-        end_date = self.request.GET.get("end_date")
-
-        if start_date and (parsed := parse_date(start_date)):
-            queryset = queryset.filter(datetime__date__gte=parsed)
-        if end_date and (parsed := parse_date(end_date)):
-            queryset = queryset.filter(datetime__date__lte=parsed)
-
-        if not queryset.exists():
-            message = "Registros de Exercícios não encontrados."
-            raise NotFound(message)
-        return queryset
+from core.views.health.mindfulness import BaseMindfulnessLogView, BaseMindfulnessView
 
 
-class MindfulnessListView(ListAPIView):
-    serializer_class = MindfulnessSerializer
+class MindfulnessListView(BaseMindfulnessView, ListAPIView):
+    """Lista todas as práticas de Mindfulness disponíveis.
 
-    def get_queryset(self) -> QuerySet[Mindfulness]:
-        queryset = Mindfulness.objects.all()
+    Esta view retorna as opções de práticas de Mindfulness cadastradas no sistema,
+    permitindo que o usuário visualize as modalidades disponíveis.
 
-        if not queryset:
-            message = "Exercícios de Mindfulness não encontrados."
-            raise NotFound(message)
-        return queryset
+    Methods:
+        get_queryset(): Retorna todas as práticas cadastradas.
+    """
+
+    pass
 
 
 class MindfulnessLogListView(BaseMindfulnessLogView, ListAPIView):
+    """Lista os registros de Mindfulness do usuário autenticado.
+
+    Esta view exibe todos os registros (`MindfulnessLog`) associados
+    ao usuário logado, permitindo acompanhar o histórico de práticas realizadas.
+
+    Methods:
+        get_queryset(): Retorna os registros de Mindfulness do usuário atual.
+    """
+
     pass
 
 
 class MindfulnessLogRegisterView(BaseMindfulnessLogView, CreateAPIView):
-    def perform_create(self, serializer: Serializer) -> None:
-        serializer.save(user=self.request.user)
+    """Cria novos registros de Mindfulness e verifica conquistas desbloqueadas.
 
-    def create(self, request: object, *args: object, **kwargs: object) -> Response:
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        unlocked_achievements = check_zen_total(request.user)
+    Após o registro de uma nova prática, esta view executa a função
+    `check_zen_total()` para verificar se o usuário atingiu condições
+    que concedem conquistas relacionadas à constância em práticas de Mindfulness.
 
-        return Response(
-            {
-                "detail": "Registro de Mindfulness criado com sucesso.",
-                "unlocked_achievements": unlocked_achievements,
-            },
-            status=status.HTTP_201_CREATED,
-            headers=headers,
-        )
+    Methods:
+        create(request, *args, **kwargs): Cria o registro e retorna conquistas
+        desbloqueadas.
+    """
+
+    pass

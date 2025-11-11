@@ -64,7 +64,7 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    "apps.user.auth.authentication.EmailBackend "
+    "core.authentication.EmailBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
 
@@ -156,11 +156,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "user.User"
-
-AUTHENTICATION_BACKENDS = [
-    "apps.user.auth.authentication.EmailBackend",
-    "django.contrib.auth.backends.ModelBackend",
-]
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

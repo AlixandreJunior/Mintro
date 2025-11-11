@@ -12,6 +12,24 @@ if TYPE_CHECKING:
 
 
 class User(AbstractUser):
+    """
+    Modelo personalizado de usuário que estende `AbstractUser`.
+
+    Este modelo adiciona campos e relacionamentos extras utilizados no sistema,
+    incluindo logs de diário, exercícios e mindfulness.
+    O campo `groups` e `user_permissions` foram desabilitados, pois o controle de
+    acesso é tratado de forma personalizada.
+
+    Attributes:
+        created_at (datetime): Data e hora de criação do usuário.
+        is_active (bool): Indica se o usuário está ativo e pode autenticar-se.
+        diary_set (Manager[Diary]): Relacionamento reverso com registros de diário.
+        mindfulnesslog_set (Manager[MindfulnessLog]): Relacionamento reverso com logs de
+        mindfulness.
+        exerciselog_set (Manager[ExerciseLog]): Relacionamento reverso com logs de
+        exercício.
+    """
+
     class Meta:
         app_label = "user"
         verbose_name = "User"
@@ -25,8 +43,11 @@ class User(AbstractUser):
     exerciselog_set: "Manager[ExerciseLog]"
 
     objects = UserManager["User"]()
+
+    # Desabilita grupos e permissões para evitar comportamento padrão do AbstractUser
     groups = None
     user_permissions = None
 
     def __str__(self) -> str:
+        """Retorna o nome de usuário como representação textual."""
         return self.username

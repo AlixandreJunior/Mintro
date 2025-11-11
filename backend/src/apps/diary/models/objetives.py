@@ -8,6 +8,15 @@ from utils.choices import ObjectiveRepeatChoices
 
 
 class Objective(models.Model):
+    """Representa um objetivo definido por um usuário para uma atividade específica.
+
+    Attributes:
+        user (User): Usuário que criou o objetivo.
+        activity (Activity): Atividade associada ao objetivo.
+        repeat (str): Frequência de repetição do objetivo.
+        created_at (datetime): Data e hora de criação do objetivo.
+    """
+
     _cached_diary_dates: list[date] | None = None
 
     class Meta:
@@ -29,4 +38,5 @@ class Objective(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return f"{self.activity.name} - {self.user.username})"
+        """Retorna uma representação legível do objetivo."""
+        return f"{self.activity.name} - {self.user.username}"

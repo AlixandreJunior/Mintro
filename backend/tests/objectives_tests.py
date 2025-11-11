@@ -2,7 +2,7 @@ from rest_framework import status
 
 from apps.diary.models.diary import Activity
 from apps.diary.models.objetives import Objective
-from utils.base_tests import BaseAPITestCase
+from core.tests.base import BaseAPITestCase
 from utils.choices import ObjectiveRepeatChoices
 
 

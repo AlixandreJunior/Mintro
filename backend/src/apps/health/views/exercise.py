@@ -1,70 +1,52 @@
-from django.db.models.query import QuerySet
-from django.utils.dateparse import parse_date
-from rest_framework import status
-from rest_framework.exceptions import NotFound
-from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
-from rest_framework.response import Response
-from rest_framework.serializers import Serializer
+"""Views relacionadas aos exercícios físicos.
 
-from apps.health.models.exercise import Exercise, ExerciseLog
-from apps.health.serializers.exercise import (
-    ExerciseLogSerializer,
-    ExerciseSerializer,
-)
-from utils.check_achievement import check_foco_total
+Este módulo define as views responsáveis por listar exercícios disponíveis,
+registrar logs de atividades físicas e retornar conquistas desbloqueadas
+após um novo registro.
 
+Classes:
+    ExerciseListView: Exibe a lista de exercícios disponíveis.
+    ExerciseLogView: Lista os registros de exercícios do usuário autenticado.
+    ExerciseLogRegisterView: Cria um novo registro de exercício e verifica conquistas.
+"""
 
-class BaseExerciseLogView(GenericAPIView):
-    serializer_class = ExerciseLogSerializer
+from rest_framework.generics import CreateAPIView, ListAPIView
 
-    def get_queryset(self) -> QuerySet[ExerciseLog]:
-        queryset = ExerciseLog.objects.filter(user=self.request.user)
-        start_date = self.request.GET.get("start_date")
-        end_date = self.request.GET.get("end_date")
-
-        if start_date and (parsed := parse_date(start_date)):
-            queryset = queryset.filter(datetime__date__gte=parsed)
-        if end_date and (parsed := parse_date(end_date)):
-            queryset = queryset.filter(datetime__date__lte=parsed)
-
-        if not queryset.exists():
-            message = "Registros de Exercícios não encontrados."
-            raise NotFound(message)
-        return queryset
+from core.views.health.exercise import BaseExerciseLogView, BaseExerciseView
 
 
-class ExerciseListView(ListAPIView):
-    serializer_class = ExerciseSerializer
+class ExerciseListView(BaseExerciseView, ListAPIView):
+    """Exibe a lista de exercícios disponíveis no sistema.
 
-    def get_queryset(self) -> QuerySet:
-        queryset = Exercise.objects.all()
-        if not queryset:
-            message = "Exercícios não encontrados."
-            raise NotFound(message)
-        return queryset
+    Esta view herda a lógica base de `BaseExerciseView`, que define o
+    queryset e o serializer padrão para exibição dos exercícios.
 
+    Methods:
+        get_queryset(): Retorna a lista de exercícios.
+    """
 
-class ExerciseLogView(BaseExerciseLogView, ListAPIView):
     pass
 
 
-class ExerciseLogRegisterView(CreateAPIView):
-    def perform_create(self, serializer: Serializer) -> None:
-        serializer.save(user=self.request.user)
+class ExerciseLogView(BaseExerciseLogView, ListAPIView):
+    """Lista os registros de exercícios realizados pelo usuário.
 
-    def create(self, request: object, *args: object, **kwargs: object) -> Response:
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
+    Esta view retorna todas as instâncias de `ExerciseLog` associadas
+    ao usuário autenticado, herdando a lógica comum de `BaseExerciseLogView`.
 
-        unlocked_achievements = check_foco_total(request.user)
+    Methods:
+        get_queryset(): Retorna os registros do usuário atual.
+    """
 
-        return Response(
-            {
-                "detail": "Registro de exercícios registrado com sucesso.",
-                "unlocked_achievements": unlocked_achievements,
-            },
-            status=status.HTTP_201_CREATED,
-            headers=headers,
-        )
+    pass
+
+
+class ExerciseLogRegisterView(BaseExerciseLogView, CreateAPIView):
+    """Cria novos registros de exercícios e verifica conquistas desbloqueadas.
+
+    Após criar o registro de exercício, esta view executa a função
+    `check_foco_total()` para identificar se o usuário atingiu critérios
+    de conquistas relacionados ao foco total.
+    """
+
+    pass
