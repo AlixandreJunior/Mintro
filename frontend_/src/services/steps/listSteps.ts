@@ -2,7 +2,7 @@ import api from '../api';
 
 export const getStepsList = async () => {
   try {
-    const response = await api.get('health/steps/');
+    const response = await api.get('health/steps/list/');
 
     const data = response.data;
     return data;

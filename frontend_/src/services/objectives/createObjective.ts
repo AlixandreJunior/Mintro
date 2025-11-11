@@ -1,7 +1,6 @@
-import { ObjectiveWrite } from '@/src/types/mental/objectives';
 import api from '../api';
 
-export const registerObjectiveLog = async (data: ObjectiveWrite) => {
+export const registerObjectiveLog = async (data: any) => {
   try {
     const response = await api.post('diary/objective/create/', data);
     return response.data;

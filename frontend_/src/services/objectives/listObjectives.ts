@@ -1,9 +1,8 @@
-import { Objective } from '@/src/types/mental/objectives'; // Ajuste o caminho
 import api from '../api';
 
-export const getObjectiveList = async (): Promise<Objective[]> => {
+export const getObjectiveList = async (): Promise<any> => {
   try {
-    const response = await api.get<Objective[]>('diary/objective/');
+    const response = await api.get('diary/objective/list/');
 
     const data = response.data;
     return data;

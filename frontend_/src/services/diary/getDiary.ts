@@ -1,9 +1,8 @@
 import api from '../api';
-import { Diary } from '@/src/types/mental/diary';
 
 export const getDiary = async (id: number) => {
   try {
-    const response = await api.get<Diary>(`diary/diary/detail/${id}`);
+    const response = await api.get(`diary/diary/detail/${id}`);
 
     const data = response.data;
     return data;

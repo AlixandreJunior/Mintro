@@ -3,7 +3,7 @@ import api from '../api';
 export const updateObjective = async (id: number, updateData: object) => {
   try {
     const response = await api.patch(
-      `diary/objective/detail/${id}/update/`,
+      `diary/objective/update/${id}/`,
       updateData
     );
     return response.data;

@@ -1,9 +1,8 @@
-import { Achievement } from '@/src/types/user/achievements';
 import api from '../api';
 
 export const getAchievements = async () => {
   try {
-    const response = await api.get<Achievement[]>('user/achievements/');
+    const response = await api.get('user/achievements/');
     return response.data;
   } catch (error: any) {
     if (error.response?.data?.detail) {

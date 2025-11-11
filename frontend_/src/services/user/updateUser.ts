@@ -1,7 +1,6 @@
-import { User } from '@/src/types/user/user';
 import api from '../api';
 
-export const updateUser = async (data: Partial<User>) => {
+export const updateUser = async (data: any) => {
   try {
     const response = await api.patch('user/update/', data);
     return response.data;

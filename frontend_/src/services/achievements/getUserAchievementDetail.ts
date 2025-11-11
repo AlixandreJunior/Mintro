@@ -1,11 +1,8 @@
-import { AchievementLog } from '@/src/types/user/achievements';
 import api from '../api';
 
 export const getUserAchievementLogDetail = async (pk: number) => {
   try {
-    const response = await api.get<AchievementLog>(
-      `user/achievements/user/${pk}/`
-    );
+    const response = await api.get(`user/achievements/log/${pk}/`);
     return response.data;
   } catch (error: any) {
     if (error.response?.data?.detail) {

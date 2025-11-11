@@ -1,9 +1,8 @@
 import api from '../api';
-import { Diary } from '@/src/types/mental/diary';
 
 export const deleteDiary = async (id: number) => {
   try {
-    const response = await api.delete(`diary/diary/detail/${id}/delete/`);
+    const response = await api.delete(`diary/diary/delete/${id}/`);
 
     return 'Diario deletado com sucesso.';
   } catch (error: any) {

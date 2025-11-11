@@ -18,6 +18,6 @@ app_name = "mindfulness"
 
 urlpatterns = [
     path("list/", MindfulnessListView.as_view(), name="list"),
-    path("log/", MindfulnessLogListView.as_view(), name="log_list"),
+    path("log/list/", MindfulnessLogListView.as_view(), name="log_list"),
     path("log/register/", MindfulnessLogRegisterView.as_view(), name="log_register"),
 ]

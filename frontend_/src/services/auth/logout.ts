@@ -7,7 +7,10 @@ export interface createAccountResponse {
 
 export const logout = async () => {
   try {
-    const response = await api.post<createAccountResponse>('logout/', {});
+    const response = await api.post<createAccountResponse>(
+      'user/auth/logout/',
+      {}
+    );
 
     const data = response.data;
     return data;

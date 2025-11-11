@@ -1,9 +1,8 @@
-import { HydratationWrite } from '@/src/types/health/hydratation';
 import api from '../api';
 
-export const registerHydratationLog = async (data: HydratationWrite) => {
+export const registerHydratationLog = async (data: any) => {
   try {
-    const response = await api.post('health/hydratation/register/', data);
+    const response = await api.post('health/hydration/register/', data);
     return response.data;
   } catch (error: any) {
     if (error.response?.data?.detail) {

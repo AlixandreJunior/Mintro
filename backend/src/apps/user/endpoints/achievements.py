@@ -13,6 +13,6 @@ app_name = "achievements"
 urlpatterns = [
     path("", AchievementListView.as_view(), name="list"),
     path("detail/<int:id>/", AchievementDetailView.as_view(), name="detail"),
-    path("user/", AchievementLogListView.as_view(), name="user_list"),
-    path("user/<int:id>/", AchievementLogDetailView.as_view(), name="user_detail"),
+    path("log/", AchievementLogListView.as_view(), name="user_list"),
+    path("log/<int:id>/", AchievementLogDetailView.as_view(), name="user_detail"),
 ]

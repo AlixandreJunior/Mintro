@@ -32,7 +32,7 @@ export const getMindfulnessLogs = async (
       endDate = format(endOfMonth(date), 'yyyy-MM-dd');
     }
 
-    const response = await api.get('health/mindfulness/log/', {
+    const response = await api.get('health/mindfulness/log/list/', {
       params: {
         start_date: startDate,
         end_date: endDate,

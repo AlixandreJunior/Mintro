@@ -33,7 +33,7 @@ export const getExerciseLogs = async (
       endDate = format(endOfMonth(date), 'yyyy-MM-dd');
     }
 
-    const response = await api.get<ExerciseLog[]>('health/exercise/log/', {
+    const response = await api.get('health/exercise/log/list/', {
       params: {
         start_date: startDate,
         end_date: endDate,

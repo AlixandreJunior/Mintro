@@ -1,17 +1,16 @@
-import { Diary } from '@/src/types/mental/diary';
 import api from '../api';
 
 export const getDiaryList = async (
   month?: number,
   year?: number
-): Promise<Diary[]> => {
+): Promise<any> => {
   try {
     const params: Record<string, any> = {};
 
     if (month) params.month = month;
     if (year) params.year = year;
 
-    const response = await api.get<Diary[]>('diary/diary/', {
+    const response = await api.get('diary/diary/', {
       params: params,
     });
     return response.data;

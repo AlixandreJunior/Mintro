@@ -2,7 +2,7 @@ import api from '../api';
 
 export const getMindfulnessList = async () => {
   try {
-    const response = await api.get('health/mindfulness/');
+    const response = await api.get('health/mindfulness/list/');
 
     const data = response.data;
     return data;

@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { Alert, Platform } from 'react-native';
 import { router } from 'expo-router';
 
-import { registerHydratationLog } from '@/services/hydratation/registerHydratation';
-import { getHydratationList } from '@/services/hydratation/listHydratation';
+import { registerHydratationLog } from '@/services/hydration/registerHydration';
+import { getHydratationList } from '@/services/hydration/listHydration';
 import { Hydratation } from '@/types/health/hydratation';
 import { formatDateToISO } from '@/utils/formatDatetimeToISO';
 import { calculateHydration } from '@/utils/healthStats';

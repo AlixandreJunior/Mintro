@@ -5,9 +5,9 @@ from django.urls import URLPattern, URLResolver, include, path
 
 urlpatterns: list[URLResolver | URLPattern] = [
     path("admin/", admin.site.urls),
-    path("api/diary/", include("apps.diary.urls")),
-    path("api/health/", include("apps.health.urls")),
-    path("api/user/", include("apps.user.urls")),
+    path("diary/", include("apps.diary.urls")),
+    path("health/", include("apps.health.urls")),
+    path("user/", include("apps.user.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

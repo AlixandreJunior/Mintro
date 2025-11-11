@@ -1,9 +1,8 @@
-import { User } from '@/src/types/user/user';
 import api from '../api';
 
 export const getUser = async () => {
   try {
-    const response = await api.get<User>('user/');
+    const response = await api.get<any>('user/');
 
     const data = response.data;
     return data;
