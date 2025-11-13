@@ -1,8 +1,8 @@
 import { SafeAreaView } from 'react-native';
-import HeaderWithOptions from '@/components/layout/HeaderWithOptions';
-import Header from '@/components/layout/Header';
-import NotificationSection from '@/components/NotificationSection';
-import NotificationScreen from '@/screens/subpages/NotificationsScreen';
+import HeaderWithOptions from '@/share/components/layout/HeaderWithOptions';
+import Header from '@/share/components/layout/Header';
+import NotificationSection from '@/share/components/NotificationSection';
+import NotificationScreen from '@/features/reminder/screens/ReminderScreen';
 
 export default function Notification(): React.JSX.Element {
   return <NotificationScreen />;

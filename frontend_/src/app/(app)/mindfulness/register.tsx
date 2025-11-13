@@ -1,8 +1,8 @@
 import React from 'react';
 import { router } from 'expo-router';
-import { getMindfulnessList } from '@/services/mindfulness/listMindfulness';
-import { registerMindfulnessLog } from '@/services/mindfulness/registerMindfulnessLog';
-import RegisterScreenTemplate from '@/components/RegisterScreenTemplate';
+import { getMindfulnessList } from '@/api/services/mindfulness/listMindfulness';
+import { registerMindfulnessLog } from '@/api/services/mindfulness/registerMindfulnessLog';
+import RegisterScreenTemplate from '@/share/components/RegisterScreenTemplate';
 
 export default function RegisterMindfulnessScreen() {
   return (

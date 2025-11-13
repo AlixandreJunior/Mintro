@@ -1,4 +1,4 @@
-import ObjectiveDetailScreen from '@/screens/subpages/ObjectiveScreen';
+import ObjectiveDetailScreen from '@/features/objective/screens/ObjectiveScreen';
 
 const ObjectiveDetail = () => {
   return <ObjectiveDetailScreen />;

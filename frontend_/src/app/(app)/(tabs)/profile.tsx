@@ -1,4 +1,4 @@
-import ProfileScreen from '@/screens/main/ProfileScreen';
+import ProfileScreen from '@/features/user/screens/ProfileScreen';
 
 const Profile = () => {
   return <ProfileScreen />;

@@ -1,4 +1,4 @@
-import CreateDiaryScreen from '@/screens/subpages/RegisterDiary';
+import CreateDiaryScreen from '@/features/diary/screens/RegisterDiary';
 
 const CreateDiary = () => {
   return <CreateDiaryScreen />;

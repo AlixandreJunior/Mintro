@@ -12,9 +12,9 @@ import {
 } from '@expo-google-fonts/poppins';
 import * as NavigationBar from 'expo-navigation-bar';
 import { Provider as PaperProvider } from 'react-native-paper';
-import AppProviders from '../components/AppProviders';
-import AuthGuard from '../components/AuthGuard';
-import { useStepCounter } from '@/hooks/useStepsCounter';
+import AppProviders from '../share/components/AppProviders';
+import AuthGuard from '../share/components/AuthGuard';
+import { useStepCounter } from '@/features/step/hooks/useStepsCounter';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({

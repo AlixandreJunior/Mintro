@@ -1,4 +1,4 @@
-import MindfulnessScreen from '@/screens/subpages/MindfulnessScreen';
+import MindfulnessScreen from '@/features/mindfulness/screens/MindfulnessScreen';
 
 const Mindfulness = () => {
   return <MindfulnessScreen />;

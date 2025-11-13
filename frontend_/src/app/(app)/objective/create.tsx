@@ -1,4 +1,4 @@
-import RegisterObjectiveScreen from '@/screens/subpages/RegisterObjective';
+import RegisterObjectiveScreen from '@/features/objective/screens/RegisterObjective';
 
 const RegisterObjective = () => {
   return <RegisterObjectiveScreen />;

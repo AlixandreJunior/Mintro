@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { Stack } from 'expo-router';
-import AuthContainer from '@/components/AuthContainer';
+import AuthContainer from '@/share/components/AuthContainer';
 
 export default function AuthLayout() {
   return (

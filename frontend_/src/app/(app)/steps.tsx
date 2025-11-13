@@ -1,4 +1,4 @@
-import StepsScreen from '@/screens/subpages/StepsScreen';
+import StepsScreen from '@/features/step/screens/StepsScreen';
 
 const Steps = () => {
   return <StepsScreen />;
