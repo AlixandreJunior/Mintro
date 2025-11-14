@@ -1,15 +1,9 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-/**
- * Hook genérico para lidar com requisições assíncronas de forma segura.
- * Garante que estados (loading, erro e dados) sejam atualizados apenas
- * se o componente ainda estiver montado.
- */
 export const useHandleRequest = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Evita atualizações de estado após desmontagem
   const mountedRef = useRef(true);
 
   useEffect(() => {
@@ -25,12 +19,6 @@ export const useHandleRequest = () => {
     []
   );
 
-  /**
-   * Executa uma função assíncrona e gerencia loading + erro automaticamente.
-   *
-   * @param fn Função que retorna uma Promise (requisição)
-   * @param setter (opcional) Função que recebe os dados da resposta
-   */
   const handleRequest = useCallback(
     async <T>(fn: () => Promise<T>, setter?: (data: T) => void) => {
       safeSetState(setLoading, true);

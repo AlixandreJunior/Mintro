@@ -1,57 +1,21 @@
-import { useState, useEffect } from 'react';
-import { getUser } from '@/api/services/user/getUser';
-import { logout as logoutRequest } from '@/api/services/auth/logout'; // importe a função de logout
-import { User } from '@/share/types/user/user';
-import { router } from 'expo-router';
-import { useAuth } from '@/share/context/AuthContext';
+import { useHandleRequest } from '@/share/hooks/useHandleRequest';
+import { UserService } from '../UserService';
 
-export function useUserProfile() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
-  const [errorUser, setErrorUser] = useState<string | null>(null);
-  const [logoutError, setLogoutError] = useState<string | null>(null);
-  const [logoutSuccess, setLogoutSuccess] = useState<boolean>(false);
+export function useUser() {
+  const { error, handleRequest, loading } = useHandleRequest();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      setLoadingUser(true);
-      setErrorUser(null);
-      try {
-        const userData = await getUser();
-        setUser(userData);
-      } catch (err: any) {
-        setErrorUser(err.message || 'Falha ao carregar dados do usuário.');
-        console.error('Erro ao buscar usuário:', err);
-      } finally {
-        setLoadingUser(false);
-      }
-    };
+  const handleUserRetrieve = async () => {
+    return await handleRequest(() => UserService.retrieve());
+  };
 
-    fetchUser();
-  }, []);
-
-  const handleLogout = async () => {
-    setLogoutError(null);
-    setLogoutSuccess(false);
-    try {
-      await logoutRequest();
-      setLogoutSuccess(true);
-      setUser(null);
-      const { logout } = useAuth();
-      await logout();
-      router.push('/(auth)/login');
-    } catch (err: any) {
-      setLogoutError(err.message || 'Erro ao fazer logout.');
-      console.error('Erro no logout:', err);
-    }
+  const handleUserUpdate = async () => {
+    return await handleRequest(() => UserService.retrieve());
   };
 
   return {
-    user,
-    loadingUser,
-    errorUser,
-    handleLogout,
-    logoutError,
-    logoutSuccess,
+    error,
+    loading,
+    handleUserRetrieve,
+    handleUserUpdate,
   };
 }
