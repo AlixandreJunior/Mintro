@@ -5,41 +5,10 @@ import { Diary } from '@/share/types/mental/diary';
 import { appendImageToFormData } from '@/share/utils/appendImageToFormData';
 import { getMoodVisuals } from '@/share/utils/moodHelper';
 import { getActivityIconName } from '@/share/utils/activityIconMapper';
+import { useHandleRequest } from '@/share/hooks/useHandleRequest';
 
-export interface TransformedActivity {
-  name: string;
-  iconName?: React.ReactNode;
-}
-
-export interface DiaryEntryCardProps {
-  id: number;
-  time: string;
-  mood: string;
-  iconSource: any;
-  activities: TransformedActivity[];
-  title: string;
-  content: string;
-  photoUrl?: string;
-}
-
-export interface AdaptedDiaryHistory {
-  date: string;
-  entries: DiaryEntryCardProps[];
-}
-
-export function useDiary() {
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  const getCombinedDateTime = (date: Date, time: Date) =>
-    new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      time.getHours(),
-      time.getMinutes(),
-      time.getSeconds()
-    );
+export const useDiary = () => {
+  const {handleRequest, error, loading} = useHandleRequest()
 
   const buildFormData = async (form: {
     title: string;

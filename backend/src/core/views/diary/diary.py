@@ -40,7 +40,6 @@ class BaseDiaryView(BaseView):
     @override
     def get_queryset(self) -> QuerySet[Diary]:
         user = self.request.user
-        search = self.request.query_params.get("search")
         month = self.request.query_params.get("month")
         year = self.request.query_params.get("year")
 
@@ -50,9 +49,6 @@ class BaseDiaryView(BaseView):
             .prefetch_related("activities")
             .order_by("-created_at")
         )
-
-        if search:
-            queryset = queryset.filter(title__icontains=search)
 
         try:
             if month:

@@ -5,11 +5,14 @@ export function useExercise(date: Date, period: 'week' | 'month' = 'week') {
   const { handleRequest, loading, error } = useHandleRequest();
 
   const handleExerciseList = async () => {
-    () => handleRequest(() => ExerciseService.list());
+    await handleRequest(() => ExerciseService.list());
   };
 
-  const handleExerciseLogList = async () => {
-    await handleRequest(() => ExerciseService.listLog());
+  const handleExerciseLogList = async (
+    date: Date,
+    period: 'week' | 'month'
+  ) => {
+    await handleRequest(() => ExerciseService.listLog(date, period));
   };
 
   const handleExerciseLogCreate = async (data: any) => {

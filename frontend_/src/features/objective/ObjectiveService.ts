@@ -12,7 +12,7 @@ export class ObjectiveService extends Service {
     );
   }
 
-  static async register(data: any) {
+  static async create(data: any) {
     return this.apiPost(
       'diary/objective/create/',
       data,
