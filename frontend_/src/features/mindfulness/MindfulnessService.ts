@@ -1,12 +1,5 @@
 // services/mindfulness/mindfulnessService.ts
-import {
-  startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth,
-  format,
-} from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { getPeriodRange, Period } from '@/share/utils/getPeriodRange';
 import { Service } from '../../share/service';
 
 type Period = 'week' | 'month';
@@ -36,19 +29,7 @@ export class MindfulnessService extends Service {
    *   period: Tipo de período — "week" ou "month".
    */
   static async listLogs(date: Date = new Date(), period: Period = 'week') {
-    const start =
-      period === 'week'
-        ? startOfWeek(date, { weekStartsOn: 0, locale: ptBR })
-        : startOfMonth(date);
-
-    const end =
-      period === 'week'
-        ? endOfWeek(date, { weekStartsOn: 0, locale: ptBR })
-        : endOfMonth(date);
-
-    const startDate = format(start, 'yyyy-MM-dd');
-    const endDate = format(end, 'yyyy-MM-dd');
-
+    const { startDate, endDate } = getPeriodRange(date, period);
     return Service.apiGet(
       `health/mindfulness/log/list/?start_date=${startDate}&end_date=${endDate}`,
       'Erro ao buscar registros de mindfulness.'

@@ -1,7 +1,6 @@
 import { useHandleRequest } from '@/share/hooks/useHandleRequest';
 import { UserService } from '../UserService';
 
-export function useUser() {
   const { error, handleRequest, loading } = useHandleRequest();
 
   const handleUserRetrieve = async () => {

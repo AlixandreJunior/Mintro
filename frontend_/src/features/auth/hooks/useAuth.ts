@@ -5,12 +5,21 @@ import { useHandleRequest } from '@/share/hooks/useHandleRequest';
 
 export function useAuthForm() {
   const { error, handleRequest, loading } = useHandleRequest();
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const router = useRouter();
 
-  const handleLogin = async (email: string, password: string) => {
+  const handleLogin = async (
+    email: string,
+    password: string
+  ): Promise<{ access: string; refresh: string }> => {
     const data = await handleRequest(() => AuthService.login(email, password));
     login(data.access, data.refresh);
+    return data;
+  };
+
+  const handleLogout = async (): Promise<any> => {
+    const data = await handleRequest(() => AuthService.logout());
+    logout();
     return data;
   };
 
@@ -18,7 +27,7 @@ export function useAuthForm() {
     username: string,
     email: string,
     password: string
-  ) => {
+  ): Promise<any> => {
     const data = await handleRequest(() =>
       AuthService.signUp(username, email, password)
     );
@@ -26,5 +35,5 @@ export function useAuthForm() {
     return data;
   };
 
-  return { handleLogin, handleSignUp, error, loading };
+  return { handleLogin, handleLogout, handleSignUp, error, loading };
 }

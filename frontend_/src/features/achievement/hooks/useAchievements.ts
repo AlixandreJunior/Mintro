@@ -1,36 +1,39 @@
 import { useCallback } from 'react';
 import { useHandleRequest } from '@/share/hooks/useHandleRequest';
 import { AchievementService } from '../AchievementService';
+import { Achievement, AchievementLog } from '@/share/types/user/achievements';
 
 export const useAchievements = () => {
   const { handleRequest, loading, error } = useHandleRequest();
 
-  const handleAchievementList = useCallback(
-    () => handleRequest(AchievementService.list),
+  const handleAchievementsList = useCallback(
+    (): Promise<Achievement[]> => handleRequest(AchievementService.list),
     [handleRequest]
   );
 
-  const handleAchievementLogList = useCallback(
-    () => handleRequest(AchievementService.listLog),
+  const handleAchievementLogsList = useCallback(
+    (): Promise<AchievementLog[]> => handleRequest(AchievementService.listLog),
     [handleRequest]
   );
 
   const handleAchievementRetrieve = useCallback(
-    (id: number) => handleRequest(() => AchievementService.retrieve(id)),
+    (id: number): Promise<Achievement> =>
+      handleRequest(() => AchievementService.retrieve(id)),
     [handleRequest]
   );
 
   const handleAchievementLogRetrieve = useCallback(
-    (id: number) => handleRequest(() => AchievementService.retrieveLog(id)),
+    (id: number): Promise<AchievementLog> =>
+      handleRequest(() => AchievementService.retrieveLog(id)),
     [handleRequest]
   );
 
   return {
     loading,
     error,
-    handleAchievementList,
+    handleAchievementsList,
     handleAchievementRetrieve,
-    handleAchievementLogList,
+    handleAchievementLogsList,
     handleAchievementLogRetrieve,
   };
 };

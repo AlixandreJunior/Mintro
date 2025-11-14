@@ -1,7 +1,11 @@
 import { Service } from '../../share/service';
 
 export class AuthService extends Service {
-  static async signUp(username: string, email: string, password: string) {
+  static async signUp(
+    username: string,
+    email: string,
+    password: string
+  ): Promise<void> {
     return this.apiPost(
       'user/create/',
       { username, email, password },
@@ -9,7 +13,10 @@ export class AuthService extends Service {
     );
   }
 
-  static async login(email: string, password: string) {
+  static async login(
+    email: string,
+    password: string
+  ): Promise<{ access: string; refresh: string }> {
     return this.apiPost<{ access: string; refresh: string }>(
       'user/auth/login/',
       { email, password },
@@ -17,7 +24,7 @@ export class AuthService extends Service {
     );
   }
 
-  static async logout() {
+  static async logout(): Promise<void> {
     return this.apiPost(
       'user/auth/logout/',
       {},
