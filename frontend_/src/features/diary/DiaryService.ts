@@ -1,5 +1,6 @@
 import { Diary } from '@/share/types/mental/diary';
 import { Service } from '../../share/service';
+import { ResponseSuccess } from '@/share/types/response';
 
 export class DiaryService extends Service {
   static async listActivities() {
@@ -19,18 +20,18 @@ export class DiaryService extends Service {
       'Erro ao tentar buscar diário'
     );
   }
-  static async create(data: any): Promise<any> {
+  static async create(data: any): Promise<ResponseSuccess> {
     return this.apiPost('diary/diary/create/', data, 'Erro ao criar diario.');
   }
 
-  static async delete(id: number): Promise<any> {
+  static async delete(id: number): Promise<ResponseSuccess> {
     return this.apiDelete(
       `diary/diary/delete/${id}/`,
       'Erro ao tentar buscar diario'
     );
   }
 
-  static async update(id: number, data: FormData): Promise<any> {
+  static async update(id: number, data: FormData): Promise<ResponseSuccess> {
     return this.apiPatch(`diary/diary/update/${id}/`, data, 'Erro ');
   }
 }

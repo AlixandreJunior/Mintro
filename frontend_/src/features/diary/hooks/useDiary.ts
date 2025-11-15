@@ -1,6 +1,7 @@
 import { useHandleRequest } from '@/share/hooks/useHandleRequest';
 import { DiaryService } from '../DiaryService';
 import { Diary } from '@/share/types/mental/diary';
+import { ResponseSuccess } from '@/share/types/response';
 
 export const useDiary = () => {
   const { handleRequest, error, loading } = useHandleRequest();
@@ -13,15 +14,18 @@ export const useDiary = () => {
     return await handleRequest(() => DiaryService.retrieve(id));
   };
 
-  const handleDiaryCreate = async (data: any): Promise<any> => {
+  const handleDiaryCreate = async (data: any): Promise<ResponseSuccess> => {
     return await handleRequest(() => DiaryService.create(data));
   };
 
-  const handleDiaryUpdate = async (id: number, data: any): Promise<any> => {
+  const handleDiaryUpdate = async (
+    id: number,
+    data: any
+  ): Promise<ResponseSuccess> => {
     return await handleRequest(() => DiaryService.update(id, data));
   };
 
-  const handleDiaryDelete = async (id: number): Promise<any> => {
+  const handleDiaryDelete = async (id: number): Promise<ResponseSuccess> => {
     return await handleRequest(() => DiaryService.delete(id));
   };
 

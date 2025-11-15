@@ -5,6 +5,7 @@ import {
   ExerciseLog,
   ExerciseLogWrite,
 } from '@/share/types/health/exercise';
+import { ResponseSuccess } from '@/share/types/response';
 
 export class ExerciseService extends Service {
   static async list(): Promise<Exercise[]> {
@@ -25,7 +26,7 @@ export class ExerciseService extends Service {
     );
   }
 
-  static async createLog(data: ExerciseLogWrite): Promise<any> {
+  static async createLog(data: ExerciseLogWrite): Promise<ResponseSuccess> {
     return await this.apiPost(
       'health/exercise/log/register/',
       data,

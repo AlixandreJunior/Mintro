@@ -1,26 +1,29 @@
 import { useHandleRequest } from '@/share/hooks/useHandleRequest';
 import { ExerciseService } from '../ExerciseService';
+import { ResponseSuccess } from '@/share/types/response';
 
 export function useExercise(date: Date, period: 'week' | 'month' = 'week') {
   const { handleRequest, loading, error } = useHandleRequest();
 
   const handleExerciseList = async () => {
-    await handleRequest(() => ExerciseService.list());
+    return await handleRequest(() => ExerciseService.list());
   };
 
   const handleExerciseLogList = async (
     date: Date,
     period: 'week' | 'month'
   ) => {
-    await handleRequest(() => ExerciseService.listLog(date, period));
+    return await handleRequest(() => ExerciseService.listLog(date, period));
   };
 
-  const handleExerciseLogCreate = async (data: any) => {
+  const handleExerciseLogCreate = async (
+    data: any
+  ): Promise<ResponseSuccess> => {
     if (!data.exercise || data.duration <= 0 || !data.datetime) {
       throw new Error('Preencha todos os campos corretamente.');
     }
 
-    await handleRequest(() => ExerciseService.createLog(data));
+    return await handleRequest(() => ExerciseService.createLog(data));
   };
 
   return {

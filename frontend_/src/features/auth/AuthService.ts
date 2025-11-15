@@ -1,3 +1,4 @@
+import { ResponseSuccess } from '@/share/types/response';
 import { Service } from '../../share/service';
 
 export class AuthService extends Service {
@@ -5,7 +6,7 @@ export class AuthService extends Service {
     username: string,
     email: string,
     password: string
-  ): Promise<void> {
+  ): Promise<ResponseSuccess> {
     return this.apiPost(
       'user/create/',
       { username, email, password },
@@ -24,7 +25,7 @@ export class AuthService extends Service {
     );
   }
 
-  static async logout(): Promise<void> {
+  static async logout(): Promise<ResponseSuccess> {
     return this.apiPost(
       'user/auth/logout/',
       {},

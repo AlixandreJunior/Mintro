@@ -1,4 +1,3 @@
-// hooks/useStepCounter.ts
 import { useEffect, useRef } from 'react';
 import { Platform, Alert } from 'react-native';
 import { Accelerometer } from 'expo-sensors';

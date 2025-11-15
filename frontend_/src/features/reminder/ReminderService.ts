@@ -1,18 +1,19 @@
+import { ResponseSuccess } from '@/share/types/response';
 import { Service } from '../../share/service';
 
 export class ReminderService extends Service {
-  static async list() {
+  static async list(): Promise<any> {
     return this.apiGet('user/reminder/list/', 'Erro ao listar lembretes.');
   }
 
-  static async retrieve(id: number) {
+  static async retrieve(id: number): Promise<any> {
     return this.apiGet(
       `user/reminder/detail/${id}/`,
       'Erro ao buscar lembrete.'
     );
   }
 
-  static async create(data: any) {
+  static async create(data: any): Promise<ResponseSuccess> {
     return this.apiPost(
       'user/reminder/create/',
       data,
@@ -20,7 +21,7 @@ export class ReminderService extends Service {
     );
   }
 
-  static async update(id: number, data: any) {
+  static async update(id: number, data: any): Promise<ResponseSuccess> {
     return this.apiPatch(
       `user/reminder/update/${id}/`,
       data,
@@ -28,7 +29,7 @@ export class ReminderService extends Service {
     );
   }
 
-  static async delete(id: number) {
+  static async delete(id: number): Promise<ResponseSuccess> {
     return this.apiDelete(
       `user/reminder/delete/${id}/`,
       'Erro ao deletar lembrete.'
