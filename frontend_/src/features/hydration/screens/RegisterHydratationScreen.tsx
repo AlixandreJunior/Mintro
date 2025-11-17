@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import FormHeader from '@/share/components/layout/FormHeader';
-import RegisterHydrationMainContent from '@/share/components/RegisterHydrationMainContent';
+import RegisterHydrationMainContent from '@/features/hydration/components/RegisterHydrationMainContent';
 import { useHydration, VOLUMES } from '@/share/hooks/useHydratationLog';
 
 const RegisterHydrationScreen = () => {

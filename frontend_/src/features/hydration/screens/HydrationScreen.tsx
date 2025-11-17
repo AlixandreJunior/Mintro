@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { FloatingActionButton } from '@/share/components/FloatingButtonAction';
-import HydrationHeader from '@/share/components/HydrationHeader';
-import HydrationMainContent from '@/share/components/HydrationMainContent';
+import HydrationHeader from '@/features/hydration/components/HydrationHeader';
+import HydrationMainContent from '@/features/hydration/components/HydrationMainContent';
 
 const HydrationScreen = () => {
   const [selectedDate, setSelectedDate] = useState(() => {

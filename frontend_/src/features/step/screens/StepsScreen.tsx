@@ -1,5 +1,5 @@
 import HeaderWithOptions from '@/share/components/layout/HeaderWithOptions';
-import StepsMainContent from '@/share/components/StepsMainContent';
+import StepsMainContent from '@/features/step/StepsMainContent';
 
 import { useSteps } from '@/features/step/hooks/useSteps';
 import { useState } from 'react';

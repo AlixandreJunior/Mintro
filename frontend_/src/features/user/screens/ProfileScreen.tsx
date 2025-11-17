@@ -1,6 +1,6 @@
 import { Dimensions, SafeAreaView, ScrollView, StyleSheet } from 'react-native';
-import { UserInfoSection } from '@/share/components/UserInfoSection';
-import { StatsSection } from '@/share/components/StatsSection';
+import { UserInfoSection } from '@/features/user/components/UserInfoSection';
+import { StatsSection } from '@/features/user/components/StatsSection';
 import { useUserProfile } from '@/share/hooks/useUserProfile';
 import AchievementSection from '@/share/components/AchievementsSection';
 

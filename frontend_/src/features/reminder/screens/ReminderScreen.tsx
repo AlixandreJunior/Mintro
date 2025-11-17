@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import HeaderWithOptions from '@/share/components/layout/HeaderWithOptions';
-import CreateNotificationModal from '@/share/components/CreateNotificationScreen';
+import CreateNotificationModal from '@/features/reminder/components/ReminderCreateSection';
 import {
   useNotifications,
   NotificationRecord,

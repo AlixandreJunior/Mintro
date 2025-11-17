@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import FormHeader from '@/share/components/layout/FormHeader';
-import ObjectiveForm from '@/share/components/ObjectiveForm';
+import ObjectiveForm from '@/features/objective/components/ObjectiveForm';
 import { useObjectiveManager } from '@/share/hooks/useObjective';
 
 const RegisterObjectiveScreen: FC = () => {

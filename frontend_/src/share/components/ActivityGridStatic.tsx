@@ -1,5 +1,5 @@
 import { ActivityIndicator } from 'react-native-paper';
-import ObjectiveGridItem from './ObjectivesGridCard';
+import ObjectiveGridItem from '../../features/objective/components/ObjectivesGridCard';
 import { StyleSheet, View } from 'react-native';
 import { getActivityIconName } from '@/share/utils/activityIconMapper';
 import { useEffect, useState } from 'react';

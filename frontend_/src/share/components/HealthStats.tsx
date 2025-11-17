@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
-import { HydratationCard } from '@/share/components/HydratationCard';
-import { StepsPanel } from './StepsPanel';
+import { HydratationCard } from '@/features/hydration/components/HydratationCard';
+import { StepsPanel } from '../../features/step/StepsPanel';
 import { ActivitiesCardSection } from './ActivitiesCardSection';
 
 interface Props {

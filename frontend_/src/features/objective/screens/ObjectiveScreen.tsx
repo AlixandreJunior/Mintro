@@ -7,9 +7,9 @@ import {
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ObjectiveHeader } from '@/share/components/ObjectiveHeader';
-import { ObjectiveMainContent } from '@/share/components/ObjectiveMainContent';
-import ObjectiveModals from '@/share/components/ObjectiveModals';
+import { ObjectiveHeader } from '@/features/objective/components/ObjectiveHeader';
+import { ObjectiveMainContent } from '@/features/objective/components/ObjectiveMainContent';
+import ObjectiveModals from '@/features/objective/components/ObjectiveModals';
 import DailyReminderModal from '@/components/DailyReminderModal';
 import { useObjectiveManager } from '@/share/hooks/useObjective';
 import { useNotifications } from '@/share/hooks/useReminder';
