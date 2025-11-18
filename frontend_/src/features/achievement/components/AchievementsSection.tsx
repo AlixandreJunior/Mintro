@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Dimensions, FlatList } from 'react-native';
 import { AchievementsHeader } from './AchievementsHeader';
 import AchievementCarousel from './AchievementCarousel';
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 const AchievementSection = () => {
   return (

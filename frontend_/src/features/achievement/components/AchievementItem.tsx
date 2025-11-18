@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import AchievementIconBase from './icons/AchievementIcon';
+import AchievementIconBase from '@/share/components/icons/AchievementIcon';
 
 const { width, height } = Dimensions.get('window');
 
@@ -19,30 +19,33 @@ export const AchievementItem: React.FC<AchievementItemProps> = ({
   itemWidth,
   marginRight,
 }) => {
-  const iconBaseSize = itemWidth * 0.9;
-  const iconMCI_Size = iconBaseSize * 0.45;
-  const mciIconColor = starsAchieved > 0 ? '#79D457' : '#A0A0A0';
+  const { iconBaseSize, iconSize, trophyColor, wrapperSize } = useMemo(() => {
+    const base = itemWidth * 0.9;
+    return {
+      iconBaseSize: base,
+      iconSize: base * 0.45,
+      trophyColor: starsAchieved > 0 ? '#79D457' : '#A0A0A0',
+      wrapperSize: { width: base, height: base * (91 / 87) },
+    };
+  }, [itemWidth, starsAchieved]);
 
   return (
     <View style={[styles.container, { width: itemWidth, marginRight }]}>
-      <View
-        style={[
-          styles.iconWrapper,
-          { width: iconBaseSize, height: iconBaseSize * (91 / 87) },
-        ]}
-      >
+      <View style={[styles.iconWrapper, wrapperSize]}>
         <AchievementIconBase
           size={iconBaseSize}
           starsAchieved={starsAchieved}
         />
+
         <View style={styles.centerIcon}>
           <MaterialCommunityIcons
             name="trophy"
-            size={iconMCI_Size}
-            color={mciIconColor}
+            size={iconSize}
+            color={trophyColor}
           />
         </View>
       </View>
+
       <Text style={styles.label}>{label}</Text>
     </View>
   );
@@ -51,7 +54,6 @@ export const AchievementItem: React.FC<AchievementItemProps> = ({
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    justifyContent: 'flex-start',
     paddingVertical: 5,
   },
   iconWrapper: {
@@ -65,10 +67,10 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: width * 0.032,
-    fontFamily: 'Poppins_400Regular',
     lineHeight: width * 0.035,
     textAlign: 'center',
-    color: '#000000',
+    color: '#000',
+    fontFamily: 'Poppins_400Regular',
     width: '100%',
     minHeight: width * 0.07,
   },
