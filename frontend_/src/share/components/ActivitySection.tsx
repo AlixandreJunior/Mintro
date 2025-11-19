@@ -9,12 +9,11 @@ interface Activity {
 
 interface ActivitiesSectionProps {
   title: string;
-  selected: string[] | string | null;
-  setSelected: Dispatch<SetStateAction<string | null>>;
+  selected: string[];
+  setSelected: Dispatch<SetStateAction<string[]>>;
   multiple?: boolean;
 }
 
-// Atividades fixas (não depende mais do backend)
 const STATIC_ACTIVITIES: Activity[] = [
   { id: '1', name: 'Família' },
   { id: '2', name: 'Amigos' },

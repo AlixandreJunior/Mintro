@@ -2,34 +2,31 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import DiaryDateHeader from './DiaryDateHeader';
 import DiaryTimelineLine from './DiaryTimelineLine';
-import { DiaryEntryCard } from '../DiaryEntryCard';
+import { groupEntriesByDay } from '../utils/group';
+import { DiaryEntryCard } from './DiaryEntryCard';
+import { Diary } from '@/share/types/mental/diary';
 
 interface DiaryDayHistoryProps {
-  date: string;
-  entries: any[];
+  entries: Diary[];
 }
 
-const DiaryDayHistory: React.FC<DiaryDayHistoryProps> = ({ date, entries }) => {
-  return (
-    <View style={styles.daySection}>
-      <DiaryDateHeader date={date} />
+const DiaryDayHistory: React.FC<DiaryDayHistoryProps> = ({ entries }) => {
+  const grouped = groupEntriesByDay(entries);
 
-      <DiaryTimelineLine>
-        {entries.map((entry, entryIndex) => (
-          <DiaryEntryCard
-            key={entryIndex}
-            id={entry.id}
-            time={entry.time}
-            mood={entry.mood}
-            iconSource={entry.iconSource}
-            activities={entry.activities}
-            title={entry.title}
-            content={entry.content}
-            photoUrl={entry.photoUrl}
-          />
-        ))}
-      </DiaryTimelineLine>
-    </View>
+  return (
+    <>
+      {Object.entries(grouped).map(([day, dayEntries]) => (
+        <View key={day} style={styles.daySection}>
+          <DiaryDateHeader date={day} />
+
+          <DiaryTimelineLine>
+            {dayEntries.map((entry: any) => (
+              <DiaryEntryCard diary={entry} />
+            ))}
+          </DiaryTimelineLine>
+        </View>
+      ))}
+    </>
   );
 };
 

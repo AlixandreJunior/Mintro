@@ -2,9 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import FormHeader from '@/share/components/layout/FormHeader';
-import DiaryForm from '@/share/components/DiaryFormTemplate';
-import { Diary } from '@/share/types/mental/diary';
-import { useDiaryManager } from '@/share/hooks/useDiary';
+import DiaryForm from '../components/DiaryFormTemplate';
+import { useDiary } from '../hooks/useDiary';
+import { formatDatetimeToISO } from '@/share/utils/formatDatetimeToISO';
+import {
+  combineDateAndTime,
+  extractDate,
+  extractTime,
+  extractTimeAsDate,
+} from '../utils/datetime';
+import { MoodType } from '@/share/types/mental/diary';
 
 const UpdateDiaryScreen = () => {
   const { id } = useLocalSearchParams();
@@ -14,54 +21,42 @@ const UpdateDiaryScreen = () => {
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [selectedActivitiesIds, setSelectedActivitiesIds] = useState<string[]>(
-    []
-  );
-  const [notes, setNotes] = useState('');
-  const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
-  const [selectedMoodId, setSelectedMoodId] = useState('Neutro');
+  const [activities, setActivities] = useState<string[]>([]);
+  const [content, setContent] = useState('');
+  const [photo, setPhoto] = useState<string>();
+  const [mood, setMood] = useState<MoodType>('Neutro');
 
-  const { loadDiaryById, handleUpdate } = useDiaryManager(selectedDate);
+  const { handleDiaryRetrieve, handleDiaryUpdate } = useDiary();
 
   useEffect(() => {
-    const fetchDiary = async () => {
-      if (id) {
-        const diary: Partial<Diary> | null = await loadDiaryById(Number(id));
-        if (!diary) return;
+    const fetchData = async () => {
+      const diary = await handleDiaryRetrieve(Number(id));
 
-        if (diary.title) setTitle(diary.title);
-        if (diary.datetime) {
-          const dt = new Date(diary.datetime);
-          setSelectedDate(dt);
-          setSelectedTime(dt);
-        }
-        if (diary.content) setNotes(diary.content);
-        if (diary.mood) setSelectedMoodId(diary.mood);
-        if (diary.photo) setSelectedImageUri(diary.photo);
-        if (diary.activities)
-          setSelectedActivitiesIds(
-            Array.isArray(diary.activities)
-              ? diary.activities.map((a: any) =>
-                  typeof a === 'number' ? a.toString() : a.id.toString()
-                )
-              : []
-          );
-      }
+      setTitle(diary.title);
+      setContent(diary.content);
+      setSelectedDate(extractDate(diary.created_at));
+      setSelectedTime(extractTimeAsDate(diary.created_at));
+      setMood(diary.mood);
+      setActivities(diary.activities.map((value) => value.id));
+      setPhoto(diary.photo);
     };
 
-    fetchDiary();
+    fetchData();
   }, [id]);
 
   const onSave = () => {
+    const created_at = formatDatetimeToISO(
+      combineDateAndTime(selectedDate, selectedTime)
+    );
+
     if (id) {
-      handleUpdate(Number(id), {
+      handleDiaryUpdate(Number(id), {
         title,
-        notes,
-        selectedDate,
-        selectedTime,
-        selectedMoodId,
-        selectedActivitiesIds,
-        selectedImageUri,
+        content,
+        created_at,
+        mood,
+        activities,
+        photo,
       });
     }
   };
@@ -85,14 +80,14 @@ const UpdateDiaryScreen = () => {
         onChangeTime={setSelectedTime}
         showTimePicker={showTimePicker}
         setShowTimePicker={setShowTimePicker}
-        selectedMoodId={selectedMoodId}
-        onSelectMood={setSelectedMoodId}
-        selectedActivitiesIds={selectedActivitiesIds}
-        onSelectActivities={setSelectedActivitiesIds}
-        notes={notes}
-        onChangeNotes={setNotes}
-        selectedImageUri={selectedImageUri}
-        onImageSelected={setSelectedImageUri}
+        mood={mood}
+        onSelectMood={setMood}
+        activities={activities}
+        onSelectActivities={setActivities}
+        content={content}
+        onChangeContent={setContent}
+        photo={photo}
+        onImageSelected={setPhoto}
       />
     </View>
   );

@@ -1,31 +1,19 @@
 import React, { useState } from 'react';
 import { View, Pressable, StyleSheet, Dimensions } from 'react-native';
-import DiaryCard from './specific/DiaryCard';
-import DiaryModal from './specific/DiaryModal';
-import { DiaryEntryHeader } from '../DiaryEntryHeader';
 import { DiaryActivities } from './DiaryActivities';
 import { DiaryEntryContent } from './DiaryEntryContent';
+import { DiaryEntryHeader } from './DiaryEntryHeader';
+import DiaryCard from './DiaryCard';
+import DiaryModal from './DiaryModal';
+import { Diary } from '@/share/types/mental/diary';
 
 interface DiaryEntryCardProps {
-  id: number;
-  time: string;
-  mood: string;
-  iconSource: React.ReactNode;
-  activities: { name: string }[];
-  title: string;
-  content: string;
-  photoUrl?: string;
+  diary: Diary & {
+    iconSource: React.ReactNode;
+  };
 }
 
-export const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
-  time,
-  mood,
-  iconSource,
-  activities,
-  title,
-  content,
-  photoUrl,
-}) => {
+export const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const openDropdown = () => setDropdownVisible(true);
   const closeDropdown = () => setDropdownVisible(false);
@@ -34,18 +22,18 @@ export const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({
     <>
       <Pressable onPress={closeDropdown}>
         <View style={styles.row}>
-          <View style={styles.icon}>{iconSource}</View>
+          <View style={styles.icon}>{diary.iconSource}</View>
           <DiaryCard style={styles.card}>
             <DiaryEntryHeader
-              mood={mood}
-              time={time}
+              mood={diary.mood}
+              time={diary.created_at.getHours()}
               onOpenMenu={openDropdown}
             />
-            <DiaryActivities activities={activities} />
+            <DiaryActivities activities={diary.activities} />
             <DiaryEntryContent
-              title={title}
-              content={content}
-              photoUrl={photoUrl}
+              title={diary.title}
+              content={diary.content}
+              photoUrl={diary.photo}
             />
           </DiaryCard>
         </View>

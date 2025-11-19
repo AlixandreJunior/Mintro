@@ -4,9 +4,9 @@ import { TextInput } from 'react-native-paper';
 
 interface MainInputProps {
   labelText: string;
-  value: any;
-  keyboardType: KeyboardType;
-  onChangeText: (text: string | number) => void;
+  value: string | number;
+  keyboardType?: KeyboardType;
+  onChangeText: (text: string) => void;
   placeholder?: string;
 }
 
@@ -22,7 +22,7 @@ export const MainInput: React.FC<MainInputProps> = ({
       <Text style={styles.inputLabel}>{labelText}</Text>
       <TextInput
         mode="outlined"
-        value={value}
+        value={String(value)}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
         style={styles.textInput}

@@ -9,19 +9,21 @@ import {
   Platform,
 } from 'react-native';
 import { getMoodVisuals } from '../utils/moodHelper';
+import { MoodType } from '../types/mental/diary';
 
 const ITEMS_PER_ROW = 5;
 const GAP = 8;
+
+interface MoodOptionProps {
+  handleMoodSelect: React.Dispatch<React.SetStateAction<MoodType>>;
+  selectedMoodId: string | null;
+}
 
 interface MoodOption {
   id: string;
   label: string;
   imageSource: () => React.ReactNode;
   isSelected: boolean;
-}
-
-interface MoodOptionProps {
-  handleMoodSelect: (moodId: string) => void;
 }
 
 const MoodOptionSection: React.FC<MoodOptionProps> = ({ handleMoodSelect }) => {

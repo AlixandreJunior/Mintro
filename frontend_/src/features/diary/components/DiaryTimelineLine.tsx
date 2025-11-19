@@ -3,41 +3,59 @@ import { StyleSheet, View } from 'react-native';
 
 interface DiaryTimelineLineProps {
   children: ReactNode;
+  lineColor?: string;
+  lineWidth?: number;
+  lineStyle?: 'solid' | 'dashed' | 'dotted';
+  offset?: number;
 }
 
-const DiaryTimelineLine: React.FC<DiaryTimelineLineProps> = ({ children }) => {
-  return (
-    <View style={styles.timelineContainer}>
-      <View style={styles.timelineLineContainer}>
-        <View style={styles.continuousTimelineLine} />
-      </View>
+export const DiaryTimelineLine: React.FC<DiaryTimelineLineProps> = ({
+  children,
+  lineColor = '#525252',
+  lineWidth = 2,
+  lineStyle = 'dashed',
+  offset = 24,
+}) => {
+  const styles = createStyles({ lineColor, lineWidth, lineStyle, offset });
 
-      {children}
+  return (
+    <View style={styles.container}>
+      <View style={styles.verticalLine} />
+      <View style={styles.content}>{children}</View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  timelineContainer: {
-    position: 'relative',
-    paddingLeft: 25,
-  },
-  timelineLineContainer: {
-    position: 'absolute',
-    left: 20,
-    top: 0,
-    bottom: 0,
-    width: 2,
-    alignItems: 'center',
-    marginLeft: -20,
-  },
-  continuousTimelineLine: {
-    width: 2,
-    height: '100%',
-    borderLeftWidth: 1.5,
-    borderLeftColor: '#525252',
-    borderStyle: 'dashed',
-  },
-});
+interface StyleParams {
+  lineColor: string;
+  lineWidth: number;
+  lineStyle: 'solid' | 'dashed' | 'dotted';
+  offset: number;
+}
+
+const createStyles = ({
+  lineColor,
+  lineWidth,
+  lineStyle,
+  offset,
+}: StyleParams) =>
+  StyleSheet.create({
+    container: {
+      position: 'relative',
+      paddingLeft: offset,
+    },
+    verticalLine: {
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      left: offset / 2,
+      borderLeftColor: lineColor,
+      borderLeftWidth: lineWidth,
+      borderStyle: lineStyle,
+    },
+    content: {
+      flexDirection: 'column',
+    },
+  });
 
 export default DiaryTimelineLine;

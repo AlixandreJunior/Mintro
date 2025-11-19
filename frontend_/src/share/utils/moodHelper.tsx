@@ -1,6 +1,6 @@
-import { MoodType } from '@/src/types/mental/diary';
 import React from 'react';
 import { Image } from 'react-native';
+import { MoodType } from '../types/mental/diary';
 
 interface MoodVisuals {
   iconSource: React.ReactNode;

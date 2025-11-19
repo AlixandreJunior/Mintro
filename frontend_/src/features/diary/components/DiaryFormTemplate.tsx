@@ -1,13 +1,13 @@
-import React from 'react';
-import { View, ScrollView, StyleSheet, Dimensions } from 'react-native';
-import { MainInput } from './ui/inputs/MainInput';
-import { DateTimeInput } from './ui/inputs/DateTimeInput';
+import React, { Dispatch, SetStateAction, useMemo } from 'react';
+import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+
 import MoodOptionSection from '@/share/components/MoodOptionSection';
 import { ActivitiesSection } from '@/share/components/ActivitySection';
-import NotesInput from './ui/inputs/NotesInput';
-import PhotoPicker from './ui/inputs/PhotoPicker';
-
-const { width } = Dimensions.get('window');
+import NotesInput from '@/share/components/ui/inputs/NotesInput';
+import PhotoPicker from '@/share/components/ui/inputs/PhotoPicker';
+import { MainInput } from '@/share/components/ui/inputs/MainInput';
+import { DiaryDateTimeRow } from './DiaryDateTimeRow';
+import { MoodType } from '@/share/types/mental/diary';
 
 interface DiaryFormProps {
   title: string;
@@ -23,121 +23,93 @@ interface DiaryFormProps {
   showTimePicker: boolean;
   setShowTimePicker: (show: boolean) => void;
 
-  selectedMoodId: string | null;
-  onSelectMood: (id: string) => void;
+  mood: MoodType;
+  onSelectMood: React.Dispatch<React.SetStateAction<MoodType>>;
 
-  selectedActivitiesIds: string[];
-  onSelectActivities: (ids: string[]) => void;
+  activities: string[];
+  onSelectActivities: Dispatch<SetStateAction<string[]>>;
 
-  notes: string;
-  onChangeNotes: (text: string) => void;
+  content: string;
+  onChangeContent: (text: string) => void;
 
-  selectedImageUri: string | null;
-  onImageSelected: (uri: string) => void;
+  photo?: string | null;
+  onImageSelected: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const DiaryForm: React.FC<DiaryFormProps> = ({
   title,
   onChangeTitle,
+
   selectedDate,
   onChangeDate,
   showDatePicker,
   setShowDatePicker,
+
   selectedTime,
   onChangeTime,
   showTimePicker,
   setShowTimePicker,
-  selectedMoodId,
+
+  mood,
   onSelectMood,
-  selectedActivitiesIds,
+
+  activities,
   onSelectActivities,
-  notes,
-  onChangeNotes,
-  selectedImageUri,
+
+  content,
+  onChangeContent,
+
+  photo,
   onImageSelected,
 }) => {
+  const screen = useWindowDimensions();
+
+  const styles = useMemo(() => createStyles(screen.width), []);
+
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
       <MainInput
         labelText="Título"
-        keyboardType="default"
         value={title}
-        //@ts-ignore
         onChangeText={onChangeTitle}
         placeholder="Título"
       />
 
-      <View style={styles.dateTimeContainer}>
-        <View style={styles.dateInputWrapper}>
-          <DateTimeInput
-            labelText="Data"
-            datetime={selectedDate}
-            onChange={(_: any, date?: Date) => {
-              setShowDatePicker(false);
-              if (date) onChangeDate(date);
-            }}
-            showPicker={showDatePicker}
-            onPress={() => setShowDatePicker(true)}
-            mode="date"
-          />
-        </View>
-        <View style={styles.timeInputWrapper}>
-          <DateTimeInput
-            labelText="Hora"
-            datetime={selectedTime}
-            onChange={(_: any, time?: Date) => {
-              setShowTimePicker(false);
-              if (time) onChangeTime(time);
-            }}
-            showPicker={showTimePicker}
-            onPress={() => setShowTimePicker(true)}
-            mode="time"
-          />
-        </View>
-      </View>
+      <DiaryDateTimeRow
+        selectedDate={selectedDate}
+        onChangeDate={onChangeDate}
+        showDatePicker={showDatePicker}
+        setShowDatePicker={setShowDatePicker}
+        selectedTime={selectedTime}
+        onChangeTime={onChangeTime}
+        showTimePicker={showTimePicker}
+        setShowTimePicker={setShowTimePicker}
+      />
 
       <MoodOptionSection
-        //@ts-ignore
-        selectedMoodId={selectedMoodId}
+        selectedMoodId={mood}
         handleMoodSelect={onSelectMood}
       />
 
       <ActivitiesSection
         title="O que você tem feito?"
-        //@ts-ignore
-        selected={selectedActivitiesIds}
-        //@ts-ignore
+        selected={activities}
         setSelected={onSelectActivities}
         multiple
       />
 
-      <NotesInput notes={notes} onChangeNotes={onChangeNotes} />
+      <NotesInput notes={content} onChangeNotes={onChangeContent} />
 
-      <PhotoPicker
-        //@ts-ignore
-        selectedImageUri={selectedImageUri}
-        //@ts-ignore
-        onImageSelected={onImageSelected}
-      />
+      <PhotoPicker selectedImageUri={photo} onImageSelected={onImageSelected} />
     </ScrollView>
   );
 };
 
-const styles = StyleSheet.create({
-  scrollViewContent: {
-    marginHorizontal: width * 0.05,
-  },
-  dateTimeContainer: {
-    flexDirection: 'row',
-    width: '100%',
-  },
-  dateInputWrapper: {
-    flex: 1,
-    marginRight: 8, // Espaço entre os inputs
-  },
-  timeInputWrapper: {
-    flex: 1,
-  },
-});
+const createStyles = (width: number) =>
+  StyleSheet.create({
+    scrollViewContent: {
+      marginHorizontal: width * 0.05,
+    },
+  });
 
 export default DiaryForm;

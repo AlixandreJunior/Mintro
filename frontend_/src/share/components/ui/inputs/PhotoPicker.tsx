@@ -11,8 +11,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 
 interface PhotoPickerProps {
-  selectedImageUri: string | null;
-  onImageSelected: (uri: string | null) => void;
+  selectedImageUri?: string | null;
+  onImageSelected: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const PhotoPicker: React.FC<PhotoPickerProps> = ({
@@ -42,7 +42,7 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
       console.log('URI correta:', uri);
       onImageSelected(uri);
     } else {
-      onImageSelected(null);
+      onImageSelected(undefined);
     }
   };
 
