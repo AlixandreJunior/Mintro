@@ -18,7 +18,6 @@ export interface Objective {
 }
 
 export interface ObjectiveWrite {
-  activity: number;
+  activities: string;
   repeat: '1x' | '3x' | '5x';
-  reminder: string | null;
 }

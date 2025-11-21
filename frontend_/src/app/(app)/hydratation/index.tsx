@@ -1,4 +1,4 @@
-import HydrationScreen from '@/features/hydration/screens/HydrationScreen';
+import HydrationScreen from '@/features/health/hydration/screens/HydrationScreen';
 
 const Hydration = () => {
   return <HydrationScreen />;

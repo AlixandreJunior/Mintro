@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { registerAchievementHandler } from '@/share/api';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '@/share/context/AuthContext';
-import AchievementModal from '@/features/achievement/components/AchievementModal';
+import AchievementModal from '@/features/user/achievement/components/AchievementModal';
 
 export default function AppProviders({
   children,

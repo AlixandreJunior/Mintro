@@ -9,8 +9,8 @@ interface Activity {
 
 interface ActivitiesSectionProps {
   title: string;
-  selected: string[];
-  setSelected: Dispatch<SetStateAction<string[]>>;
+  selected: string[] | string | null;
+  setSelected: React.Dispatch<React.SetStateAction<string[] | string | null>>;
   multiple?: boolean;
 }
 

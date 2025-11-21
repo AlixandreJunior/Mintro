@@ -1,66 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
+
 import FormHeader from './layout/FormHeader';
 import RegisterFormContent from './RegisterFormContent';
 import { formatDatetimeToISO } from '@/share/utils/formatDatetimeToISO';
-import { ExerciseLogWrite } from '@/share/types/health/exercise';
-import { MindfulnessLogWrite } from '@/share/types/health/mindfulness';
 
 interface Item {
   id: number;
   name: string;
 }
 
-interface RegisterScreenHookProps<T extends Item> {
+interface RegisterScreenHookProps<T extends Item, TPayload> {
   title: string;
   items: T[];
-  saving: boolean;
-  handleSaveItem: (
-    data: ExerciseLogWrite | MindfulnessLogWrite
-  ) => Promise<any>;
+  handleSaveItem: (data: TPayload) => Promise<any>;
   labelSelect: string;
   onSuccessRedirect?: () => void;
 }
 
-export default function RegisterScreenTemplate<T extends Item>({
+export default function RegisterScreenTemplate<T extends Item, TPayload>({
   title,
   items,
-  saving,
   handleSaveItem,
   labelSelect,
   onSuccessRedirect,
-}: RegisterScreenHookProps<T>) {
-  const [itemId, setItemId] = useState<number | null>(items?.[0]?.id || null);
+}: RegisterScreenHookProps<T, TPayload>) {
+  const defaultItemId = useMemo(() => items?.[0]?.id ?? null, [items]);
+
+  const [itemId, setItemId] = useState<number | null>(defaultItemId);
   const [duration, setDuration] = useState(0);
   const [datetime, setDatetime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  const handleSave = async () => {
-    if (!itemId)
-      return Alert.alert('Erro', `Selecione um ${labelSelect.toLowerCase()}.`);
-    if (!duration || +duration <= 0)
-      return Alert.alert('Erro', 'A duração deve ser um número positivo.');
-
-    const data = {
-      [labelSelect.toLowerCase()]: itemId,
-      duration: +duration,
-      datetime: formatDatetimeToISO(datetime),
-    };
-
-    try {
-      //@ts-ignore
-      await handleSaveItem(data);
-      Alert.alert('Sucesso', `${labelSelect} registrado com sucesso!`);
-      if (onSuccessRedirect) onSuccessRedirect();
-    } catch (error: any) {
-      Alert.alert(
-        'Erro',
-        error.message ||
-          `Não foi possível registrar o ${labelSelect.toLowerCase()}.`
-      );
+  const validateForm = useCallback(() => {
+    if (!itemId) {
+      Alert.alert('Erro', `Selecione um ${labelSelect.toLowerCase()}.`);
+      return false;
     }
-  };
+
+    if (!duration || duration <= 0) {
+      Alert.alert('Erro', 'A duração deve ser um número positivo.');
+      return false;
+    }
+
+    return true;
+  }, [itemId, duration, labelSelect]);
+
+  const handleSave = useCallback(async () => {
+    if (!validateForm()) return;
+
+    const payload = {
+      [labelSelect.toLowerCase()]: itemId,
+      duration,
+      datetime: formatDatetimeToISO(datetime),
+    } as TPayload;
+
+    await handleSaveItem(payload);
+
+    Alert.alert('Sucesso', `${labelSelect} registrado com sucesso!`);
+    onSuccessRedirect?.();
+  }, [
+    itemId,
+    duration,
+    datetime,
+    handleSaveItem,
+    labelSelect,
+    validateForm,
+    onSuccessRedirect,
+  ]);
 
   return (
     <View style={styles.container}>
@@ -72,13 +80,12 @@ export default function RegisterScreenTemplate<T extends Item>({
         onSelectItem={setItemId}
         datetime={datetime}
         setDatetime={setDatetime}
+        duration={duration}
+        setDuration={setDuration}
         showDatePicker={showDatePicker}
         setShowDatePicker={setShowDatePicker}
         showTimePicker={showTimePicker}
         setShowTimePicker={setShowTimePicker}
-        duration={duration}
-        setDuration={setDuration}
-        saving={saving}
       />
     </View>
   );

@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import { HydratationCard } from '@/features/hydration/components/HydratationCard';
-import { StepsPanel } from '../../features/step/StepsPanel';
-import { ActivitiesCardSection } from './ActivitiesCardSection';
+import { HydratationCard } from '@/features/health/hydration/components/HydratationCard';
+import { ActivitiesCardSection } from '../../features/health/exercise/components/ActivitiesCardSection';
+import { StepsPanel } from '@/features/health/step/components/StepsPanel';
 
 interface Props {
   currentDate: Date;

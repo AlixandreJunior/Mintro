@@ -1,4 +1,4 @@
-import StepsScreen from '@/features/step/screens/StepsScreen';
+import StepsScreen from '@/features/health/step/screens/StepsScreen';
 
 const Steps = () => {
   return <StepsScreen />;

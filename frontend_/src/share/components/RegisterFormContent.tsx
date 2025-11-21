@@ -22,7 +22,6 @@ interface RegisterFormContentProps {
   setShowTimePicker: (show: boolean) => void;
   duration: number;
   setDuration: (value: number) => void;
-  saving: boolean;
 }
 
 export default function RegisterFormContent({
@@ -37,7 +36,6 @@ export default function RegisterFormContent({
   setShowTimePicker,
   duration,
   setDuration,
-  saving,
 }: RegisterFormContentProps) {
   const updateDate = (_event: any, date?: Date) => {
     setShowDatePicker(false);
@@ -94,13 +92,6 @@ export default function RegisterFormContent({
         keyboardType="numeric"
         value={duration.toString()}
       />
-
-      {saving && (
-        <View style={styles.savingOverlay}>
-          <ActivityIndicator size="large" color="#ffffff" />
-          <Text style={styles.savingText}>Registrando...</Text>
-        </View>
-      )}
     </View>
   );
 }

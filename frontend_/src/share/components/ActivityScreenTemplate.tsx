@@ -1,9 +1,10 @@
-import { StyleSheet, SafeAreaView } from 'react-native';
+import React, { useCallback } from 'react';
+import { StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 import HeaderWithOptions from './layout/HeaderWithOptions';
 import { FloatingActionButton } from './FloatingButtonAction';
-
 import ActivityMainContent from './ActivityTemplateMainContent';
 
 interface Props {
@@ -13,20 +14,27 @@ interface Props {
 }
 
 function ActivityScreenTemplate({ title, type, onAddPress }: Props) {
+  const handleBack = useCallback(() => {
+    router.back();
+  }, []);
+
+  const handleAddPress = useCallback(() => {
+    onAddPress();
+  }, [onAddPress]);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <HeaderWithOptions title={title} onBackPress={() => router.back()} />
+    <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
+      <HeaderWithOptions title={title} onBackPress={handleBack} />
 
       <ActivityMainContent type={type} />
 
-      <FloatingActionButton onPress={onAddPress} />
+      <FloatingActionButton onPress={handleAddPress} />
     </SafeAreaView>
   );
 }
 
+export default React.memo(ActivityScreenTemplate);
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  scrollView: { flex: 1 },
 });
-
-export default ActivityScreenTemplate;

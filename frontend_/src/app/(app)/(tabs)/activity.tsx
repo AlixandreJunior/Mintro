@@ -1,4 +1,4 @@
-import HealthScreen from '@/features/exercise/screens/HealthScreen';
+import HealthScreen from '@/features/health/exercise/screens/HealthScreen';
 
 const Health = () => {
   return <HealthScreen />;

@@ -9,22 +9,22 @@ import {
 
 const { width, height } = Dimensions.get('window');
 
-interface Period {
-  key: 'week' | 'month' | 'year';
+export interface Period<K> {
+  key: K;
   label: string;
 }
 
-interface PeriodSelectorProps {
-  periods: Period[];
-  selectedPeriod: 'week' | 'month' | 'year';
-  onPeriodChange: (period: 'week' | 'month' | 'year') => void;
+interface PeriodSelectorProps<K> {
+  periods: Period<K>[];
+  selectedPeriod: K;
+  onPeriodChange: (period: K) => void;
 }
 
-export default function PeriodSelector({
+export default function PeriodSelector<K extends string>({
   periods,
   selectedPeriod,
   onPeriodChange,
-}: PeriodSelectorProps) {
+}: PeriodSelectorProps<K>) {
   return (
     <View style={styles.container}>
       {periods.map(({ key, label }) => (
@@ -35,7 +35,6 @@ export default function PeriodSelector({
             styles.button,
             selectedPeriod === key && styles.selectedButton,
           ]}
-          activeOpacity={0.7}
         >
           <Text
             style={[styles.text, selectedPeriod === key && styles.selectedText]}

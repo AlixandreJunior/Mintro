@@ -13,8 +13,8 @@ import {
 import * as NavigationBar from 'expo-navigation-bar';
 import { Provider as PaperProvider } from 'react-native-paper';
 import AppProviders from '../share/providers/AppProviders';
-import AuthGuard from '../features/auth/components/AuthGuard';
-import { useStepCounter } from '@/features/step/hooks/useStepsCounter';
+import AuthGuard from '../features/user/auth/components/AuthGuard';
+import { useStepCounter } from '@/features/health/step/hooks/useStepsCounter';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
