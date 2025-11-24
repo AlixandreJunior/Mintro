@@ -2,11 +2,11 @@ import ActivityScreenTemplate from '@/share/components/ActivityScreenTemplate';
 import { router } from 'expo-router';
 
 const MindfulnessScreen = () => {
-  const title = 'Atividade';
-  const type = 'exercise';
+  const title = 'Mindfulness';
+  const type = 'mindfulness';
 
   const handlePress = () => {
-    router.push('./exercises/register');
+    router.push('./mindfulness/register');
   };
 
   return (

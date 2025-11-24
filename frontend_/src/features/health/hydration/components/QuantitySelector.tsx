@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card } from 'react-native-paper';
-import { QuantityCounter } from '../../../../share/components/specific/QuantityCounter';
 import BaseCard from '../../../../share/components/ui/card/BaseCard';
+import { QuantityCounter } from './QuantityCounter';
 
 interface QuantitySelectorProps {
   quantities: Record<number, number>;

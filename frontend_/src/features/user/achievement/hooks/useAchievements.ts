@@ -7,12 +7,14 @@ export const useAchievements = () => {
   const { handleRequest, loading, error } = useHandleRequest();
 
   const handleAchievementsList = useCallback(
-    (): Promise<Achievement[]> => handleRequest(AchievementService.list),
+    (): Promise<Achievement[]> =>
+      handleRequest(() => AchievementService.list()),
     [handleRequest]
   );
 
   const handleAchievementLogsList = useCallback(
-    (): Promise<AchievementLog[]> => handleRequest(AchievementService.listLog),
+    (): Promise<AchievementLog[]> =>
+      handleRequest(() => AchievementService.listLog()),
     [handleRequest]
   );
 

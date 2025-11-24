@@ -15,7 +15,7 @@ interface Props {
 
 function ActivityScreenTemplate({ title, type, onAddPress }: Props) {
   const handleBack = useCallback(() => {
-    router.back();
+    router.replace('/(app)/(tabs)/activity');
   }, []);
 
   const handleAddPress = useCallback(() => {

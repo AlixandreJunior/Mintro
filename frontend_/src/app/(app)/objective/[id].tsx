@@ -1,4 +1,4 @@
-import ObjectiveDetailScreen from '@/features/objective/screens/ObjectiveScreen';
+import ObjectiveDetailScreen from '@/features/diary/objective/screens/ObjectiveScreen';
 
 const ObjectiveDetail = () => {
   return <ObjectiveDetailScreen />;

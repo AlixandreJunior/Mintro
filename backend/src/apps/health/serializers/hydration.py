@@ -13,7 +13,8 @@ class HydrationLogSerializer(serializers.ModelSerializer):
     """
 
     user = serializers.PrimaryKeyRelatedField(read_only=True)
+    goal = serializers.IntegerField(source="user.hydration_goal", read_only=True)
 
     class Meta:  # type: ignore
         model = HydrationLog
-        fields = ("id", "user", "quantity", "date")
+        fields = ("id", "user", "quantity", "date", "goal")

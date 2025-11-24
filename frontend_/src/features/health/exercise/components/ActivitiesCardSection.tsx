@@ -9,44 +9,24 @@ import { MindfulnessLog } from '@/share/types/health/mindfulness';
 import { ExerciseLog } from '@/share/types/health/exercise';
 
 interface ActivitiesCardSectionProps {
+  mindfulnessLogs: MindfulnessLog[];
+  exerciseLogs: ExerciseLog[];
   currentDate: Date;
 }
 
 export function ActivitiesCardSection({
+  mindfulnessLogs,
+  exerciseLogs,
   currentDate,
 }: ActivitiesCardSectionProps) {
-  const { handleExerciseLogList } = useExercise();
-  const { handleMindfulnessLogList } = useMindfulness();
-
-  const [data, setData] = useState<{
-    exercise: ExerciseLog[];
-    mindfulness: MindfulnessLog[];
-  }>({
-    exercise: [],
-    mindfulness: [],
-  });
-
-  const loadData = useCallback(async () => {
-    const [exercise, mindfulness] = await Promise.all([
-      handleExerciseLogList(currentDate, 'week'),
-      handleMindfulnessLogList(currentDate, 'week'),
-    ]);
-
-    setData({ exercise, mindfulness });
-  }, [currentDate, handleExerciseLogList, handleMindfulnessLogList]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
   const exerciseDaysProgress = useMemo(
-    () => getWeeklyProgress(data.exercise, currentDate),
-    [data.exercise, currentDate]
+    () => getWeeklyProgress(exerciseLogs, currentDate),
+    [exerciseLogs, currentDate]
   );
 
   const mindfulnessDaysProgress = useMemo(
-    () => getWeeklyProgress(data.mindfulness, currentDate),
-    [data.mindfulness, currentDate]
+    () => getWeeklyProgress(mindfulnessLogs, currentDate),
+    [mindfulnessLogs, currentDate]
   );
 
   const completedExerciseDays = exerciseDaysProgress.filter(Boolean).length;

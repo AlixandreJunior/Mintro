@@ -1,4 +1,4 @@
-import UpdateDiaryScreen from '@/features/diary/screens/UpdateDiaryScreen';
+import UpdateDiaryScreen from '@/features/diary/diary/screens/UpdateDiaryScreen';
 
 const UpdateDiary = () => {
   return <UpdateDiaryScreen />;

@@ -33,22 +33,8 @@ export default function RegisterScreenTemplate<T extends Item, TPayload>({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  const validateForm = useCallback(() => {
-    if (!itemId) {
-      Alert.alert('Erro', `Selecione um ${labelSelect.toLowerCase()}.`);
-      return false;
-    }
-
-    if (!duration || duration <= 0) {
-      Alert.alert('Erro', 'A duração deve ser um número positivo.');
-      return false;
-    }
-
-    return true;
-  }, [itemId, duration, labelSelect]);
-
   const handleSave = useCallback(async () => {
-    if (!validateForm()) return;
+    console.log({ itemId, duration, datetime });
 
     const payload = {
       [labelSelect.toLowerCase()]: itemId,
@@ -66,7 +52,6 @@ export default function RegisterScreenTemplate<T extends Item, TPayload>({
     datetime,
     handleSaveItem,
     labelSelect,
-    validateForm,
     onSuccessRedirect,
   ]);
 

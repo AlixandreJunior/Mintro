@@ -1,41 +1,104 @@
 import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import BaseCard from '../../../../share/components/ui/card/BaseCard';
 import { Hydration } from '@/share/types/health/hydratation';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface Props {
   logs: Hydration[];
   dateLabel: string;
-  loading: boolean;
-  error: string | null;
+  mode: 'day' | 'week' | 'month' | 'year';
 }
 
 export const HydrationHistory: React.FC<Props> = ({
   logs,
   dateLabel,
-  error,
+  mode,
 }) => {
-  if (error) return <Text style={styles.errorText}>{error}</Text>;
-
   if (logs.length === 0)
     return (
-      <Text style={styles.noDataText}>Nenhum registro para essa data.</Text>
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyTitle}>Nenhuma hidratação registrada.</Text>
+        <Text style={styles.emptySubtitle}>
+          Adicione sua primeira hidratação.
+        </Text>
+      </View>
     );
+
+  // --- Agrupamento genérico ---
+  const groupBy = (
+    items: Hydration[],
+    keyFn: (log: Hydration) => string
+  ): Record<string, Hydration[]> =>
+    items.reduce((acc, log) => {
+      const key = keyFn(log);
+      acc[key] = acc[key] ? [...acc[key], log] : [log];
+      return acc;
+    }, {} as Record<string, Hydration[]>);
+
+  let grouped: Record<string, Hydration[]> = {};
+
+  if (mode === 'day') {
+    grouped = { [dateLabel]: logs };
+  }
+  if (mode === 'week') {
+    grouped = groupBy(logs, (log) =>
+      format(new Date(log.date), 'EEEE', { locale: ptBR }).replace(/^\w/, (c) =>
+        c.toUpperCase()
+      )
+    );
+  }
+  if (mode === 'month') {
+    grouped = groupBy(logs, (log) =>
+      format(new Date(log.date), 'd', { locale: ptBR })
+    );
+  }
+  if (mode === 'year') {
+    grouped = groupBy(logs, (log) =>
+      format(new Date(log.date), 'MMMM', { locale: ptBR }).replace(/^\w/, (c) =>
+        c.toUpperCase()
+      )
+    );
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Histórico</Text>
-      <Text style={styles.date}>Data: {dateLabel}</Text>
-      {logs.map((log, i) => (
-        <BaseCard key={i} style={styles.historyCard}>
-          <View style={styles.rowBetween}>
-            <Text style={styles.cardValue}>{log.quantity} ml</Text>
-            <Text style={styles.cardCupsText}>
-              {Math.round(log.quantity / 250)} copo(s)
-            </Text>
+      <Text style={styles.date}>Período: {dateLabel}</Text>
+
+      {Object.entries(grouped).map(([label, items]) => {
+        // total do grupo
+        const total = items.reduce((sum, log) => sum + log.quantity, 0);
+
+        return (
+          <View key={label} style={{ marginBottom: 24 }}>
+            {/* Cabeçalho do agrupamento */}
+            {mode !== 'day' && (
+              <Text style={styles.groupLabel}>
+                {label} — {total} ml ({Math.round(total / 250)} copo(s))
+              </Text>
+            )}
+
+            {/* Cards individuais */}
+            {items.map((log, i) => (
+              <BaseCard key={i} style={styles.historyCard}>
+                <View style={styles.rowBetween}>
+                  <Text style={styles.cardValue}>{log.quantity} ml</Text>
+
+                  <Text style={styles.cardHour}>
+                    {format(new Date(log.date), 'HH:mm')}
+                  </Text>
+                </View>
+
+                <Text style={styles.cardCupsText}>
+                  {Math.round(log.quantity / 250)} copo(s)
+                </Text>
+              </BaseCard>
+            ))}
           </View>
-        </BaseCard>
-      ))}
+        );
+      })}
     </View>
   );
 };
@@ -56,27 +119,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-  mt20: { marginTop: 20 },
-
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
-    fontFamily: 'Poppins_400Regular',
-  },
-  noDataText: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: 'gray',
-    fontSize: 16,
-    fontFamily: 'Poppins_400Regular',
+  groupLabel: {
+    fontSize: 14,
+    fontFamily: 'Poppins_500Medium',
+    color: '#111',
+    marginBottom: 8,
   },
 
   historyCard: {
     borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
+    padding: 16,
+    marginBottom: 12,
   },
 
   rowBetween: {
@@ -86,11 +139,31 @@ const styles = StyleSheet.create({
   },
 
   cardValue: {
-    fontSize: 22,
+    fontSize: 20,
     fontFamily: 'Poppins_500Medium',
-    color: '#000',
+  },
+  cardHour: {
+    fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
+    color: '#666',
   },
   cardCupsText: {
+    marginTop: 4,
+    fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
+    color: '#666',
+  },
+
+  emptyContainer: {
+    marginTop: 40,
+    alignItems: 'center',
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontFamily: 'Poppins_500Medium',
+    color: '#333',
+  },
+  emptySubtitle: {
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
     color: '#666',

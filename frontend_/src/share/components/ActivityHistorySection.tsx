@@ -1,101 +1,121 @@
 import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { format } from 'date-fns';
+import { View, Text, StyleSheet } from 'react-native';
+import { format, isToday, isYesterday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import type { ExerciseLog } from '@/src/types/health/exercise';
-import type { MindfulnessLog } from '@/src/types/health/mindfulness';
+import { ExerciseLog } from '../types/health/exercise';
+import { MindfulnessLog } from '../types/health/mindfulness';
 
 interface Props {
   type: 'exercise' | 'mindfulness';
-  loading: boolean;
-  error: string | null;
   logs: ExerciseLog[] | MindfulnessLog[];
 }
 
-export const ActivityHistorySection: React.FC<Props> = ({
-  type,
-  loading,
-  error,
-  logs,
-}) => {
-  const today = format(new Date(), "dd 'de' MMMM", { locale: ptBR });
-
+export const ActivityHistorySection: React.FC<Props> = ({ type, logs }) => {
   const isExercise = type === 'exercise';
+
+  // --- AUX ------------------------------------------------------------
+
+  const getName = (log: any) =>
+    isExercise
+      ? log.exercise?.name || log.description || 'Exercício'
+      : log.mindfulness?.name || log.description || 'Mindfulness';
+
+  const getExerciseDetails = (log: ExerciseLog) => {
+    const distance = log.distance ? `${log.distance}km` : '';
+    const duration = log.duration ? `${log.duration}min` : '';
+    return distance && duration
+      ? `${distance} - ${duration}`
+      : distance || duration || '';
+  };
+
+  const buildKey = (log: any) =>
+    log.id ?? `${log.datetime}-${log.duration}-${getName(log)}`;
+
+  const parseDate = (log: any) =>
+    log.datetime ? new Date(log.datetime) : new Date(log.date);
+
+  // --- AGRUPAMENTO ----------------------------------------------------
+
+  const grouped = logs.reduce((acc: any, log: any) => {
+    const date = parseDate(log);
+    const dayKey = format(date, 'yyyy-MM-dd');
+
+    if (!acc[dayKey]) acc[dayKey] = [];
+    acc[dayKey].push(log);
+
+    return acc;
+  }, {});
+
+  const sortedDays = Object.keys(grouped).sort(
+    (a, b) => new Date(b).getTime() - new Date(a).getTime()
+  );
+
+  // --- RENDER ---------------------------------------------------------
+
+  const renderCard = (log: any) => (
+    <View key={buildKey(log)} style={styles.historyCard}>
+      <View style={styles.historyCardContent}>
+        <View>
+          <Text style={styles.exerciseType}>{getName(log)}</Text>
+
+          {isExercise && (
+            <Text style={styles.exerciseDetails}>
+              {getExerciseDetails(log as ExerciseLog)}
+            </Text>
+          )}
+        </View>
+
+        {!isExercise && (
+          <Text style={styles.exerciseCount}>{log.duration || 0} min</Text>
+        )}
+      </View>
+    </View>
+  );
+
+  const renderDayTitle = (dateString: string) => {
+    const date = new Date(dateString);
+
+    if (isToday(date)) return 'Hoje';
+    if (isYesterday(date)) return 'Ontem';
+
+    return format(date, "dd 'de' MMMM", { locale: ptBR });
+  };
 
   return (
     <View style={styles.historySection}>
       <Text style={styles.historyTitle}>Histórico</Text>
-      <Text style={styles.historyDate}>Hoje, {today}</Text>
 
-      {loading ? (
-        <ActivityIndicator
-          size="large"
-          color="#4CAF50"
-          style={styles.loadingIndicator}
-        />
-      ) : error ? (
-        <Text style={styles.errorText}>
-          Falha ao carregar histórico: {error}
-        </Text>
-      ) : logs.length > 0 ? (
-        logs.map((log, index) => (
-          <View key={index} style={styles.historyCard}>
-            <View style={styles.historyCardContent}>
-              <View>
-                <Text style={styles.exerciseType}>
-                  {isExercise
-                    ? (log as ExerciseLog).exercise?.name ||
-                      (log as ExerciseLog).description ||
-                      'Exercício'
-                    : (log as MindfulnessLog).mindfulness?.name ||
-                      (log as MindfulnessLog).description ||
-                      'Mindfulness'}
-                </Text>
-                {isExercise && (
-                  <Text style={styles.exerciseDetails}>
-                    {(log as ExerciseLog).distance
-                      ? `${(log as ExerciseLog).distance}km`
-                      : ''}
-                    {(log as ExerciseLog).distance &&
-                    (log as ExerciseLog).duration
-                      ? ' - '
-                      : ''}
-                    {(log as ExerciseLog).duration
-                      ? `${(log as ExerciseLog).duration}min`
-                      : ''}
-                  </Text>
-                )}
-              </View>
-              {!isExercise && (
-                <Text style={styles.exerciseCount}>
-                  {(log as MindfulnessLog).duration || 0} min
-                </Text>
-              )}
-            </View>
-          </View>
-        ))
-      ) : (
-        <View style={styles.historyCard}>
-          <View style={styles.historyCardContent}>
-            <View>
-              <Text style={styles.exerciseType}>
-                {isExercise
-                  ? 'Nenhum exercício registrado'
-                  : 'Nenhum registro de mindfulness'}
-              </Text>
-              <Text style={styles.exerciseDetails}>
-                {isExercise
-                  ? 'Adicione seu primeiro exercício'
-                  : 'Adicione sua primeira sessão'}
-              </Text>
-            </View>
-            <Text style={styles.exerciseCount}>0 min</Text>
-          </View>
+      {logs.length === 0 && (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyTitle}>
+            {isExercise
+              ? 'Nenhum exercício registrado'
+              : 'Nenhuma sessão registrada'}
+          </Text>
+          <Text style={styles.emptySubtitle}>
+            {isExercise
+              ? 'Adicione seu primeiro exercício'
+              : 'Adicione sua primeira sessão'}
+          </Text>
         </View>
       )}
+
+      {sortedDays.map((dayKey) => {
+        const logList = grouped[dayKey];
+
+        return (
+          <View key={dayKey} style={{ marginBottom: 24 }}>
+            <Text style={styles.historyDate}>{renderDayTitle(dayKey)}</Text>
+
+            {logList.map(renderCard)}
+          </View>
+        );
+      })}
     </View>
   );
 };
+
+// --------------------------------------------------------------
 
 const styles = StyleSheet.create({
   historySection: {
@@ -109,10 +129,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   historyDate: {
-    fontSize: 12,
-    fontFamily: 'Poppins_400Regular',
-    color: '#666',
-    marginBottom: 16,
+    fontSize: 14,
+    fontFamily: 'Poppins_500Medium',
+    color: '#444',
+    marginBottom: 12,
+    marginTop: 12,
   },
   historyCard: {
     backgroundColor: 'white',
@@ -123,13 +144,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   historyCardContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderColor: '#E5E7EB',
   },
   exerciseType: {
     fontSize: 16,
@@ -147,14 +167,24 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_500Medium',
     color: '#666',
   },
-  loadingIndicator: {
-    marginTop: 50,
+
+  // --- Empty state centralizado ---
+  emptyContainer: {
+    marginTop: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 50,
+  emptyTitle: {
     fontSize: 16,
+    fontFamily: 'Poppins_500Medium',
+    color: '#333',
+    marginBottom: 6,
+  },
+  emptySubtitle: {
+    fontSize: 14,
     fontFamily: 'Poppins_400Regular',
+    color: '#666',
   },
 });
+
+export default ActivityHistorySection;

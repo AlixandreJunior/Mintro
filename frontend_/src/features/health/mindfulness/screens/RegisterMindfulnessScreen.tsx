@@ -16,12 +16,12 @@ const RegisterMindfulnessScreen = () => {
     };
 
     load();
-  });
+  }, []);
 
   return (
     <RegisterScreenTemplate
       title="Registrar Mindfulness"
-      labelSelect="Mindfulness"
+      labelSelect="Mindfulness_id"
       items={mindfulness}
       handleSaveItem={handleMindfulnessLogCreate}
       onSuccessRedirect={() => router.back()}

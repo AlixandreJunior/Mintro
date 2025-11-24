@@ -8,28 +8,15 @@ import {
 import { ProgressCircle } from '../../../../share/components/icons/ProgressCircle';
 import WaterDropIcon from '../../../../share/components/icons/WaterDropIcon';
 import { router } from 'expo-router';
-import { use, useEffect, useState } from 'react';
-import { useHydration } from '../hooks/useHydration';
 import { Hydration } from '@/share/types/health/hydratation';
 
 interface HydratationCardProps {
-  date: Date;
+  logs: Hydration[];
 }
 
 const { width, height } = Dimensions.get('window');
 
-export const HydratationCard: React.FC<HydratationCardProps> = ({ date }) => {
-  const [logs, setLogs] = useState<Hydration[]>([]);
-  const { handleHydrationList } = useHydration();
-
-  useEffect(() => {
-    const load = async () => {
-      const data = await handleHydrationList(date);
-      setLogs(data);
-    };
-    load();
-  }, [date]);
-
+export const HydratationCard: React.FC<HydratationCardProps> = ({ logs }) => {
   const totalHydrationToday = logs.reduce(
     (sum, { quantity = 0 }) => sum + quantity,
     0

@@ -41,15 +41,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       ? await AsyncStorage.getItem('refreshToken')
       : await SecureStore.getItemAsync('refreshToken');
 
-    if (access !== accessToken) setAccessToken(access);
-    if (refresh !== refreshToken) setRefreshToken(refresh);
-    if (!!access !== isAuthenticated) setIsAuthenticated(!!access);
-
     return { access, refresh };
   };
 
   const loadTokens = async () => {
     const tokens = await fetchTokens();
+
     setAccessToken(tokens.access);
     setRefreshToken(tokens.refresh);
     setIsAuthenticated(!!tokens.access);
@@ -67,31 +64,48 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (access: string, refresh: string) => {
     await storeTokens(access, refresh);
+
     setAccessToken(access);
     setRefreshToken(refresh);
     setIsAuthenticated(true);
+
+    // Redireciona ao logar
     router.replace('/(app)/(tabs)/mental');
   };
 
   const logout = async () => {
     await clearTokens();
+
     setAccessToken(null);
     setRefreshToken(null);
     setIsAuthenticated(false);
+
+    // Redireciona ao sair
     router.replace('/(auth)/login');
   };
 
   useEffect(() => {
     const initializeAuth = async () => {
       await loadTokens();
-      setAuthHandlers({ onLogout: logout, getTokens: fetchTokens });
+      setAuthHandlers({
+        onLogout: logout,
+        getTokens: fetchTokens,
+        saveTokens: storeTokens,
+      });
     };
+
     initializeAuth();
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, login, logout, accessToken, refreshToken }}
+      value={{
+        isAuthenticated,
+        login,
+        logout,
+        accessToken,
+        refreshToken,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,16 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosError, AxiosInstance } from 'axios';
 
-/**
- * URL base da API.
- * Altere conforme o ambiente (desenvolvimento, staging, produção).
- */
-const apiUrl = 'http://192.168.1.5:8000/';
+const apiUrl = 'http://127.0.0.1:8000/';
 
-/**
- * Instância principal do Axios usada para todas as chamadas à API.
- * - Define o tempo limite padrão (10 segundos)
- * - Usa interceptores para autenticação e conquistas
- */
 const api: AxiosInstance = axios.create({
   baseURL: apiUrl,
   timeout: 10000,
@@ -30,16 +21,6 @@ let getTokens:
 let saveTokens: ((access: string, refresh: string) => Promise<void>) | null =
   null;
 
-/**
- * Define as funções usadas para gerenciar autenticação.
- *
- * Exemplo de uso:
- * setAuthHandlers({
- *   onLogout: () => logoutUser(),
- *   getTokens: async () => ({ access: localStorage.getItem("access"), refresh: localStorage.getItem("refresh") }),
- *   saveTokens: async (a, r) => { localStorage.setItem("access", a); localStorage.setItem("refresh", r); },
- * })
- */
 export const setAuthHandlers = (handlers: {
   onLogout: () => void;
   getTokens?: () => Promise<{ access: string | null; refresh: string | null }>;
@@ -51,20 +32,12 @@ export const setAuthHandlers = (handlers: {
 };
 
 /* ============================================================
- * 🔹 HANDLER DE CONQUISTAS (ACHIEVEMENTS)
+ * 🔹 HANDLER DE CONQUISTAS
  * ============================================================
  */
 
 let showAchievements: ((achievements: string[]) => void) | null = null;
 
-/**
- * Registra uma função global que será chamada quando conquistas forem desbloqueadas.
- *
- * Exemplo:
- * registerAchievementHandler((achievements) => {
- *   abrirModalDeConquistas(achievements)
- * })
- */
 export const registerAchievementHandler = (
   fn: (achievements: string[]) => void
 ) => {
@@ -72,18 +45,26 @@ export const registerAchievementHandler = (
 };
 
 /* ============================================================
- * 🔹 INTERCEPTOR DE RESPOSTA
+ * 🔹 INTERCEPTOR DE REQUEST → INJETAR TOKEN AUTOMATICAMENTE
  * ============================================================
  */
 
-/**
- * Intercepta todas as respostas da API.
- *
- * - Exibe conquistas se o backend retornar `unlocked_achievements`
- * - Faz refresh automático do token caso receba um erro 401 (Unauthorized)
+api.interceptors.request.use(async (config) => {
+  if (getTokens && config.headers) {
+    const { access } = await getTokens();
+    if (access) {
+      config.headers.Authorization = `Bearer ${access}`;
+    }
+  }
+  return config;
+});
+
+/* ============================================================
+ * 🔹 INTERCEPTOR DE RESPONSE → REFRESH TOKEN
+ * ============================================================
  */
+
 api.interceptors.response.use(
-  // Trata respostas bem-sucedidas
   (response) => {
     const achievements = response?.data?.unlocked_achievements;
     if (
@@ -96,13 +77,12 @@ api.interceptors.response.use(
     return response;
   },
 
-  // Trata erros e tenta atualizar o token se for 401
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
 
-    // Se for 401 (token inválido) e ainda não tentou atualizar
+    // Token expirado
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -112,28 +92,31 @@ api.interceptors.response.use(
       }
 
       try {
-        // Busca o refresh token atual
+        // Recupera tokens
         const { refresh } = await getTokens();
+
         if (!refresh) {
           onLogout();
           return Promise.reject(error);
         }
 
-        // Solicita novos tokens
-        const res = await axios.post(`${apiUrl}refresh/`, { refresh });
+        // Solicita um novo token
+        const res = await axios.post(`${apiUrl}user/auth/refresh/`, {
+          refresh,
+        });
         const { access: newAccess, refresh: newRefresh } = res.data;
 
-        // Salva os novos tokens
+        // Salva novos tokens
         if (saveTokens) await saveTokens(newAccess, newRefresh);
 
-        // Atualiza o header e refaz a requisição original
+        // Reenvia com novo token
         if (originalRequest.headers)
           originalRequest.headers.Authorization = `Bearer ${newAccess}`;
 
         return api(originalRequest);
-      } catch (e) {
+      } catch (refreshError) {
         onLogout?.();
-        return Promise.reject(e);
+        return Promise.reject(refreshError);
       }
     }
 

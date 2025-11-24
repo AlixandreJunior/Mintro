@@ -55,22 +55,6 @@ const StepsMainContent: React.FC<StepsMainContentProps> = ({
   );
 
   const content = useMemo(() => {
-    if (loading) {
-      return (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" />
-        </View>
-      );
-    }
-
-    if (error) {
-      return (
-        <View style={styles.loadingContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-        </View>
-      );
-    }
-
     return (
       <>
         <StepsSummary
@@ -90,7 +74,6 @@ const StepsMainContent: React.FC<StepsMainContentProps> = ({
     chartData,
     selectedPeriod,
   ]);
-
 
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>

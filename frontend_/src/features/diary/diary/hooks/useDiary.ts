@@ -7,8 +7,11 @@ import { objectToFormData } from '@/share/utils/formData';
 export const useDiary = () => {
   const { handleRequest, error, loading } = useHandleRequest();
 
-  const handleDiaryList = async (): Promise<Diary[]> => {
-    return await handleRequest(() => DiaryService.list());
+  const handleDiaryList = async (
+    month: number,
+    year?: number
+  ): Promise<Diary[]> => {
+    return await handleRequest(() => DiaryService.list(month, year));
   };
 
   const handleDiaryRetrieve = async (id: number): Promise<Diary> => {

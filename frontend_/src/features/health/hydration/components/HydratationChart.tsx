@@ -1,29 +1,17 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { View } from 'react-native';
 import Chart from '../../step/components/StepsChart';
-import { useHydration } from '../hooks/useHydration';
 import { Hydration } from '@/share/types/health/hydratation';
 
 interface HydrationChartProps {
-  selectedDate: Date;
+  logs: Hydration[];
   selectedPeriod: 'day' | 'week' | 'month' | 'year';
 }
 
 const HydrationChart: React.FC<HydrationChartProps> = ({
-  selectedDate,
+  logs,
   selectedPeriod,
 }) => {
-  const [logs, setLogs] = useState<Hydration[]>([]);
-  const { handleHydrationList, error } = useHydration();
-
-  useEffect(() => {
-    const load = async () => {
-      const data = await handleHydrationList(selectedDate);
-      setLogs(data);
-    };
-    load();
-  }, [selectedDate]);
-
   const periodConfig = {
     day: {
       length: 24,
@@ -34,7 +22,7 @@ const HydrationChart: React.FC<HydrationChartProps> = ({
       getIndex: (d: Date) => d.getDay(),
     },
     month: {
-      length: 30,
+      length: 31,
       getIndex: (d: Date) => d.getDate() - 1,
     },
     year: {
@@ -53,24 +41,25 @@ const HydrationChart: React.FC<HydrationChartProps> = ({
       const date = new Date(log.date);
       const index = config.getIndex(date);
 
-      if (index >= 0 && index < config.length) {
+      if (index >= 0 && index < buckets.length) {
         buckets[index] += log.quantity ?? 0;
       }
     });
 
     return buckets.map((y, i) => ({
-      x: selectedPeriod === 'day' ? i : i + 1,
+      x: i + 1,
       y,
     }));
   }, [logs, selectedPeriod]);
 
-  if (error) return null;
-
   return (
     <View>
-      {selectedPeriod !== 'day' && (
-        <Chart data={chartData} mode={selectedPeriod} barColor="#4DC4FF" />
-      )}
+      <Chart
+        key={logs.length + selectedPeriod}
+        data={chartData}
+        mode={selectedPeriod}
+        barColor="#4DC4FF"
+      />
     </View>
   );
 };

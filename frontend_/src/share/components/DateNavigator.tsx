@@ -41,8 +41,44 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
   mode,
   onDateChange,
 }) => {
+  const today = new Date();
+  const todayStart = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+
+  // --- Desabilita botão "próximo" se a próxima data ultrapassa HOJE ---
+  const isNextDisabled = (() => {
+    switch (mode) {
+      case 'day': {
+        const next = addDays(currentDate, 1);
+        return next.getTime() > todayStart.getTime();
+      }
+
+      case 'week': {
+        const next = addWeeks(currentDate, 1);
+        const nextStart = startOfWeek(next, { weekStartsOn: 0 });
+        return nextStart.getTime() > todayStart.getTime();
+      }
+
+      case 'month': {
+        const next = addMonths(currentDate, 1);
+        const monthStart = new Date(next.getFullYear(), next.getMonth(), 1);
+        return monthStart.getTime() > todayStart.getTime();
+      }
+
+      case 'year': {
+        const next = addYears(currentDate, 1);
+        const yearStart = new Date(next.getFullYear(), 0, 1);
+        return yearStart.getTime() > todayStart.getTime();
+      }
+    }
+  })();
+
   const handlePrev = () => {
     let newDate: Date;
+
     switch (mode) {
       case 'day':
         newDate = subDays(currentDate, 1);
@@ -59,27 +95,33 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
       default:
         newDate = currentDate;
     }
+
     onDateChange(newDate);
   };
 
   const handleNext = () => {
-    let newDate: Date;
+    if (isNextDisabled) return;
+
+    let newDate: Date = currentDate;
+
     switch (mode) {
       case 'day':
         newDate = addDays(currentDate, 1);
         break;
+
       case 'week':
         newDate = addWeeks(currentDate, 1);
         break;
+
       case 'month':
         newDate = addMonths(currentDate, 1);
         break;
+
       case 'year':
         newDate = addYears(currentDate, 1);
         break;
-      default:
-        newDate = currentDate;
     }
+
     onDateChange(newDate);
   };
 
@@ -129,16 +171,22 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
         return format(currentDate, "EEEE, d 'de' MMMM", {
           locale: ptBR,
         }).replace(/^\w/, (c) => c.toUpperCase());
+
       case 'week': {
         const start = startOfWeek(currentDate, {
           locale: ptBR,
           weekStartsOn: 0,
         });
-        const end = endOfWeek(currentDate, { locale: ptBR, weekStartsOn: 0 });
+        const end = endOfWeek(currentDate, {
+          locale: ptBR,
+          weekStartsOn: 0,
+        });
         return `${format(start, 'd/MM')} - ${format(end, 'd/MM')}`;
       }
+
       case 'month':
         return format(currentDate, "MMMM 'de' yyyy", { locale: ptBR });
+
       case 'year':
         return format(currentDate, 'yyyy', { locale: ptBR });
     }
@@ -154,11 +202,11 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
         <Text style={styles.dateText}>{getFormattedLabel()}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleNext}>
+      <TouchableOpacity onPress={handleNext} disabled={isNextDisabled}>
         <MaterialCommunityIcons
           name="chevron-right"
           size={24}
-          color="#374151"
+          color={isNextDisabled ? 'rgba(55, 65, 81, 0.3)' : '#374151'}
         />
       </TouchableOpacity>
     </View>

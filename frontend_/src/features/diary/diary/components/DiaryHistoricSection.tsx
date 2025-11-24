@@ -21,9 +21,13 @@ const DiaryHistoricSection: React.FC<DiaryHistoricSectionProps> = ({
 
   useEffect(() => {
     const load = async () => {
-      const list = await handleDiaryList();
+      const month = initialDate.getMonth() + 1; // Janeiro = 0
+      const year = initialDate.getFullYear();
+
+      const list = await handleDiaryList(month, year);
       setDiaries(list ?? []);
     };
+
     load();
   }, [initialDate]);
 

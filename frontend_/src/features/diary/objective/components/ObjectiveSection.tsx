@@ -16,7 +16,7 @@ const ObjectiveSection = () => {
       setObjectives(list ?? []);
     };
     load();
-  });
+  }, []);
 
   return (
     <>

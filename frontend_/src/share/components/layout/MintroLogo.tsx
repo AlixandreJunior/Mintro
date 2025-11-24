@@ -8,7 +8,7 @@ export default function MintroLogo(): React.JSX.Element {
     <View style={styles.header}>
       <View style={styles.logoContainer}>
         <Image
-          source={require('@/assets/images/logosrobomintro.png')}
+          source={require('@/share/assets/images/logosrobomintro.png')}
           style={styles.logoImage}
           resizeMode="contain"
         />
@@ -21,17 +21,17 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: width * 0.05, 
+    paddingHorizontal: width * 0.05,
     paddingTop: height * 0.08,
     paddingBottom: height * 0.02,
-    minHeight: height * 0.25, 
+    minHeight: height * 0.25,
   },
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoImage: {
-    width: Math.min(width * 0.5, 200), 
-    height: Math.min(width * 0.5, 200), 
+    width: Math.min(width * 0.5, 200),
+    height: Math.min(width * 0.5, 200),
   },
 });

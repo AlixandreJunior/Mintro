@@ -1,5 +1,5 @@
+import { Service } from '@/share/service';
 import { Diary } from '@/share/types/mental/diary';
-import { Service } from '../../share/service';
 import { ResponseSuccess } from '@/share/types/response';
 
 export class DiaryService extends Service {

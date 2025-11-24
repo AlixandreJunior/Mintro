@@ -18,7 +18,7 @@ const ProfileScreen = () => {
       setUser(data);
     };
     load();
-  });
+  }, []);
 
   const { handleUserRetrieve, error, loading } = useUser();
   const { handleLogout } = useAuthForm();

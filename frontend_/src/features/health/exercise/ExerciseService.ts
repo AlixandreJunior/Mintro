@@ -16,10 +16,10 @@ export class ExerciseService extends Service {
   }
 
   static async listLog(
-    date: Date = new Date(),
+    date: string,
     period: Period = 'week'
   ): Promise<ExerciseLog[]> {
-    const { startDate, endDate } = getPeriodRange(date, period);
+    const { startDate, endDate } = getPeriodRange(new Date(date), period);
     return await this.apiGet(
       `health/exercise/log/list/?start_date=${startDate}&end_date=${endDate}`,
       'Erro ao buscar logs de exercícios.'

@@ -11,7 +11,7 @@ export function useExercise() {
   };
 
   const handleExerciseLogList = async (
-    date: Date,
+    date: string,
     period: 'week' | 'month'
   ) => {
     return await handleRequest(() => ExerciseService.listLog(date, period));
@@ -20,7 +20,7 @@ export function useExercise() {
   const handleExerciseLogCreate = async (
     data: ExerciseLogWrite
   ): Promise<ResponseSuccess> => {
-    if (!data.exercise || data.duration <= 0 || !data.datetime) {
+    if (!data.exercise_id || data.duration <= 0 || !data.datetime) {
       throw new Error('Preencha todos os campos corretamente.');
     }
 

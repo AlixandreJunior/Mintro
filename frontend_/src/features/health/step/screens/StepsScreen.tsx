@@ -25,11 +25,19 @@ const StepsScreen = () => {
 
   useEffect(() => {
     const loadSteps = async () => {
-      const data = await handleStepsList(
-        formatDateToISO(selectedDate),
-        selectedPeriod
-      );
-      setLogs(data);
+      try {
+        const data = await handleStepsList(
+          formatDateToISO(selectedDate),
+          selectedPeriod
+        );
+        setLogs(data);
+      } catch (error: any) {
+        if (error?.response?.status === 404) {
+          setLogs([]);
+        } else {
+          console.error('Erro ao carregar logs de passos:', error);
+        }
+      }
     };
 
     loadSteps();

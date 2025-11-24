@@ -6,12 +6,12 @@ export class StepsService extends Service {
     period: 'day' | 'week' | 'month' | 'year'
   ): Promise<any> {
     return this.apiGet(
-      'health/steps/list/?date=' + date + '&period=' + period,
+      'health/step/list/?date=' + date + '&period=' + period,
       'Erro ao tentar registros de passos'
     );
   }
 
   static async create(data: any): Promise<any> {
-    return this.apiPost('health/steps/register/', data);
+    return this.apiPost('health/step/register/', data);
   }
 }

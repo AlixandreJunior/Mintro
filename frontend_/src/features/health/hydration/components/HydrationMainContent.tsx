@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet } from 'react-native';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import HydrationChart from '@/features/health/hydration/components/HydratationChart';
 import HydrationDateNavigator from '@/features/health/hydration/components/HydrationDateNavigator';
@@ -31,13 +31,23 @@ const HydrationMainContent: React.FC<HydrationMainContentProps> = ({
 
   useEffect(() => {
     const load = async () => {
-      const data = await handleHydrationList(selectedDate);
-      setLogs(data);
-    };
-    load();
-  }, [selectedDate]);
+      try {
+        console.log(selectedDate);
+        const data = await handleHydrationList(selectedDate, selectedPeriod);
 
-  const total = logs.reduce((sum, { quantity = 0 }) => sum + quantity, 0);
+        setLogs(data || []);
+      } catch (err) {
+        console.error('Erro ao carregar hidratação:', err);
+        setLogs([]);
+      }
+    };
+
+    load();
+  }, [selectedDate, selectedPeriod]);
+
+  const total = useMemo(() => {
+    return logs.reduce((sum, { quantity = 0 }) => sum + quantity, 0);
+  }, [logs]);
 
   return (
     <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -52,18 +62,14 @@ const HydrationMainContent: React.FC<HydrationMainContentProps> = ({
         setSelectedDate={setSelectedDate}
       />
 
-      <HydrationSummary total={total} progress={(total / 1000) * 100} />
+      <HydrationSummary logs={logs} mode={selectedPeriod} goal={2000} />
 
-      <HydrationChart
-        selectedDate={selectedDate}
-        selectedPeriod={selectedPeriod}
-      />
+      <HydrationChart logs={logs} selectedPeriod={selectedPeriod} />
 
       <HydrationHistory
         logs={logs}
         dateLabel={formatDateToISO(selectedDate)}
-        loading={loading}
-        error={error}
+        mode={selectedPeriod}
       />
     </ScrollView>
   );

@@ -10,7 +10,7 @@ export interface Diary {
   user: number;
   title: string;
   content: string;
-  created_at: Date;
+  created_at: string;
   mood: MoodType;
   activities: Activity[];
   photo?: string;

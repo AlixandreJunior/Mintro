@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import { router } from 'expo-router';
-import { startOfWeek, isSameDay } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { StyleSheet, ScrollView } from 'react-native';
 
-import HeaderWithOptions from './layout/HeaderWithOptions';
 import DateNavigator from '@/share/components/DateNavigator';
 import { SummarySection } from '@/share/components/SummarySection';
 import { ActivityHistorySection } from '@/share/components/ActivityHistorySection';
 import { WeekDaysContainer } from '@/share/components/WeekDaysContainer';
 import PeriodSelector from './PeriodSelector';
-import { FloatingActionButton } from './FloatingButtonAction';
 import ActivityCalendar from './ActivityCalendar';
 
-import { useExerciseLogs } from '@/share/hooks/useExerciseLogs';
-import { useMindfulnessLogs } from '@/share/hooks/useMindfulnessLog';
-import { MindfulnessLog } from '@/share/types/health/mindfulness';
-import { ExerciseLog } from '@/share/types/health/exercise';
+import { useExercise } from '@/features/health/exercise/hooks/useExercise';
+import { useMindfulness } from '@/features/health/mindfulness/hooks/useMindfulness';
+
+import { useActivityLogs } from '../hooks/useActivityLogs';
+import { buildWeekDaysDisplay } from '../utils/buildWeekDaysDisplay';
 
 interface WeekDayDisplay {
   id: string;
@@ -29,81 +25,69 @@ interface ActivityMainContentProps {
   type: 'exercise' | 'mindfulness';
 }
 
-function ActivityMainContent({ type }: ActivityMainContentProps) {
-  const [currentDisplayDate, setCurrentDisplayDate] = useState(new Date());
+const periods = [
+  { key: 'week' as const, label: 'Semana' },
+  { key: 'month' as const, label: 'Mês' },
+];
+
+export default function ActivityMainContent({
+  type,
+}: ActivityMainContentProps) {
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month'>(
     'week'
   );
   const [weekDaysDisplay, setWeekDaysDisplay] = useState<WeekDayDisplay[]>([]);
-  const error = null;
-  const { logs, loading } =
-    type === 'exercise'
-      ? useExerciseLogs(currentDisplayDate, selectedPeriod)
-      : useMindfulnessLogs(currentDisplayDate, selectedPeriod);
+
+  const hook = type === 'exercise' ? useExercise() : useMindfulness();
+  const { logs, loadLogs } = useActivityLogs(type, hook);
 
   useEffect(() => {
-    if (selectedPeriod === 'week' && logs.length) {
-      const startOfCurrentWeek = startOfWeek(currentDisplayDate, {
-        weekStartsOn: 0,
-        locale: ptBR,
-      });
+    loadLogs(currentDate, selectedPeriod);
+  }, [currentDate, selectedPeriod]);
 
-      const currentWeekDays: Date[] = [...Array(7)].map((_, i) => {
-        const day = new Date(startOfCurrentWeek);
-        day.setDate(startOfCurrentWeek.getDate() + i);
-        return day;
-      });
-
-      const daysOfWeek = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
-
-      const weekDaysData: WeekDayDisplay[] = currentWeekDays.map(
-        (day, index) => ({
-          id: daysOfWeek[index],
-          letter: daysOfWeek[index],
-          date: day,
-          exercised: logs.some((log) => isSameDay(new Date(log.datetime), day)),
-        })
-      );
-
-      setWeekDaysDisplay(weekDaysData);
+  useEffect(() => {
+    if (selectedPeriod === 'week') {
+      setWeekDaysDisplay(buildWeekDaysDisplay(currentDate, logs));
     } else {
       setWeekDaysDisplay([]);
     }
-  }, [logs, currentDisplayDate, selectedPeriod]);
+  }, [logs, currentDate, selectedPeriod]);
 
-  const completedDays = weekDaysDisplay.filter((d) => d.exercised).length;
-  const totalLogs = logs.length;
-
-  const handlePeriodChange = (period: typeof selectedPeriod) => {
-    setSelectedPeriod(period);
-  };
-
-  const markedDates = logs.map((log) => new Date(log.datetime));
-
-  const periods: { key: 'week' | 'month'; label: string }[] = [
-    { key: 'week', label: 'Semana' },
-    { key: 'month', label: 'Mês' },
-  ];
+  // ----------------------------------------------------------
+  // 🔥 Correção da contagem de dias completados no MÊS
+  // ----------------------------------------------------------
+  const completedDays =
+    selectedPeriod === 'week'
+      ? weekDaysDisplay.filter((d) => d.exercised).length
+      : new Set(
+          logs.map((l) => {
+            const d = new Date(l.datetime);
+            return d.toDateString(); // garante unicidade por dia
+          })
+        ).size;
+  // ----------------------------------------------------------
 
   return (
     <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
       <PeriodSelector
         periods={periods}
         selectedPeriod={selectedPeriod}
-        // @ts-ignore
-        onPeriodChange={handlePeriodChange}
+        onPeriodChange={setSelectedPeriod}
       />
 
       <DateNavigator
-        currentDate={currentDisplayDate}
+        currentDate={currentDate}
         mode={selectedPeriod}
-        onDateChange={setCurrentDisplayDate}
+        onDateChange={setCurrentDate}
       />
 
       <SummarySection
         activityType={type}
         completedDays={completedDays}
-        totalExercises={totalLogs}
+        totalExercises={logs.length}
+        period={selectedPeriod}
+        currentDate={currentDate}
       />
 
       {selectedPeriod === 'week' && (
@@ -112,24 +96,16 @@ function ActivityMainContent({ type }: ActivityMainContentProps) {
 
       {selectedPeriod === 'month' && (
         <ActivityCalendar
-          markedDates={markedDates}
-          currentDate={currentDisplayDate}
+          markedDates={logs.map((l) => new Date(l.datetime))}
+          currentDate={currentDate}
         />
       )}
 
-      <ActivityHistorySection
-        type={type}
-        loading={loading}
-        logs={logs}
-        error={error}
-      />
+      <ActivityHistorySection type={type} logs={logs} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  scrollView: { flex: 1 },
+  scrollView: { flex: 1, backgroundColor: '#fff' },
 });
-
-export default ActivityMainContent;

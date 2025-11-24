@@ -18,6 +18,13 @@ export const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary }) => {
   const openDropdown = () => setDropdownVisible(true);
   const closeDropdown = () => setDropdownVisible(false);
 
+  const timeObj = new Date(diary.created_at);
+
+  const time =
+    timeObj.getHours().toString().padStart(2, '0') +
+    ':' +
+    timeObj.getMinutes().toString().padStart(2, '0');
+
   return (
     <>
       <Pressable onPress={closeDropdown}>
@@ -26,10 +33,12 @@ export const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary }) => {
           <DiaryCard style={styles.card}>
             <DiaryEntryHeader
               mood={diary.mood}
-              time={diary.created_at.getHours()}
+              time={time}
               onOpenMenu={openDropdown}
             />
+
             <DiaryActivities activities={diary.activities} />
+
             <DiaryEntryContent
               title={diary.title}
               content={diary.content}

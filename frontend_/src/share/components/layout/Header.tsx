@@ -9,23 +9,34 @@ import {
 } from 'react-native';
 import NotificationIcon from '../icons/ChatIcon';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useUserProfile } from '@/share/hooks/useUserProfile';
+import { useUser } from '@/features/user/user/hooks/useUser';
+import { useEffect, useState } from 'react';
+import { User } from '@/share/types/user/user';
 
 const { width, height } = Dimensions.get('window');
 
 const Header = () => {
-  const { user } = useUserProfile();
+  const [user, setUser] = useState<User>();
+  const { handleUserRetrieve } = useUser();
+
+  useEffect(() => {
+    const load = async () => {
+      const userData = await handleUserRetrieve();
+      setUser(userData);
+    };
+    load();
+  }, []);
 
   const avatarChar = user?.username
     ? user.username.charAt(0).toUpperCase()
     : 'A';
 
-  const logoSource = require('@/assets/images/logosrobomintro.png');
+  const logoSource = require('@/share/assets/images/logosrobomintro.png');
   return (
     <SafeAreaView style={styles.header}>
       <TouchableOpacity
         style={styles.avatarContainer}
-        onPress={() => router.push('/(tabs)/profile')}
+        onPress={() => router.push('/(app)/(tabs)/profile')}
       >
         <Text style={styles.avatarText}>{avatarChar}</Text>
       </TouchableOpacity>

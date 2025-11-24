@@ -1,65 +1,57 @@
-"use client"
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 
-import type React from "react"
-import { View, StyleSheet } from "react-native"
-import Svg, { Circle } from "react-native-svg"
-
-interface ProgressCircleProps {
-  progress: number // 0-100
-  size: number
-  strokeWidth?: number
-  color?: string
-  backgroundColor?: string
+interface Props {
+  progress: number; // 0 a 1
+  size?: number;
+  strokeWidth?: number;
+  color?: string;
+  backgroundColor?: string;
 }
 
-const ProgressCircle: React.FC<ProgressCircleProps> = ({
+const ProgressCircle: React.FC<Props> = ({
   progress,
-  size,
-  strokeWidth = 8,
-  color = "#9CC9FF",
-  backgroundColor = "#E5E7EB",
+  size = 100,
+  strokeWidth = 10,
+  color = '#4A90E2',
+  backgroundColor = '#E6EAF2',
 }) => {
-  const radius = (size - strokeWidth) / 2
-  const circumference = radius * 2 * Math.PI
-  const strokeDasharray = circumference
-  const strokeDashoffset = circumference - (progress / 100) * circumference
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+
+  const strokeDashoffset = circumference * (1 - progress);
 
   return (
-    <View style={[styles.container, { width: size, height: size }]}>
-      <Svg width={size} height={size} style={styles.svg}>
+    <View style={{ width: size, height: size }}>
+      <Svg width={size} height={size}>
+        {/* Fundo */}
         <Circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           stroke={backgroundColor}
           strokeWidth={strokeWidth}
-          fill="transparent"
+          fill="none"
         />
+
+        {/* Progresso */}
         <Circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           stroke={color}
           strokeWidth={strokeWidth}
-          fill="transparent"
-          strokeDasharray={strokeDasharray}
+          fill="none"
+          strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          rotation="-90"
+          origin={`${size / 2}, ${size / 2}`}
         />
       </Svg>
     </View>
-  )
-}
+  );
+};
 
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  svg: {
-    position: "absolute",
-  },
-})
-
-export default ProgressCircle
+export default ProgressCircle;

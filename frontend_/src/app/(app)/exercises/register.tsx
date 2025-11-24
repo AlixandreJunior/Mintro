@@ -1,4 +1,4 @@
-import RegisterExerciseScreen from '@/screens/subpages/RegisterExerciseScreen';
+import RegisterExerciseScreen from '@/features/health/exercise/screens/RegisterExerciseScreen';
 
 const RegisterExercise = () => {
   return <RegisterExerciseScreen />;

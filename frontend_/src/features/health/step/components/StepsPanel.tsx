@@ -11,22 +11,11 @@ import { formatDateToISO } from '@/share/utils/formatDatetimeToISO';
 const { width, height } = Dimensions.get('window');
 
 interface StepsPanelProps {
-  date: Date;
+  logs: Step[];
 }
-export const StepsPanel: React.FC<StepsPanelProps> = ({ date }) => {
-  const [logs, setLogs] = useState<Step[]>([]);
-  const { handleStepsList } = useSteps();
-
+export const StepsPanel: React.FC<StepsPanelProps> = ({ logs }) => {
   const kcalPerStep = 0.05;
   const distancePerStep = 0.78;
-
-  useEffect(() => {
-    const load = async () => {
-      const data = await handleStepsList(formatDateToISO(date), 'day');
-      setLogs(data);
-    };
-    load();
-  });
 
   const totalSteps = useMemo(() => {
     return logs.reduce((acc, log) => acc + log.steps, 0);

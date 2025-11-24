@@ -17,10 +17,10 @@ export class MindfulnessService extends Service {
   }
 
   static async listLogs(
-    date: Date = new Date(),
+    date: string,
     period: Period = 'week'
   ): Promise<MindfulnessLog[]> {
-    const { startDate, endDate } = getPeriodRange(date, period);
+    const { startDate, endDate } = getPeriodRange(new Date(date), period);
     return Service.apiGet(
       `health/mindfulness/log/list/?start_date=${startDate}&end_date=${endDate}`,
       'Erro ao buscar registros de mindfulness.'

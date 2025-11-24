@@ -11,7 +11,7 @@ export function useMindfulness() {
   };
 
   const handleMindfulnessLogList = async (
-    date?: Date,
+    date: string,
     period?: 'week' | 'month'
   ): Promise<MindfulnessLog[]> => {
     return await handleRequest(() => MindfulnessService.listLogs(date, period));

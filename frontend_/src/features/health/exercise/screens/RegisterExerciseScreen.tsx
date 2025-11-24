@@ -19,7 +19,7 @@ const RegisterExerciseScreen = () => {
   return (
     <RegisterScreenTemplate
       title="Registrar Exercício"
-      labelSelect="Exercise"
+      labelSelect="Exercise_id"
       items={exercises}
       handleSaveItem={handleExerciseLogCreate}
       onSuccessRedirect={() => router.back()}
