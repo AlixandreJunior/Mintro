@@ -11,12 +11,17 @@ Classes:
 
 from typing import TYPE_CHECKING, cast
 
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import (
+    CreateAPIView,
+    DestroyAPIView,
+    ListAPIView,
+    UpdateAPIView,
+)
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from core.views.health.hydration import BaseHydrationView
 from core.check_achievement import check_gole_a_gole
+from core.views.health.hydration import BaseHydrationView
 
 if TYPE_CHECKING:
     from apps.user.models.user import User
@@ -69,3 +74,11 @@ class HydratationLogRegisterView(BaseHydrationView, CreateAPIView):
         }
 
         return response
+
+
+class HydrationLogDeleteView(BaseHydrationView, DestroyAPIView):
+    pass
+
+
+class HydrationLogUpdateView(BaseHydrationView, UpdateAPIView):
+    pass

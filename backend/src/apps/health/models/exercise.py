@@ -39,7 +39,6 @@ class ExerciseLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     duration = models.PositiveIntegerField()
-    distance = models.PositiveIntegerField(blank=True, null=True)
     description = models.TextField(max_length=200, blank=True)
     datetime = models.DateTimeField(default=timezone.now)
 

@@ -50,5 +50,15 @@ class BaseExerciseLogView(BaseView):
             raise NotFound(message)
         return queryset
 
+    @override
+    def get_object(self) -> ExerciseLog:
+        exercise_log_id = self.kwargs.get("id")
+
+        try:
+            return self.model.objects.get(id=exercise_log_id, user=self.request.user)
+        except self.model.DoesNotExist as e:
+            msg = "Registro não encontrado."
+            raise NotFound(msg) from e
+
     def perform_create(self, serializer: BaseSerializer) -> None:
         serializer.save(user=self.request.user)

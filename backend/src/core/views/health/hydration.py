@@ -13,6 +13,7 @@ from core.views.base import BaseView
 class BaseHydrationView(BaseView):
     model = HydrationLog
     serializer_class = HydrationLogSerializer
+    update_message = "Hidratação atualizada com sucesso!"
 
     def perform_create(self, serializer: BaseSerializer) -> None:
         serializer.save(user=self.request.user)
@@ -32,3 +33,13 @@ class BaseHydrationView(BaseView):
             message = "Registros de Hidratação não encontrados."
             raise NotFound(message)
         return queryset
+
+    @override
+    def get_object(self) -> HydrationLog:
+        hydration_id = self.kwargs.get("id")
+
+        try:
+            return self.model.objects.get(id=hydration_id, user=self.request.user)
+        except self.model.DoesNotExist as e:
+            msg = "Registro não encontrado."
+            raise NotFound(msg) from e

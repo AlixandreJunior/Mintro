@@ -10,6 +10,8 @@ from django.urls import path
 from apps.health.views.hydration import (
     HydratationLogListView,
     HydratationLogRegisterView,
+    HydrationLogDeleteView,
+    HydrationLogUpdateView,
 )
 
 app_name = "hydration"
@@ -17,4 +19,6 @@ app_name = "hydration"
 urlpatterns = [
     path("list/", HydratationLogListView.as_view(), name="list"),
     path("register/", HydratationLogRegisterView.as_view(), name="register"),
+    path("delete/<int:id>/", HydrationLogDeleteView.as_view(), name="delete"),
+    path("update/<int:id>/", HydrationLogUpdateView.as_view(), name="update"),
 ]

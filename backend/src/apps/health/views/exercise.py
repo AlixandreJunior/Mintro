@@ -10,7 +10,12 @@ Classes:
     ExerciseLogRegisterView: Cria um novo registro de exercício e verifica conquistas.
 """
 
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import (
+    CreateAPIView,
+    DestroyAPIView,
+    ListAPIView,
+    UpdateAPIView,
+)
 
 from core.views.health.exercise import BaseExerciseLogView, BaseExerciseView
 
@@ -42,6 +47,28 @@ class ExerciseLogView(BaseExerciseLogView, ListAPIView):
 
 
 class ExerciseLogRegisterView(BaseExerciseLogView, CreateAPIView):
+    """Cria novos registros de exercícios e verifica conquistas desbloqueadas.
+
+    Após criar o registro de exercício, esta view executa a função
+    `check_foco_total()` para identificar se o usuário atingiu critérios
+    de conquistas relacionados ao foco total.
+    """
+
+    pass
+
+
+class ExerciseLogDeleteView(BaseExerciseLogView, DestroyAPIView):
+    """Cria novos registros de exercícios e verifica conquistas desbloqueadas.
+
+    Após criar o registro de exercício, esta view executa a função
+    `check_foco_total()` para identificar se o usuário atingiu critérios
+    de conquistas relacionados ao foco total.
+    """
+
+    pass
+
+
+class ExerciseLogUpdateView(BaseExerciseLogView, UpdateAPIView):
     """Cria novos registros de exercícios e verifica conquistas desbloqueadas.
 
     Após criar o registro de exercício, esta view executa a função
