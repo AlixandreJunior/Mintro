@@ -1,12 +1,9 @@
 import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useEffect, useMemo, useState } from 'react';
 import { router } from 'expo-router';
-import { StepsKcalPanel } from './StepsKcalPanel';
-import { StepsDistancePanel } from './StepsDistancePanel';
 import { StepsMainPanel } from './StepsMainPanel';
-import { useSteps } from '@/features/health/step/hooks/useSteps';
 import { Step } from '@/share/types/health/steps';
-import { formatDateToISO } from '@/share/utils/formatDatetimeToISO';
+import { StepsSidePanel } from './StepsSidePanel';
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,11 +19,11 @@ export const StepsPanel: React.FC<StepsPanelProps> = ({ logs }) => {
   }, [logs]);
 
   const totalDistance = useMemo(() => {
-    return logs.reduce((acc, log) => acc + distancePerStep, 0);
+    return logs.reduce((acc) => acc + distancePerStep, 0);
   }, [logs]);
 
   const totalKcal = useMemo(() => {
-    return logs.reduce((acc, log) => acc + kcalPerStep, 0);
+    return logs.reduce((acc) => acc + kcalPerStep, 0);
   }, [logs]);
 
   return (
@@ -34,9 +31,13 @@ export const StepsPanel: React.FC<StepsPanelProps> = ({ logs }) => {
       style={styles.mainStats}
       onPress={() => router.push('/steps')}
     >
-      <StepsDistancePanel distance={totalDistance} />
+      <StepsSidePanel
+        value={totalDistance}
+        icon="map-marker"
+        color={'#5262f8ff'}
+      />
       <StepsMainPanel steps={totalSteps} />
-      <StepsKcalPanel kcal={totalKcal} />
+      <StepsSidePanel value={totalKcal} icon="fire" color={'#F97316'} />
     </TouchableOpacity>
   );
 };

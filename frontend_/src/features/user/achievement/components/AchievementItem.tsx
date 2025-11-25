@@ -15,7 +15,7 @@ interface AchievementItemProps {
 
 export const AchievementItem: React.FC<AchievementItemProps> = ({
   label,
-  starsAchieved,
+  starsAchieved = 3,
   itemWidth,
   marginRight,
 }) => {

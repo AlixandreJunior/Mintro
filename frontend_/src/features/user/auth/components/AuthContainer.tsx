@@ -22,17 +22,7 @@ const AuthContainer: React.FC<AuthContainerProps> = ({ children }) => {
         showsVerticalScrollIndicator={false}
       >
         <MintroLogo />
-        <View
-          style={[
-            styles.content,
-            {
-              paddingHorizontal: width * 0.06,
-              paddingBottom: height * 0.05,
-            },
-          ]}
-        >
-          {children}
-        </View>
+        {children}
       </ScrollView>
     </SafeAreaView>
   );
@@ -47,6 +37,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 20,
   },
   scrollContent: {
     flexGrow: 1,

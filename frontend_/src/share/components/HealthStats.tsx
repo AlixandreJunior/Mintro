@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 
 import { HydratationCard } from '@/features/health/hydration/components/HydratationCard';
@@ -10,8 +10,7 @@ import { useHydration } from '@/features/health/hydration/hooks/useHydration';
 import { useExercise } from '@/features/health/exercise/hooks/useExercise';
 import { useMindfulness } from '@/features/health/mindfulness/hooks/useMindfulness';
 
-import { formatDateToISO } from '../utils/formatDatetimeToISO';
-
+import { useLoadList } from '../hooks/useLoadList';
 import { Step } from '../types/health/steps';
 import { Hydration } from '../types/health/hydratation';
 import { ExerciseLog } from '../types/health/exercise';
@@ -22,51 +21,30 @@ interface Props {
 }
 
 export function HealthStats({ currentDate }: Props) {
-  const [stepsLogs, setStepsLogs] = useState<Step[]>([]);
-  const [hydrationLogs, setHydrationLogs] = useState<Hydration[]>([]);
-  const [exerciseLogs, setExerciseLogs] = useState<ExerciseLog[]>([]);
-  const [mindfulnessLogs, setMindfulnessLogs] = useState<MindfulnessLog[]>([]);
-
   const { handleStepsList } = useSteps();
   const { handleHydrationList } = useHydration();
   const { handleExerciseLogList } = useExercise();
   const { handleMindfulnessLogList } = useMindfulness();
 
-  useEffect(() => {
-    const loadAll = async () => {
-      const isoDate = formatDateToISO(currentDate);
+  const { data: stepsLogs } = useLoadList<Step>({
+    loader: () => handleStepsList(currentDate, 'day'),
+    deps: [currentDate],
+  });
 
-      const loaders = [
-        { fn: () => handleStepsList(isoDate, 'day'), set: setStepsLogs },
-        { fn: () => handleHydrationList(isoDate), set: setHydrationLogs },
-        {
-          fn: () => handleExerciseLogList(isoDate, 'week'),
-          set: setExerciseLogs,
-        },
-        {
-          fn: () => handleMindfulnessLogList(isoDate, 'week'),
-          set: setMindfulnessLogs,
-        },
-      ];
+  const { data: hydrationLogs } = useLoadList<Hydration>({
+    loader: () => handleHydrationList(currentDate, 'day'),
+    deps: [currentDate],
+  });
 
-      await Promise.all(
-        loaders.map(async ({ fn, set }) => {
-          try {
-            const data = await fn();
-            set(data ?? []);
-          } catch (error: any) {
-            if (error?.response?.status === 404) {
-              set([]);
-            } else {
-              console.error('Erro ao carregar logs:', error);
-            }
-          }
-        })
-      );
-    };
+  const { data: exerciseLogs } = useLoadList<ExerciseLog>({
+    loader: () => handleExerciseLogList(currentDate, 'week'),
+    deps: [currentDate],
+  });
 
-    loadAll();
-  }, [currentDate]);
+  const { data: mindfulnessLogs } = useLoadList<MindfulnessLog>({
+    loader: () => handleMindfulnessLogList(currentDate, 'week'),
+    deps: [currentDate],
+  });
 
   return (
     <View>

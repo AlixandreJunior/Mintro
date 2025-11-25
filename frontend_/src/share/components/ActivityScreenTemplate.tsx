@@ -11,9 +11,17 @@ interface Props {
   title: string;
   type: 'exercise' | 'mindfulness';
   onAddPress: () => void;
+  onEdit: (...args: any[]) => void;
+  onDelete: (...args: any[]) => void;
 }
 
-function ActivityScreenTemplate({ title, type, onAddPress }: Props) {
+function ActivityScreenTemplate({
+  title,
+  type,
+  onAddPress,
+  onDelete,
+  onEdit,
+}: Props) {
   const handleBack = useCallback(() => {
     router.replace('/(app)/(tabs)/activity');
   }, []);
@@ -26,7 +34,7 @@ function ActivityScreenTemplate({ title, type, onAddPress }: Props) {
     <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
       <HeaderWithOptions title={title} onBackPress={handleBack} />
 
-      <ActivityMainContent type={type} />
+      <ActivityMainContent type={type} onDelete={onDelete} onEdit={onEdit} />
 
       <FloatingActionButton onPress={handleAddPress} />
     </SafeAreaView>

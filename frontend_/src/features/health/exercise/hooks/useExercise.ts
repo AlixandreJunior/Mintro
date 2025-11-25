@@ -11,7 +11,7 @@ export function useExercise() {
   };
 
   const handleExerciseLogList = async (
-    date: string,
+    date: Date,
     period: 'week' | 'month'
   ) => {
     return await handleRequest(() => ExerciseService.listLog(date, period));
@@ -27,10 +27,25 @@ export function useExercise() {
     return await handleRequest(() => ExerciseService.createLog(data));
   };
 
+  const handleExerciseLogDelete = async (
+    id: number
+  ): Promise<ResponseSuccess> => {
+    return await handleRequest(() => ExerciseService.deleteLog(id));
+  };
+
+  const handleExerciseLogUpdate = async (
+    id: number,
+    data: ExerciseLogWrite
+  ): Promise<ResponseSuccess> => {
+    return await handleRequest(() => ExerciseService.updateLog(id, data));
+  };
+
   return {
     handleExerciseList,
     handleExerciseLogList,
     handleExerciseLogCreate,
+    handleExerciseLogDelete,
+    handleExerciseLogUpdate,
     loading,
     error,
   };

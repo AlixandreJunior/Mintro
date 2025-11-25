@@ -4,95 +4,75 @@ import { format, isToday, isYesterday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ExerciseLog } from '../types/health/exercise';
 import { MindfulnessLog } from '../types/health/mindfulness';
+import {
+  dayLabel,
+  getDetails,
+  getName,
+  parseDate,
+} from '../utils/activityHistoryHelpers';
+import HealthCard from './HealthCard';
+import CardActions from './CardActions';
 
 interface Props {
   type: 'exercise' | 'mindfulness';
   logs: ExerciseLog[] | MindfulnessLog[];
+  onEdit: (...args: any[]) => void;
+  onDelete: (...args: any[]) => void;
 }
 
-export const ActivityHistorySection: React.FC<Props> = ({ type, logs }) => {
+export const ActivityHistorySection: React.FC<Props> = ({
+  type,
+  logs,
+  onDelete,
+  onEdit,
+}) => {
   const isExercise = type === 'exercise';
 
-  // --- AUX ------------------------------------------------------------
+  const isExerciseLog = (
+    log: ExerciseLog | MindfulnessLog
+  ): log is ExerciseLog => isExercise && 'distance' in log;
 
-  const getName = (log: any) =>
-    isExercise
-      ? log.exercise?.name || log.description || 'Exercício'
-      : log.mindfulness?.name || log.description || 'Mindfulness';
+  const grouped: Record<string, (ExerciseLog | MindfulnessLog)[]> = {};
 
-  const getExerciseDetails = (log: ExerciseLog) => {
-    const distance = log.distance ? `${log.distance}km` : '';
-    const duration = log.duration ? `${log.duration}min` : '';
-    return distance && duration
-      ? `${distance} - ${duration}`
-      : distance || duration || '';
-  };
-
-  const buildKey = (log: any) =>
-    log.id ?? `${log.datetime}-${log.duration}-${getName(log)}`;
-
-  const parseDate = (log: any) =>
-    log.datetime ? new Date(log.datetime) : new Date(log.date);
-
-  // --- AGRUPAMENTO ----------------------------------------------------
-
-  const grouped = logs.reduce((acc: any, log: any) => {
+  logs.forEach((log) => {
     const date = parseDate(log);
-    const dayKey = format(date, 'yyyy-MM-dd');
-
-    if (!acc[dayKey]) acc[dayKey] = [];
-    acc[dayKey].push(log);
-
-    return acc;
-  }, {});
+    const key = format(date, 'yyyy-MM-dd');
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(log);
+  });
 
   const sortedDays = Object.keys(grouped).sort(
     (a, b) => new Date(b).getTime() - new Date(a).getTime()
   );
 
-  // --- RENDER ---------------------------------------------------------
-
-  const renderCard = (log: any) => (
-    <View key={buildKey(log)} style={styles.historyCard}>
-      <View style={styles.historyCardContent}>
+  const renderCard = (log: ExerciseLog | MindfulnessLog) => (
+    <HealthCard key={log.id}>
+      <View style={styles.row}>
         <View>
-          <Text style={styles.exerciseType}>{getName(log)}</Text>
-
-          {isExercise && (
-            <Text style={styles.exerciseDetails}>
-              {getExerciseDetails(log as ExerciseLog)}
-            </Text>
-          )}
+          <Text style={styles.title}>{getName(log, isExercise)}</Text>
+          <Text style={styles.details}>{getDetails(log, isExerciseLog)}</Text>
         </View>
 
-        {!isExercise && (
-          <Text style={styles.exerciseCount}>{log.duration || 0} min</Text>
-        )}
+        <CardActions
+          onEdit={() => onEdit(log)}
+          onDelete={() => onDelete(log.id)}
+        />
       </View>
-    </View>
+    </HealthCard>
   );
 
-  const renderDayTitle = (dateString: string) => {
-    const date = new Date(dateString);
-
-    if (isToday(date)) return 'Hoje';
-    if (isYesterday(date)) return 'Ontem';
-
-    return format(date, "dd 'de' MMMM", { locale: ptBR });
-  };
-
   return (
-    <View style={styles.historySection}>
-      <Text style={styles.historyTitle}>Histórico</Text>
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Histórico</Text>
 
       {logs.length === 0 && (
-        <View style={styles.emptyContainer}>
+        <View style={styles.empty}>
           <Text style={styles.emptyTitle}>
             {isExercise
               ? 'Nenhum exercício registrado'
               : 'Nenhuma sessão registrada'}
           </Text>
-          <Text style={styles.emptySubtitle}>
+          <Text style={styles.emptySub}>
             {isExercise
               ? 'Adicione seu primeiro exercício'
               : 'Adicione sua primeira sessão'}
@@ -100,87 +80,64 @@ export const ActivityHistorySection: React.FC<Props> = ({ type, logs }) => {
         </View>
       )}
 
-      {sortedDays.map((dayKey) => {
-        const logList = grouped[dayKey];
-
-        return (
-          <View key={dayKey} style={{ marginBottom: 24 }}>
-            <Text style={styles.historyDate}>{renderDayTitle(dayKey)}</Text>
-
-            {logList.map(renderCard)}
-          </View>
-        );
-      })}
+      {sortedDays.map((dayKey) => (
+        <View key={dayKey} style={{ marginBottom: 24 }}>
+          <Text style={styles.date}>{dayLabel(new Date(dayKey))}</Text>
+          {grouped[dayKey].map(renderCard)}
+        </View>
+      ))}
     </View>
   );
 };
 
-// --------------------------------------------------------------
-
 const styles = StyleSheet.create({
-  historySection: {
+  section: {
     paddingHorizontal: 16,
     marginBottom: 50,
   },
-  historyTitle: {
+  sectionTitle: {
     fontSize: 18,
     fontFamily: 'Poppins_500Medium',
     color: '#333',
     marginBottom: 8,
   },
-  historyDate: {
+  date: {
     fontSize: 14,
     fontFamily: 'Poppins_500Medium',
     color: '#444',
-    marginBottom: 12,
-    marginTop: 12,
+    marginVertical: 12,
   },
-  historyCard: {
-    backgroundColor: 'white',
+  card: {
+    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
     elevation: 3,
     marginBottom: 12,
   },
-  historyCardContent: {
+  row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
-  exerciseType: {
+  title: {
     fontSize: 16,
     fontFamily: 'Poppins_400Regular',
     color: '#000',
-    marginBottom: 4,
   },
-  exerciseDetails: {
+  details: {
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
     color: '#666',
   },
-  exerciseCount: {
-    fontSize: 16,
-    fontFamily: 'Poppins_500Medium',
-    color: '#666',
-  },
-
-  // --- Empty state centralizado ---
-  emptyContainer: {
+  empty: {
     marginTop: 40,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   emptyTitle: {
     fontSize: 16,
     fontFamily: 'Poppins_500Medium',
     color: '#333',
-    marginBottom: 6,
   },
-  emptySubtitle: {
+  emptySub: {
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
     color: '#666',

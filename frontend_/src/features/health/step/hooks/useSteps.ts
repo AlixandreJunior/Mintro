@@ -6,7 +6,7 @@ export const useSteps = () => {
   const { error, handleRequest, loading } = useHandleRequest();
 
   const handleStepsList = async (
-    date: string,
+    date: Date,
     period: 'day' | 'week' | 'month' | 'year'
   ): Promise<any> => {
     return await handleRequest(() => StepsService.list(date, period));

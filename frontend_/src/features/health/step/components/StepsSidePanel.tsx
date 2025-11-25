@@ -1,31 +1,28 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import ProgressCircle from '@/share/components/ProgressCircle';
 
-const { width } = Dimensions.get('window');
-
-interface StepsKcalPanelProps {
-  kcal: number;
+interface StepsSidePanelProps {
+  value: number;
+  icon: 'fire' | 'map-marker';
+  color?: string;
 }
 
-export const StepsKcalPanel: React.FC<StepsKcalPanelProps> = ({ kcal }) => {
+export const StepsSidePanel: React.FC<StepsSidePanelProps> = ({
+  value,
+  icon,
+  color = '#000',
+}) => {
   return (
     <View style={styles.sideStatItem}>
       <View
         style={[styles.progressContainer, styles.sideStatProgressContainer]}
       >
-        <ProgressCircle
-          progress={Math.min(kcal / 20, 100)}
-          size={width * 0.18}
-          color="#9CC9FF"
-          strokeWidth={5}
-        />
         <View style={styles.progressContent}>
-          <MaterialCommunityIcons name="fire" size={16} color="#F97316" />
+          <MaterialCommunityIcons name={icon} size={24} color={color} />
         </View>
       </View>
-      <Text style={styles.sideStatValue}>{kcal}</Text>
+      <Text style={styles.sideStatValue}>{value.toFixed(2)}</Text>
       <Text style={styles.sideStatLabel}>kcal</Text>
     </View>
   );
@@ -40,7 +37,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 20,
   },
   progressContent: {
     position: 'absolute',
@@ -51,7 +48,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: '#374151',
-    marginBottom: 4,
+    marginTop: 8,
   },
   sideStatLabel: {
     fontSize: 12,

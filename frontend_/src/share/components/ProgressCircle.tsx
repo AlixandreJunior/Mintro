@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
 interface Props {
-  progress: number; // 0 a 1
+  progress: number | string;
   size?: number;
   strokeWidth?: number;
   color?: string;
@@ -20,7 +20,7 @@ const ProgressCircle: React.FC<Props> = ({
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 
-  const strokeDashoffset = circumference * (1 - progress);
+  const strokeDashoffset = circumference * (1 - Number(progress));
 
   return (
     <View style={{ width: size, height: size }}>

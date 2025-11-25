@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, Dimensions } from 'react-native';
 import { useAchievements } from '../hooks/useAchievements';
 import { AchievementItem } from './AchievementItem';
 import { buildParsedAchievements, buildProgressMap } from '../utils/helpers';
+
+const { width } = Dimensions.get('window');
+const ITEM_WIDTH = width * 0.28; // 👈 Ajuste ideal
 
 const AchievementCarousel: React.FC = () => {
   const { handleAchievementsList, handleAchievementLogsList, loading } =
@@ -12,21 +15,28 @@ const AchievementCarousel: React.FC = () => {
   const [userAchievements, setUserAchievements] = useState<any[]>([]);
 
   useEffect(() => {
-    Promise.all([handleAchievementsList(), handleAchievementLogsList()]).then(
-      ([achievementsData, userData]) => {
-        setAchievements(achievementsData ?? []);
-        setUserAchievements(userData ?? []);
-      }
-    );
+    const load = async () => {
+      const [achievementsData, userData] = await Promise.all([
+        handleAchievementsList(),
+        handleAchievementLogsList(),
+      ]);
+
+      setAchievements(achievementsData ?? []);
+      setUserAchievements(userData ?? []);
+    };
+
+    load();
   }, []);
 
-  const progressMap = useMemo(() => {
-    return buildProgressMap(userAchievements);
-  }, [userAchievements]);
+  const progressMap = useMemo(
+    () => buildProgressMap(userAchievements),
+    [userAchievements]
+  );
 
-  const parsedAchievements = useMemo(() => {
-    return buildParsedAchievements(achievements, progressMap);
-  }, [achievements, progressMap]);
+  const parsedAchievements = useMemo(
+    () => buildParsedAchievements(achievements, progressMap),
+    [achievements, progressMap]
+  );
 
   if (loading || achievements.length === 0) return null;
 
@@ -34,15 +44,17 @@ const AchievementCarousel: React.FC = () => {
     <FlatList
       horizontal
       data={parsedAchievements}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
         <AchievementItem
           label={item.label}
           starsAchieved={item.starsAchieved}
           totalStars={item.totalStars}
-          itemWidth={3}
+          itemWidth={ITEM_WIDTH}
+          marginRight={12}
         />
       )}
+      showsHorizontalScrollIndicator={false}
     />
   );
 };

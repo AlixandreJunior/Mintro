@@ -1,46 +1,68 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import ProgressCircle from '@/share/components/ProgressCircle';
 import ShoeIcon from '@/share/components/icons/ShoeIcon';
+import { buildDashboardSummary, PeriodMode } from '../utils/summary';
 
-interface StepsSummaryProps {
-  totalSteps: number;
-  goalSteps: number;
-  progress: number; // entre 0 e 1
+interface DashboardSummaryProps<T extends Record<string, any>> {
+  logs: T[];
+  mode: PeriodMode;
+  goal: number;
+  dateKey: keyof T;
+  valueKey: keyof T;
+  selectedDate: Date;
+  icon?: React.ReactNode;
+  color?: string;
+  labelSuffix?: string;
 }
 
-export const StepsSummary: React.FC<StepsSummaryProps> = ({
-  totalSteps,
-  goalSteps,
-  progress,
-}) => {
-  const remaining = Math.max(0, goalSteps - totalSteps);
+export function DashboardSummary<T extends Record<string, any>>({
+  logs,
+  mode,
+  goal,
+  dateKey,
+  valueKey,
+  selectedDate,
+  icon = <ShoeIcon />,
+  color = '#A5D6A7',
+  labelSuffix = '',
+}: DashboardSummaryProps<T>) {
+  const { value, progress, label } = useMemo(
+    () =>
+      buildDashboardSummary<T>({
+        logs,
+        mode,
+        goal,
+        dateKey,
+        valueKey,
+        selectedDate,
+      }),
+    [logs, mode, goal, dateKey, valueKey, selectedDate]
+  );
 
   return (
     <View style={styles.mainContent}>
       <View style={styles.leftContent}>
         <Text style={styles.currentAmount}>
-          {totalSteps.toLocaleString('pt-BR')} passos
+          {value.toLocaleString('pt-BR')} {labelSuffix}
         </Text>
-        <Text style={styles.remainingText}>
-          Faltam {remaining.toLocaleString('pt-BR')} passos para você atingir
-          {'\n'}sua meta diária de {goalSteps.toLocaleString('pt-BR')} passos
-        </Text>
+
+        <Text style={styles.remainingText}>{label}</Text>
       </View>
+
       <View style={styles.progressContainer}>
         <ProgressCircle
           progress={progress}
           size={100}
-          color="#A5D6A7"
+          color={color}
           strokeWidth={8}
         />
-        <View style={styles.progressIcon}>
-          <ShoeIcon />
-        </View>
+
+        <View style={styles.progressIcon}>{icon}</View>
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   mainContent: {

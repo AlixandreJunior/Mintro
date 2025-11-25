@@ -25,7 +25,7 @@ export default function CustomTabBar() {
     },
     {
       name: 'activity',
-      title: 'Sade',
+      title: 'Saúde',
       icon: Heart,
       route: '/(tabs)/activity',
     },
@@ -74,8 +74,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
-    height: 90,
-    paddingTop: 15,
+    height: 60,
+    paddingTop: 20,
     paddingBottom: 15,
     paddingHorizontal: 20,
     justifyContent: 'space-around',

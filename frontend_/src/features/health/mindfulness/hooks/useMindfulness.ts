@@ -1,6 +1,10 @@
 import { useHandleRequest } from '@/share/hooks/useHandleRequest';
 import { MindfulnessService } from '../MindfulnessService';
-import { Mindfulness, MindfulnessLog } from '@/share/types/health/mindfulness';
+import {
+  Mindfulness,
+  MindfulnessLog,
+  MindfulnessLogWrite,
+} from '@/share/types/health/mindfulness';
 import { ResponseSuccess } from '@/share/types/response';
 
 export function useMindfulness() {
@@ -11,7 +15,7 @@ export function useMindfulness() {
   };
 
   const handleMindfulnessLogList = async (
-    date: string,
+    date: Date,
     period?: 'week' | 'month'
   ): Promise<MindfulnessLog[]> => {
     return await handleRequest(() => MindfulnessService.listLogs(date, period));
@@ -23,11 +27,26 @@ export function useMindfulness() {
     return await handleRequest(() => MindfulnessService.createLog(data));
   };
 
+  const handleMindfulnessLogDelete = async (
+    id: number
+  ): Promise<ResponseSuccess> => {
+    return await handleRequest(() => MindfulnessService.deleteLog(id));
+  };
+
+  const handleMindfulnessLogUpdate = async (
+    id: number,
+    data: MindfulnessLogWrite
+  ): Promise<ResponseSuccess> => {
+    return await handleRequest(() => MindfulnessService.updateLog(id, data));
+  };
+
   return {
     error,
     loading,
     handleMindfulnessList,
     handleMindfulnessLogList,
     handleMindfulnessLogCreate,
+    handleMindfulnessLogUpdate,
+    handleMindfulnessLogDelete,
   };
 }

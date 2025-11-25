@@ -15,7 +15,7 @@ const CreateDiaryScreen = () => {
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [activities, setActivities] = useState<string[]>([]);
+  const [activities_ids, setActivities_ids] = useState<string[]>([]);
   const [content, setContent] = useState('');
   const [photo, setPhoto] = useState<string>();
   const [mood, setMood] = useState<MoodType>('Neutro');
@@ -32,7 +32,7 @@ const CreateDiaryScreen = () => {
       content,
       created_at,
       mood,
-      activities,
+      activities_ids,
       photo,
     });
   };
@@ -58,8 +58,8 @@ const CreateDiaryScreen = () => {
         setShowTimePicker={setShowTimePicker}
         mood={mood}
         onSelectMood={setMood}
-        activities={activities}
-        onSelectActivities={setActivities}
+        activities={activities_ids}
+        onSelectActivities={setActivities_ids}
         content={content}
         onChangeContent={setContent}
         photo={photo}

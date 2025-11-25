@@ -21,6 +21,6 @@ export interface DiaryWrite {
   content: string;
   created_at: string;
   mood: MoodType;
-  activities: string[];
+  activities_ids: string[];
   photo?: string;
 }

@@ -23,6 +23,8 @@ interface WeekDayDisplay {
 
 interface ActivityMainContentProps {
   type: 'exercise' | 'mindfulness';
+  onEdit: (...args: any[]) => void;
+  onDelete: (...args: any[]) => void;
 }
 
 const periods = [
@@ -32,6 +34,8 @@ const periods = [
 
 export default function ActivityMainContent({
   type,
+  onDelete,
+  onEdit,
 }: ActivityMainContentProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month'>(
@@ -101,7 +105,12 @@ export default function ActivityMainContent({
         />
       )}
 
-      <ActivityHistorySection type={type} logs={logs} />
+      <ActivityHistorySection
+        type={type}
+        logs={logs}
+        onDelete={onDelete}
+        onEdit={onEdit}
+      />
     </ScrollView>
   );
 }

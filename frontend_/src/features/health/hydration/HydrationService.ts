@@ -1,10 +1,7 @@
-// services/hydration/hydrationService.ts
-import { format } from 'date-fns';
 import { Service } from '../../../share/service';
 import { Hydration, HydrationWrite } from '@/share/types/health/hydratation';
 import { ResponseSuccess } from '@/share/types/response';
 import { getPeriodRange, Period } from '@/share/utils/getPeriodRange';
-import { da } from 'date-fns/locale';
 
 export class HydrationService extends Service {
   static async list(date: Date, period: Period): Promise<Hydration[]> {
@@ -22,5 +19,16 @@ export class HydrationService extends Service {
       data,
       'Erro ao registrar hidratação.'
     );
+  }
+
+  static async update(
+    id: number,
+    data: HydrationWrite
+  ): Promise<ResponseSuccess> {
+    return this.apiPatch(`health/hydration/update/${id}/`, data);
+  }
+
+  static async delete(id: number): Promise<ResponseSuccess> {
+    return this.apiDelete(`health/hydration/delete/${id}/`);
   }
 }

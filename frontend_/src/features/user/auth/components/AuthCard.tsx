@@ -14,11 +14,13 @@ export const AuthCard: React.FC<AuthCardProps> = ({ children }) => {
 
 const styles = StyleSheet.create({
   AuthCard: {
+    alignSelf: 'center',
+    justifyContent: 'center',
     borderRadius: 16,
     paddingHorizontal: width * 0.08,
     paddingVertical: height * 0.05,
-    width: '100%',
     maxWidth: width * 0.9,
     minWidth: width * 0.85,
+    width: '100%',
   },
 });

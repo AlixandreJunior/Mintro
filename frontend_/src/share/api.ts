@@ -59,10 +59,40 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-/* ============================================================
- * 🔹 INTERCEPTOR DE RESPONSE → REFRESH TOKEN
- * ============================================================
- */
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: unknown) => void;
+  reject: (error?: unknown) => void;
+  request: AxiosRequestConfig;
+}> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      if (prom.request.headers && token) {
+        prom.request.headers.Authorization = `Bearer ${token}`;
+      }
+      prom.resolve(api(prom.request));
+    }
+  });
+  failedQueue = [];
+};
+
+const refreshToken = async () => {
+  if (!getTokens) throw new Error('getTokens handler not defined');
+
+  const { refresh } = await getTokens();
+  if (!refresh) throw new Error('No refresh token available');
+
+  const res = await axios.post(`${apiUrl}user/auth/refresh/`, { refresh });
+  const { access: newAccess, refresh: newRefresh } = res.data;
+
+  if (saveTokens) await saveTokens(newAccess, newRefresh);
+
+  return newAccess;
+};
 
 api.interceptors.response.use(
   (response) => {
@@ -76,47 +106,42 @@ api.interceptors.response.use(
     }
     return response;
   },
-
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
 
-    // Token expirado
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
       if (!getTokens || !onLogout) {
         onLogout?.();
         return Promise.reject(error);
       }
 
-      try {
-        // Recupera tokens
-        const { refresh } = await getTokens();
-
-        if (!refresh) {
-          onLogout();
-          return Promise.reject(error);
-        }
-
-        // Solicita um novo token
-        const res = await axios.post(`${apiUrl}user/auth/refresh/`, {
-          refresh,
+      if (isRefreshing) {
+        // Fila requests enquanto o refresh acontece
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject, request: originalRequest });
         });
-        const { access: newAccess, refresh: newRefresh } = res.data;
+      }
 
-        // Salva novos tokens
-        if (saveTokens) await saveTokens(newAccess, newRefresh);
+      originalRequest._retry = true;
+      isRefreshing = true;
 
-        // Reenvia com novo token
-        if (originalRequest.headers)
+      try {
+        const newAccess = await refreshToken();
+        processQueue(null, newAccess);
+
+        if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newAccess}`;
+        }
 
         return api(originalRequest);
       } catch (refreshError) {
+        processQueue(refreshError, null);
         onLogout?.();
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 

@@ -16,10 +16,10 @@ export class ExerciseService extends Service {
   }
 
   static async listLog(
-    date: string,
+    date: Date,
     period: Period = 'week'
   ): Promise<ExerciseLog[]> {
-    const { startDate, endDate } = getPeriodRange(new Date(date), period);
+    const { startDate, endDate } = getPeriodRange(date, period);
     return await this.apiGet(
       `health/exercise/log/list/?start_date=${startDate}&end_date=${endDate}`,
       'Erro ao buscar logs de exercícios.'
@@ -29,6 +29,21 @@ export class ExerciseService extends Service {
   static async createLog(data: ExerciseLogWrite): Promise<ResponseSuccess> {
     return await this.apiPost(
       'health/exercise/log/register/',
+      data,
+      'Erro ao registrar exercício.'
+    );
+  }
+
+  static async deleteLog(id: number): Promise<ResponseSuccess> {
+    return await this.apiDelete(`health/exercise/log/delete/${id}/`);
+  }
+
+  static async updateLog(
+    id: number,
+    data: ExerciseLogWrite
+  ): Promise<ResponseSuccess> {
+    return await this.apiPatch(
+      `health/exercise/log/update/${id}/`,
       data,
       'Erro ao registrar exercício.'
     );
