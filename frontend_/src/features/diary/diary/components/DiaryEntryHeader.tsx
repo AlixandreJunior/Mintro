@@ -1,19 +1,23 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import VerticalDotsIcon from '@/share/components/icons/VerticalDotsIcon';
+import CardActions from '@/share/components/CardActions';
 
 interface DiaryEntryHeaderProps {
   mood: string;
   time: number | string;
   onOpenMenu: () => void;
   moodColor?: string;
+  onEdit?: (...args: any[]) => void;
+  onDelete?: (...args: any[]) => void;
 }
 
 export const DiaryEntryHeader: React.FC<DiaryEntryHeaderProps> = ({
   mood,
   time,
-  onOpenMenu,
   moodColor = '#207700',
+  onDelete,
+  onEdit,
 }) => {
   const styles = createStyles(moodColor);
 
@@ -24,13 +28,7 @@ export const DiaryEntryHeader: React.FC<DiaryEntryHeaderProps> = ({
       <View style={styles.rightContainer}>
         <Text style={styles.time}>{time}</Text>
 
-        <TouchableOpacity
-          onPress={onOpenMenu}
-          activeOpacity={0.7}
-          style={styles.dotsButton}
-        >
-          <VerticalDotsIcon size={15} />
-        </TouchableOpacity>
+        <CardActions onDelete={onDelete} onEdit={onEdit} />
       </View>
     </View>
   );

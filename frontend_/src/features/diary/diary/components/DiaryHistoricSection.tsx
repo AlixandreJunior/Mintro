@@ -5,6 +5,7 @@ import DiaryEmptyState from './DiaryEmptyState';
 import DiaryErrorState from './DiaryErrorState';
 import { useDiary } from '../hooks/useDiary';
 import { Diary } from '@/share/types/mental/diary';
+import { useLoadList } from '@/share/hooks/useLoadList';
 
 interface DiaryHistoricSectionProps {
   initialDate: Date;
@@ -14,30 +15,20 @@ const DiaryHistoricSection: React.FC<DiaryHistoricSectionProps> = ({
   initialDate,
 }) => {
   const { handleDiaryList, error } = useDiary();
-  const [diaries, setDiaries] = useState<Diary[]>([]);
   const { width } = useWindowDimensions();
 
   const styles = createStyles(width);
 
-  useEffect(() => {
-    const load = async () => {
-      const month = initialDate.getMonth() + 1; // Janeiro = 0
-      const year = initialDate.getFullYear();
-
-      const list = await handleDiaryList(month, year);
-      setDiaries(list ?? []);
-    };
-
-    load();
-  }, [initialDate]);
+  const { data: diaries } = useLoadList<Diary>({
+    loader: () => handleDiaryList(initialDate),
+    deps: [initialDate],
+  });
 
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Histórico</Text>
 
-      {error ? (
-        <DiaryErrorState message={error} />
-      ) : diaries.length === 0 ? (
+      {diaries.length === 0 ? (
         <DiaryEmptyState />
       ) : (
         <DiaryDayHistory entries={diaries} />

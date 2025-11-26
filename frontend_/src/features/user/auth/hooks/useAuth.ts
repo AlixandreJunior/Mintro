@@ -17,12 +17,6 @@ export function useAuthForm() {
     return data;
   };
 
-  const handleLogout = async (): Promise<any> => {
-    const data = await handleRequest(() => AuthService.logout());
-    logout();
-    return data;
-  };
-
   const handleSignUp = async (
     username: string,
     email: string,
@@ -35,5 +29,5 @@ export function useAuthForm() {
     return data;
   };
 
-  return { handleLogin, handleLogout, handleSignUp, error, loading };
+  return { handleLogin, handleSignUp, error, loading };
 }

@@ -6,6 +6,8 @@ import { DiaryEntryHeader } from './DiaryEntryHeader';
 import DiaryCard from './DiaryCard';
 import DiaryModal from './DiaryModal';
 import { Diary } from '@/share/types/mental/diary';
+import { useDiary } from '../hooks/useDiary';
+import { router } from 'expo-router';
 
 interface DiaryEntryCardProps {
   diary: Diary & {
@@ -25,6 +27,16 @@ export const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary }) => {
     ':' +
     timeObj.getMinutes().toString().padStart(2, '0');
 
+  const { handleDiaryDelete } = useDiary();
+
+  const onDelete = async () => {
+    await handleDiaryDelete(diary.id);
+  };
+
+  const onEdit = async () => {
+    router.replace(`/(app)/diary/${diary.id}`);
+  };
+
   return (
     <>
       <Pressable onPress={closeDropdown}>
@@ -35,6 +47,8 @@ export const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary }) => {
               mood={diary.mood}
               time={time}
               onOpenMenu={openDropdown}
+              onDelete={onDelete}
+              onEdit={onEdit}
             />
 
             <DiaryActivities activities={diary.activities} />

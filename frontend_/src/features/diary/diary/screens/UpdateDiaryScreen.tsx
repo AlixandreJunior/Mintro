@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import FormHeader from '@/share/components/layout/FormHeader';
-import DiaryForm from '../components/DiaryFormTemplate';
+import DiaryForm from '../components/DiaryForm';
 import { useDiary } from '../hooks/useDiary';
 import { formatDatetimeToISO } from '@/share/utils/formatDatetimeToISO';
 import {

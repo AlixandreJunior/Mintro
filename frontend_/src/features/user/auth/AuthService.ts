@@ -25,10 +25,10 @@ export class AuthService extends Service {
     );
   }
 
-  static async logout(): Promise<ResponseSuccess> {
+  static async logout(refresh: string): Promise<ResponseSuccess> {
     return this.apiPost(
       'user/auth/logout/',
-      {},
+      { refresh },
       'Erro ao tentar fazer logout.'
     );
   }

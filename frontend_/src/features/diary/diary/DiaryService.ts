@@ -1,6 +1,7 @@
 import { Service } from '@/share/service';
 import { Diary } from '@/share/types/mental/diary';
 import { ResponseSuccess } from '@/share/types/response';
+import { getPeriodRange } from '@/share/utils/getPeriodRange';
 
 export class DiaryService extends Service {
   static async listActivities() {
@@ -14,9 +15,10 @@ export class DiaryService extends Service {
     );
   }
 
-  static async list(month?: number, year?: number): Promise<Diary[]> {
+  static async list(date: Date): Promise<Diary[]> {
+    const { startDate, endDate } = getPeriodRange(date, 'month');
     return this.apiGet(
-      `diary/diary/?month=${month}&year=${year}`,
+      `diary/diary/?start_date=${startDate}&end_date=${endDate}`,
       'Erro ao tentar buscar diário'
     );
   }

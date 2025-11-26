@@ -3,56 +3,38 @@ import { ActivityIndicator } from 'react-native-paper';
 import { router } from 'expo-router';
 import { useObjective } from '../hooks/useObjective';
 import ObjectiveDisplayCard from './ObjectiveCard';
-import { use, useEffect, useState } from 'react';
 import { Objective } from '@/share/types/mental/objectives';
+import { useLoadList } from '@/share/hooks/useLoadList';
 
 const ObjectiveSection = () => {
-  const { handleObjectiveList, loading, error } = useObjective();
-  const [objectives, setObjectives] = useState<Objective[] | []>([]);
+  const { handleObjectiveList } = useObjective();
 
-  useEffect(() => {
-    const load = async () => {
-      const list = await handleObjectiveList();
-      setObjectives(list ?? []);
-    };
-    load();
-  }, []);
+  const { data: objectives } = useLoadList<Objective>({
+    loader: () => handleObjectiveList(),
+    deps: [],
+  });
 
   return (
     <>
-      {loading ? (
+      {objectives.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Objetivos</Text>
-          <ActivityIndicator size="large" color="#0000ff" />
+          {objectives.map((objective) => (
+            <ObjectiveDisplayCard
+              key={objective.id}
+              objectiveTitle={objective.activity.name}
+              objectiveSubtitle={new Date(
+                objective.created_at
+              ).toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+              })}
+              //@ts-ignore
+              onPress={() => router.push(`/objective/${objective.id}`)}
+            />
+          ))}
         </View>
-      ) : error ? (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Objetivos</Text>
-          <Text style={styles.errorText}>
-            Erro ao carregar objetivos: {error}
-          </Text>
-        </View>
-      ) : (
-        objectives.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Objetivos</Text>
-            {objectives.map((objective) => (
-              <ObjectiveDisplayCard
-                key={objective.id}
-                objectiveTitle={objective.activity.name}
-                objectiveSubtitle={new Date(
-                  objective.created_at
-                ).toLocaleDateString('pt-BR', {
-                  day: '2-digit',
-                  month: 'long',
-                  year: 'numeric',
-                })}
-                //@ts-ignore
-                onPress={() => router.push(`/objective/${objective.id}`)}
-              />
-            ))}
-          </View>
-        )
       )}
     </>
   );

@@ -1,7 +1,7 @@
 from typing import override
 
 from django.db.models.query import QuerySet
-from django.forms import ValidationError
+from django.utils.dateparse import parse_date
 from rest_framework import permissions
 from rest_framework.exceptions import NotFound
 from rest_framework.serializers import BaseSerializer
@@ -39,32 +39,18 @@ class BaseDiaryView(BaseView):
 
     @override
     def get_queryset(self) -> QuerySet[Diary]:
-        user = self.request.user
-        month = self.request.query_params.get("month")
-        year = self.request.query_params.get("year")
+        queryset = self.model.objects.filter(user=self.request.user)
+        start_date = self.request.GET.get("start_date")
+        end_date = self.request.GET.get("end_date")
 
-        queryset = (
-            self.model.objects.filter(user=user)
-            .select_related("user")
-            .prefetch_related("activities")
-            .order_by("-created_at")
-        )
+        if start_date and (parsed := parse_date(start_date)):
+            queryset = queryset.filter(created_at__date__gte=parsed)
+        if end_date and (parsed := parse_date(end_date)):
+            queryset = queryset.filter(created_at__date__lte=parsed)
 
-        try:
-            if month:
-                queryset = queryset.filter(created_at__month=int(month))
-            if year:
-                queryset = queryset.filter(created_at__year=int(year))
-
-            if not queryset:
-                msg = "Diários não encontrados."
-                raise NotFound(msg)
-
-        except ValueError as e:
-            msg = "Os parâmetros de mês e ano devem ser números inteiros."
-
-            raise ValidationError(msg) from e
-
+        if not queryset.exists():
+            message = "Diários não encontrados."
+            raise NotFound(message)
         return queryset
 
     @override

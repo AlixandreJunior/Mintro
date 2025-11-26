@@ -3,9 +3,9 @@ import { UserInfoSection } from '@/features/user/user/components/UserInfoSection
 import { StatsSection } from '@/features/user/user/components/StatsSection';
 import AchievementSection from '../../achievement/components/AchievementsSection';
 import { useUser } from '../hooks/useUser';
-import { useAuthForm } from '../../auth/hooks/useAuth';
 import { User } from '@/share/types/user/user';
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/share/context/AuthContext';
 
 const { width } = Dimensions.get('window');
 
@@ -21,12 +21,11 @@ const ProfileScreen = () => {
   }, []);
 
   const { handleUserRetrieve, error, loading } = useUser();
-  const { handleLogout } = useAuthForm();
-
+  const { logout } = useAuth();
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <UserInfoSection user={user} onLogout={handleLogout} />
+        <UserInfoSection user={user} onLogout={() => logout()} />
         <StatsSection
           fetchedUser={user}
           loadingUser={loading}

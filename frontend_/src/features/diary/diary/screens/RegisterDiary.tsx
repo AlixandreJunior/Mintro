@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 
 import FormHeader from '@/share/components/layout/FormHeader';
 import { useDiary } from '../hooks/useDiary';
-import DiaryForm from '../components/DiaryFormTemplate';
+import DiaryForm from '../components/DiaryForm';
 import { MoodType } from '@/share/types/mental/diary';
 import { formatDatetimeToISO } from '@/share/utils/formatDatetimeToISO';
 import { combineDateAndTime } from '../utils/datetime';

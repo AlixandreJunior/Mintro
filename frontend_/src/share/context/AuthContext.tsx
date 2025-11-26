@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { setAuthHandlers } from '@/share/api';
+import { AuthService } from '@/features/user/auth/AuthService';
 
 const isWeb = Platform.OS === 'web';
 
@@ -69,18 +70,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setRefreshToken(refresh);
     setIsAuthenticated(true);
 
-    // Redireciona ao logar
     router.replace('/(app)/(tabs)/mental');
   };
 
   const logout = async () => {
+    if (refreshToken) {
+      await AuthService.logout(refreshToken);
+    }
     await clearTokens();
 
     setAccessToken(null);
     setRefreshToken(null);
     setIsAuthenticated(false);
 
-    // Redireciona ao sair
     router.replace('/(auth)/login');
   };
 
