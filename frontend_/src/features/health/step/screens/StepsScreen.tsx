@@ -43,7 +43,7 @@ const StepsScreen = () => {
         barColor="#A5D6A7"
         icon={<ShoeIcon />}
         dateLabel="De hoje"
-        
+        un="passos"
       />
     </SafeAreaView>
   );

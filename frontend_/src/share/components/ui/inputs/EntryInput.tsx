@@ -21,6 +21,7 @@ interface EntryInputProps {
     showSecureText: boolean;
     setShowSecureText: () => void;
   };
+  errors?: string[];
 }
 
 const { width, height } = Dimensions.get('window');
@@ -33,12 +34,17 @@ export const EntryInput: React.FC<EntryInputProps> = ({
   value,
   onChange,
   secureText,
+  errors,
 }) => {
   return (
     <View style={styles.inputGroup}>
       <Text style={styles.label}>{labelText}</Text>
-
-      <View style={styles.inputContainer}>
+      <View
+        style={[
+          styles.inputContainer,
+          errors ? { borderColor: '#EF4444' } : null,
+        ]}
+      >
         {icon && <View style={styles.iconWrapper}>{icon}</View>}
 
         <TextInput
@@ -65,6 +71,12 @@ export const EntryInput: React.FC<EntryInputProps> = ({
           </TouchableOpacity>
         )}
       </View>
+      {errors &&
+        errors.map((errMsg, index) => (
+          <Text key={index} style={styles.errorText}>
+            {errMsg}
+          </Text>
+        ))}
     </View>
   );
 };
@@ -101,5 +113,10 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     padding: 4,
+  },
+  errorText: {
+    color: '#EF4444',
+    fontSize: width * 0.035,
+    marginTop: 4,
   },
 });

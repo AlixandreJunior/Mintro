@@ -1,7 +1,7 @@
 import DiaryScreen from '@/features/diary/diary/screens/DiaryScreen';
 
-const Diary = () => {
+const Mental = () => {
   return <DiaryScreen />;
 };
 
-export default Diary;
+export default Mental;

@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import cast
+from typing import Any, cast
 
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.request import Request
@@ -17,16 +17,16 @@ class CreateMixin(CreateModelMixin):
     """
 
     create_message: str = "Criado com sucesso."
-    achievement_check: Callable[[User], list[object]] | None = None
+    achievement_check: Callable[[User], list[dict[str, Any]]] | None = None
 
     def create(self, request: Request, *args: object, **kwargs: object) -> Response:
         response: Response = super().create(request, *args, **kwargs)
         user: User = cast("User", request.user)
 
-        data: dict[str, object] = {"detail": self.create_message}
+        data: dict[str, Any] = {"detail": self.create_message}
 
         if self.achievement_check:
-            unlocked_achievements: list[object] = self.achievement_check(user)
+            unlocked_achievements = self.achievement_check(user)
             if unlocked_achievements:
                 data["unlocked_achievements"] = unlocked_achievements
 

@@ -1,22 +1,38 @@
-import React from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
-import { Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text, Dimensions } from 'react-native';
 
-const { width } = useWindowDimensions();
+const { width } = Dimensions.get('window');
 
 interface ErrorContainerProps {
-  error: string | null;
+  error?: string[] | null;
+  duration?: number;
 }
 
-export const ErrorContainer: React.FC<ErrorContainerProps> = ({ error }) => {
+export const ErrorContainer: React.FC<ErrorContainerProps> = ({
+  error,
+  duration = 4000,
+}) => {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    if (!error || error.length === 0) return;
+
+    setVisible(true);
+    const timer = setTimeout(() => setVisible(false), duration);
+
+    return () => clearTimeout(timer);
+  }, [error, duration]);
+
+  if (!error || error.length === 0 || !visible) return null;
+
   return (
-    <>
-      {error && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-        </View>
-      )}
-    </>
+    <View style={styles.errorContainer}>
+      {error.map((errMsg, index) => (
+        <Text key={index} style={styles.errorText}>
+          {errMsg}
+        </Text>
+      ))}
+    </View>
   );
 };
 
@@ -34,5 +50,6 @@ const styles = StyleSheet.create({
     fontSize: width * 0.035,
     fontWeight: '500',
     textAlign: 'center',
+    marginBottom: 4,
   },
 });

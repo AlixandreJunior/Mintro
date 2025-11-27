@@ -15,6 +15,7 @@ interface DashboardHistoryProps<T extends Record<string, any>> {
   selectedDate: Date;
   valueKey: keyof T;
   dateKey: keyof T;
+  un: string;
   onEdit?: (log: T) => void;
   onDelete?: (id: number) => Promise<ResponseSuccess>;
 }
@@ -25,6 +26,7 @@ export function DashboardHistory<T extends Record<string, any>>({
   selectedDate,
   valueKey,
   dateKey,
+  un,
   onEdit,
   onDelete,
 }: DashboardHistoryProps<T>) {
@@ -46,5 +48,5 @@ export function DashboardHistory<T extends Record<string, any>>({
     );
   }
 
-  return <DashboardHistoryOthers data={data} />;
+  return <DashboardHistoryOthers data={data} un={un} />;
 }

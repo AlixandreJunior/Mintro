@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { DiaryActivities } from './DiaryActivities';
 import { DiaryEntryContent } from './DiaryEntryContent';
-import { DiaryEntryHeader } from './DiaryEntryHeader';
 import DiaryCard from './DiaryCard';
-import DiaryModal from './DiaryModal';
+import { DiaryEntryHeader } from './DiaryEntryHeader';
 import { Diary } from '@/share/types/mental/diary';
 import { useDiary } from '../hooks/useDiary';
 import { router } from 'expo-router';
@@ -15,13 +14,8 @@ interface DiaryEntryCardProps {
   };
 }
 
-export const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary }) => {
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const openDropdown = () => setDropdownVisible(true);
-  const closeDropdown = () => setDropdownVisible(false);
-
+const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary }) => {
   const timeObj = new Date(diary.created_at);
-
   const time =
     timeObj.getHours().toString().padStart(2, '0') +
     ':' +
@@ -33,61 +27,56 @@ export const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary }) => {
     await handleDiaryDelete(diary.id);
   };
 
-  const onEdit = async () => {
+  const onEdit = () => {
     router.replace(`/(app)/diary/${diary.id}`);
   };
 
   return (
-    <>
-      <Pressable onPress={closeDropdown}>
-        <View style={styles.row}>
-          <View style={styles.icon}>{diary.iconSource}</View>
-          <DiaryCard style={styles.card}>
-            <DiaryEntryHeader
-              mood={diary.mood}
-              time={time}
-              onOpenMenu={openDropdown}
-              onDelete={onDelete}
-              onEdit={onEdit}
-            />
-
+    <Pressable>
+      <View style={styles.row}>
+        <View style={styles.icon}>{diary.iconSource}</View>
+        <DiaryCard style={styles.card}>
+          <DiaryEntryHeader
+            mood={diary.mood}
+            time={time}
+            onDelete={onDelete}
+            onEdit={onEdit}
+          />
+          {diary.activities?.length > 0 && (
             <DiaryActivities activities={diary.activities} />
-
+          )}
+          {diary.title || diary.content || diary.photo ? (
             <DiaryEntryContent
               title={diary.title}
               content={diary.content}
               photoUrl={diary.photo}
             />
-          </DiaryCard>
-        </View>
-      </Pressable>
-
-      <DiaryModal
-        visible={dropdownVisible}
-        onClose={closeDropdown}
-        onEdit={() => {}}
-        onDelete={() => {}}
-      />
-    </>
+          ) : null}
+        </DiaryCard>
+      </View>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
-  card: { marginLeft: 49, maxWidth: screen.width - 65 },
   row: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 16,
-    position: 'relative',
+    marginBottom: 12,
+    width: '100%',
   },
   icon: {
-    position: 'absolute',
-    left: -15,
-    top: 0,
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
+    marginRight: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 2,
+  },
+  card: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
   },
 });
+
+export default DiaryEntryCard;

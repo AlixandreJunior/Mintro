@@ -6,6 +6,5 @@ export interface Step {
 }
 
 export interface StepWrite {
-  date: string;
   steps: number;
 }

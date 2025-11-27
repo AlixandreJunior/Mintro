@@ -3,6 +3,7 @@ from typing import override
 from django.db.models.query import QuerySet
 from django.utils.dateparse import parse_date
 from rest_framework.exceptions import NotFound
+from rest_framework.serializers import BaseSerializer
 
 from apps.health.models.steps import StepLog
 from apps.health.serializers.steps import StepLogSerializer
@@ -12,6 +13,10 @@ from core.views.base import BaseView
 class BaseStepsView(BaseView):
     model = StepLog
     serializer_class = StepLogSerializer
+    create_message = "Registro criado com sucesso."
+
+    def perform_create(self, serializer: BaseSerializer) -> None:
+        serializer.save(user=self.request.user)
 
     @override
     def get_queryset(self) -> QuerySet[StepLog]:

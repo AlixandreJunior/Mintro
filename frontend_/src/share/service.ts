@@ -4,15 +4,23 @@ import api from './api';
 export class Service {
   static handleError(error: unknown, fallback = 'Erro inesperado') {
     if (axios.isAxiosError(error)) {
+      // Se vier um objeto do backend, lança diretamente
+      if (error.response?.data && typeof error.response.data === 'object') {
+        throw error.response.data;
+      }
+
+      // fallback para mensagens gerais
       const msg =
         error.response?.data?.detail ||
         error.response?.data?.message ||
         error.message ||
         fallback;
-      throw new Error(msg);
+      throw { non_field_errors: [msg] };
     }
-    throw new Error(fallback);
+
+    throw { non_field_errors: [fallback] };
   }
+
   static isFormData(data: any): data is FormData {
     return data instanceof FormData;
   }

@@ -16,7 +16,7 @@ export const useDiary = () => {
   };
 
   const handleDiaryCreate = async (
-    data: DiaryWrite
+    data: FormData
   ): Promise<ResponseSuccess> => {
     return await handleRequest(() => DiaryService.create(data));
   };

@@ -8,10 +8,12 @@ interface DashboardHistoryOthersProps<T extends Record<string, any>> {
     label: string;
     total: number;
   }[];
+  un: string;
 }
 
 export function DashboardHistoryOthers<T extends Record<string, any>>({
   data,
+  un,
 }: DashboardHistoryOthersProps<T>) {
   return (
     <DashboardHistoryContainer>
@@ -20,7 +22,7 @@ export function DashboardHistoryOthers<T extends Record<string, any>>({
           <View style={styles.rowBetween}>
             <Text style={styles.groupLabel}>{label}</Text>
             <Text style={styles.cardValue}>
-              {total.toLocaleString('pt-BR')} ml
+              {total.toLocaleString('pt-BR')} {un}
             </Text>
           </View>
         </HealthCard>

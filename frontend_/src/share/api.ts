@@ -9,11 +9,6 @@ const api: AxiosInstance = axios.create({
 
 console.log('API URL:', apiUrl);
 
-/* ============================================================
- * 🔹 HANDLERS DE AUTENTICAÇÃO
- * ============================================================
- */
-
 let onLogout: (() => void) | null = null;
 let getTokens:
   | (() => Promise<{ access: string | null; refresh: string | null }>)
@@ -31,11 +26,6 @@ export const setAuthHandlers = (handlers: {
   saveTokens = handlers.saveTokens || null;
 };
 
-/* ============================================================
- * 🔹 HANDLER DE CONQUISTAS
- * ============================================================
- */
-
 let showAchievements: ((achievements: string[]) => void) | null = null;
 
 export const registerAchievementHandler = (
@@ -43,11 +33,6 @@ export const registerAchievementHandler = (
 ) => {
   showAchievements = fn;
 };
-
-/* ============================================================
- * 🔹 INTERCEPTOR DE REQUEST → INJETAR TOKEN AUTOMATICAMENTE
- * ============================================================
- */
 
 api.interceptors.request.use(async (config) => {
   if (getTokens && config.headers) {

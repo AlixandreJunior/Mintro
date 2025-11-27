@@ -1,24 +1,19 @@
-// screens/NotificationScreen.tsx
 import React, { useState, useEffect } from 'react';
-import {
-  SafeAreaView,
-  FlatList,
-  View,
-  Text,
-  Button,
-  Alert,
-} from 'react-native';
+import { SafeAreaView, FlatList } from 'react-native';
 
 import HeaderWithOptions from '@/share/components/layout/HeaderWithOptions';
 import CreateNotificationModal from '@/features/user/reminder/components/ReminderCreateSection';
-
 import { useReminder } from '@/features/user/reminder/hooks/useReminder';
 import { useNotification } from '../hooks/useNotification';
+import {
+  useLoadReminders,
+  openModal,
+  closeModal,
+} from '@/features/user/reminder/utils/helpers';
+import ReminderCard from '../components/ReminderCard';
 
-const NotificationScreen = () => {
-  const { scheduleOnce, scheduleDaily, cancel, list, update } =
-    useNotification();
-
+const ReminderScreen = () => {
+  const { scheduleOnce, scheduleDaily, cancel } = useNotification();
   const {
     handleReminderList,
     handleReminderCreate,
@@ -27,171 +22,110 @@ const NotificationScreen = () => {
   } = useReminder();
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [editingNotification, setEditingNotification] = useState<any | null>(
-    null
-  );
+  const [reminders, setReminders] = useState<any[]>([]);
+  const [editingReminder, setEditingReminder] = useState<any | null>(null);
 
-  const typeLabels: Record<string, string> = {
-    diario: 'Diário',
-    objetivo: 'Objetivo',
-    hidratacao: 'Hidratação',
-    exercicio: 'Exercício',
-    mindfulness: 'Mindfulness',
-    outro: 'Outro',
-  };
+  const loadReminders = useLoadReminders(handleReminderList);
 
-  const getTypeLabel = (t: string) => typeLabels[t] ?? t;
+  useEffect(() => {
+    loadReminders(setReminders);
+  }, []);
 
-  const openModal = (n?: any) => {
-    setEditingNotification(n ?? null);
-    setModalVisible(true);
-  };
-
-  const closeModal = () => {
-    setEditingNotification(null);
-    setModalVisible(false);
-  };
-
-  const loadNotifications = async () => {
-    const localList = await list();
-    setNotifications(localList);
-  };
-
-  const handleSaveNotification = async (
-    title: string,
-    body: string,
-    hour: number,
-    minute: number,
-    daily: boolean,
-    type: string
-  ) => {
+  const handleDelete = async (item: any) => {
     try {
-      const date = new Date();
-      date.setHours(hour, minute, 0, 0);
+      if (item.local_notification_id) await cancel(item.local_notification_id);
+      await handleReminderDelete(item.id);
+      loadReminders(setReminders);
+    } catch (e) {
+      console.error('Erro ao excluir lembrete:', e);
+    }
+  };
 
-      if (editingNotification) {
-        await update(editingNotification.id, title, body, date, daily, type);
+  const handleSave = async (data: {
+    title: string;
+    content: string;
+    date: string;
+    time: string;
+    is_daily: boolean;
+    type: string;
+    deadline?: string | null;
+  }) => {
+    try {
+      const [hour, minute] = data.time.split(':').map(Number);
+      const dateObj = new Date(`${data.date}T${data.time}`);
+
+      const payload = {
+        title: data.title,
+        content: data.content,
+        type: data.type,
+        date: data.date,
+        time: data.time,
+        is_daily: data.is_daily,
+        deadline: data.deadline ?? null,
+      };
+
+      let reminder;
+      if (!editingReminder) {
+        reminder = await handleReminderCreate(payload);
       } else {
-        if (daily) {
-          await scheduleDaily(title, body, hour, minute, type);
-        } else {
-          await scheduleOnce(title, body, date, type);
-        }
+        reminder = await handleReminderUpdate(editingReminder.id, payload);
+        if (editingReminder.local_notification_id)
+          await cancel(editingReminder.local_notification_id);
       }
 
-      await loadNotifications();
-      closeModal();
+      const localId = data.is_daily
+        ? await scheduleDaily(data.title, data.content, hour, minute, data.type)
+        : await scheduleOnce(data.title, data.content, dateObj, data.type);
+
+      (reminder as any).local_notification_id = localId;
+
+      loadReminders(setReminders);
+      closeModal(setEditingReminder, setModalVisible);
     } catch (e) {
       console.error('Erro ao salvar notificação:', e);
     }
   };
 
-  const handleDelete = (item: any) => {
-    Alert.alert(
-      'Excluir notificação',
-      'Tem certeza que deseja excluir esta notificação?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: async () => {
-            await cancel(item.id);
-            await loadNotifications();
-          },
-        },
-      ]
+  const renderItem = ({ item }: { item: any }) => {
+    return (
+      <ReminderCard
+        title={item.title}
+        date={item.date}
+        time={item.time}
+        isDaily={item.is_daily}
+        type={item.type}
+        onEdit={() => openModal(setEditingReminder, setModalVisible, item)}
+        onDelete={() => handleDelete(item)}
+      />
     );
   };
 
-  // formato da data dentro da lista
-  const formatNotificationDate = (n: any) => {
-    const date = new Date(n.date);
-    const hh = date.getHours().toString().padStart(2, '0');
-    const mm = date.getMinutes().toString().padStart(2, '0');
-
-    return n.isDaily
-      ? `Diária - ${hh}:${mm}`
-      : `Única - ${date.toLocaleDateString()} ${hh}:${mm}`;
-  };
-
-  useEffect(() => {
-    loadNotifications();
-  }, []);
-
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, marginHorizontal: 12 }}>
       <HeaderWithOptions
-        title="Notificações"
-        options={[{ label: 'Nova', onPress: () => openModal() }]}
+        title="Lembretes"
+        options={[
+          {
+            label: 'Novo',
+            onPress: () => openModal(setEditingReminder, setModalVisible),
+          },
+        ]}
       />
-
       <FlatList
-        data={notifications}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              padding: 12,
-              borderBottomWidth: 1,
-              borderBottomColor: '#ccc',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontWeight: 'bold' }}>{item.title}</Text>
-              <Text>{item.body}</Text>
-
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginTop: 4,
-                }}
-              >
-                <Text style={{ fontSize: 12, color: '#666' }}>
-                  {formatNotificationDate(item)}
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: item.isDaily ? '#007AFF' : '#FF9500',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {item.isDaily ? 'DIÁRIA' : 'ÚNICA'}
-                </Text>
-              </View>
-
-              <Text style={{ fontSize: 12, color: '#999', marginTop: 2 }}>
-                Tipo: {getTypeLabel(item.type)}
-              </Text>
-            </View>
-
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <Button title="Editar" onPress={() => openModal(item)} />
-              <Button title="Excluir" onPress={() => handleDelete(item)} />
-            </View>
-          </View>
-        )}
-        ListEmptyComponent={
-          <View style={{ padding: 20, alignItems: 'center' }}>
-            <Text style={{ color: '#666' }}>Nenhuma notificação agendada</Text>
-          </View>
-        }
+        data={reminders}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderItem}
+        contentContainerStyle={{ paddingVertical: 4 }}
       />
 
       <CreateNotificationModal
         visible={modalVisible}
-        onClose={closeModal}
-        onSave={handleSaveNotification}
+        onClose={() => closeModal(setEditingReminder, setModalVisible)}
+        onSave={handleSave}
+        notification={editingReminder}
       />
     </SafeAreaView>
   );
 };
 
-export default NotificationScreen;
+export default ReminderScreen;

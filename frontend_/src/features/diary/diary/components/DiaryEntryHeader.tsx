@@ -6,7 +6,6 @@ import CardActions from '@/share/components/CardActions';
 interface DiaryEntryHeaderProps {
   mood: string;
   time: number | string;
-  onOpenMenu: () => void;
   moodColor?: string;
   onEdit?: (...args: any[]) => void;
   onDelete?: (...args: any[]) => void;

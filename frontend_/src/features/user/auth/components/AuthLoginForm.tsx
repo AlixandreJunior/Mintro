@@ -4,6 +4,13 @@ import { EntryInput } from '@/share/components/ui/inputs/EntryInput';
 
 const iconProps = { size: 20, color: '#9CA3AF', style: { marginRight: 12 } };
 
+interface BackendErrors {
+  username?: string;
+  email?: string[];
+  password?: string[];
+  non_field_errors?: string[];
+}
+
 interface AuthLoginFormProps {
   email: string;
   setEmail: (email: string) => void;
@@ -11,7 +18,9 @@ interface AuthLoginFormProps {
   setPassword: (password: string) => void;
   showPassword: boolean;
   setShowPassword: React.Dispatch<React.SetStateAction<boolean>>;
+  errors: BackendErrors | null;
 }
+
 const AuthLoginForm: React.FC<AuthLoginFormProps> = ({
   email,
   password,
@@ -19,6 +28,7 @@ const AuthLoginForm: React.FC<AuthLoginFormProps> = ({
   setEmail,
   setPassword,
   setShowPassword,
+  errors,
 }) => {
   return (
     <>
@@ -29,6 +39,7 @@ const AuthLoginForm: React.FC<AuthLoginFormProps> = ({
         value={email}
         placeholder="Digite seu email"
         icon={<Mail {...iconProps} />}
+        errors={errors?.email}
       />
 
       <EntryInput
@@ -42,6 +53,7 @@ const AuthLoginForm: React.FC<AuthLoginFormProps> = ({
           setShowSecureText: () => setShowPassword((prev) => !prev),
         }}
         icon={<Lock {...iconProps} />}
+        errors={errors?.password}
       />
     </>
   );

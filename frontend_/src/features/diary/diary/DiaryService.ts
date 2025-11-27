@@ -22,7 +22,7 @@ export class DiaryService extends Service {
       'Erro ao tentar buscar diário'
     );
   }
-  static async create(data: any): Promise<ResponseSuccess> {
+  static async create(data: FormData): Promise<ResponseSuccess> {
     return this.apiPost('diary/diary/create/', data, 'Erro ao criar diario.');
   }
 

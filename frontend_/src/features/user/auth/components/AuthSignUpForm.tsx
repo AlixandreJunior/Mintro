@@ -3,6 +3,13 @@ import { StyleSheet } from 'react-native';
 import { Lock, Mail } from 'lucide-react-native';
 import { EntryInput } from '@/share/components/ui/inputs/EntryInput';
 
+interface BackendErrors {
+  username?: string[];
+  email?: string[];
+  password?: string[];
+  non_field_errors?: string[];
+}
+
 interface SignUpFormProps {
   name: string;
   setName: (name: string) => void;
@@ -12,6 +19,7 @@ interface SignUpFormProps {
   setPassword: (password: string) => void;
   showPassword: boolean;
   setShowPassword: React.Dispatch<React.SetStateAction<boolean>>;
+  errors: BackendErrors | null;
 }
 
 const AuthSignUpForm: React.FC<SignUpFormProps> = ({
@@ -23,6 +31,7 @@ const AuthSignUpForm: React.FC<SignUpFormProps> = ({
   setEmail,
   setPassword,
   setShowPassword,
+  errors,
 }) => {
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -34,6 +43,7 @@ const AuthSignUpForm: React.FC<SignUpFormProps> = ({
         onChange={setName}
         value={name}
         placeholder="Digite seu nome completo"
+        errors={errors?.username}
       />
       <EntryInput
         labelText="Email"
@@ -42,6 +52,7 @@ const AuthSignUpForm: React.FC<SignUpFormProps> = ({
         value={email}
         placeholder="Digite seu email"
         icon={<Mail size={20} color="#9CA3AF" style={styles.inputIcon} />}
+        errors={errors?.email}
       />
       <EntryInput
         labelText="Senha"
@@ -54,6 +65,7 @@ const AuthSignUpForm: React.FC<SignUpFormProps> = ({
           setShowSecureText: togglePasswordVisibility,
         }}
         icon={<Lock size={20} color="#9CA3AF" style={styles.inputIcon} />}
+        errors={errors?.password}
       />
     </>
   );

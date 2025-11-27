@@ -32,6 +32,7 @@ interface DashboardMainContentProps<
   icon: React.ReactNode;
 
   dateLabel: string;
+  un: string;
 
   onEdit?: (log: T) => void;
   onDelete?: (id: number) => Promise<ResponseSuccess>;
@@ -54,6 +55,7 @@ export function DashboardMainContent<
   barColor,
   icon,
   dateLabel,
+  un,
   onDelete,
   onEdit,
 }: DashboardMainContentProps<T, P>) {
@@ -101,6 +103,7 @@ export function DashboardMainContent<
         dateKey={dateKey}
         onDelete={onDelete}
         onEdit={onEdit}
+        un={un}
       />
     </ScrollView>
   );

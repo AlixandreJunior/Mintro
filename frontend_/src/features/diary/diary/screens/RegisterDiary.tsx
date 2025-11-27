@@ -8,6 +8,7 @@ import DiaryForm from '../components/DiaryForm';
 import { MoodType } from '@/share/types/mental/diary';
 import { formatDatetimeToISO } from '@/share/utils/formatDatetimeToISO';
 import { combineDateAndTime } from '../utils/datetime';
+import { appendImageToFormData } from '@/share/utils/appendImageToFormData';
 
 const CreateDiaryScreen = () => {
   const [title, setTitle] = useState('');
@@ -22,19 +23,24 @@ const CreateDiaryScreen = () => {
 
   const { handleDiaryCreate } = useDiary();
 
-  const onSave = () => {
+  const onSave = async () => {
     const created_at = formatDatetimeToISO(
       combineDateAndTime(selectedDate, selectedTime)
     );
 
-    handleDiaryCreate({
-      title,
-      content,
-      created_at,
-      mood,
-      activities_ids,
-      photo,
-    });
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('content', content);
+    formData.append('created_at', created_at);
+    formData.append('mood', mood);
+
+    activities_ids.forEach((id) =>
+      formData.append('activities_ids', String(id))
+    );
+
+    await appendImageToFormData(formData, photo);
+
+    handleDiaryCreate(formData);
   };
 
   return (

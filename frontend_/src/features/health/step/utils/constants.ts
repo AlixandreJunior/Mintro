@@ -1,4 +1,4 @@
-export const UPDATE_INTERVAL_MS = 25;
+export const UPDATE_INTERVAL_MS = 50;
 export const MIN_STEP_INTERVAL_MS = 350;
 export const WARMUP_MS = 1500;
 export const BASELINE_ALPHA = 0.02;

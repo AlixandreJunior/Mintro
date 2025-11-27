@@ -36,7 +36,7 @@ const HeaderWithOptions: React.FC<HeaderWithOptionsProps> = ({
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView>
       <View style={styles.appbar}>
         <Appbar.BackAction onPress={handleBack} />
         <Appbar.Content title={title} titleStyle={styles.appbarTitle} />
@@ -68,7 +68,6 @@ const HeaderWithOptions: React.FC<HeaderWithOptionsProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {},
   appbar: {
     backgroundColor: '#FFFF',
     marginHorizontal: width * 0.01,

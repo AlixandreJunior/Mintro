@@ -23,15 +23,6 @@ class ReminderListView(BaseReminderView, generics.ListAPIView):
 class ReminderCreateView(BaseReminderView, generics.CreateAPIView):
     """
     CreateAPIView para criar um novo lembrete (Reminder).
-
-    Herda de:
-        - BaseReminderView: define o modelo e o serializer padrão.
-
-    Uso:
-        - Endpoint: /api/reminders/
-        - Método: POST
-        - Corpo esperado: informações do lembrete (ex: título, descrição, data, hora).
-        - Retorna: o lembrete recém-criado.
     """
 
     pass

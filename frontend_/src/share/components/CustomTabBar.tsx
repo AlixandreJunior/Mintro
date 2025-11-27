@@ -16,6 +16,8 @@ export default function CustomTabBar() {
   const router = useRouter();
   const pathname = usePathname();
 
+  router.push('')
+
   const tabs = [
     {
       name: 'mental',

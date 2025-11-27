@@ -17,7 +17,7 @@ class StepLogListView(BaseStepsView, ListAPIView):
     pass
 
 
-class StepLogRegisterView(CreateAPIView):
+class StepLogRegisterView(BaseStepsView, CreateAPIView):
     """Endpoint para registrar novos logs de passos do usuário.
 
     Métodos:

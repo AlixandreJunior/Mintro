@@ -9,8 +9,8 @@ const { width, height } = Dimensions.get('window');
 interface AuthFormCardProps {
   welcomeText: string;
   subtitleText: string;
-  error: string | null;
   children: React.ReactNode;
+  error?: string[] | null;
 }
 
 export const AuthFormCard: React.FC<AuthFormCardProps> = ({

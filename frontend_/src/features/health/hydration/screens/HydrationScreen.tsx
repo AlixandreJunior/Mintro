@@ -67,7 +67,8 @@ const HydrationScreen = () => {
         icon={<WaterDropIcon size={24} color="#0022FF" />}
         dateLabel="De hoje"
         onDelete={handleHydrationDelete}
-        onEdit={handleEdit} // Passa o callback para abrir modal
+        onEdit={handleEdit}
+        un="ml"
       />
 
       <FloatingActionButton

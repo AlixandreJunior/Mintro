@@ -21,10 +21,9 @@ class ReminderAdmin(admin.ModelAdmin):  # type: ignore
         date_hierarchy (str): Campo usado para navegação hierárquica por data.
     """
 
-    list_display = ("id", "user", "title", "type", "deadline", "time", "is_daily")
-    list_filter = ("type", "is_daily", "deadline")
+    list_display = ("id", "user", "title", "type", "time", "is_daily")
+    list_filter = ("type", "is_daily")
     search_fields = ("title", "content", "user__username", "user__email")
-    ordering = ("-deadline", "time")
+    ordering = ("time",)
     list_editable = ("is_daily",)
     readonly_fields = ("date", "time")
-    date_hierarchy = "deadline"

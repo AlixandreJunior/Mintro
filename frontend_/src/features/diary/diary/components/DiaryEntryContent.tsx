@@ -20,23 +20,37 @@ export const DiaryEntryContent: React.FC<DiaryEntryContentProps> = ({
   photoUrl,
   maxImageRatio = 0.5,
 }) => {
-  const screen = useWindowDimensions();
-  const styles = createStyles(screen.width, maxImageRatio);
+  const { width: screenWidth } = useWindowDimensions();
+  const cardPadding = 24; // considerar padding do card
+  const maxWidth = screenWidth - cardPadding;
+
+  const styles = createStyles(maxWidth, maxImageRatio);
 
   return (
     <View>
-      <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-        {title}
-      </Text>
+      {title ? (
+        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+          {title}
+        </Text>
+      ) : null}
 
-      <Text style={styles.content}>{content}</Text>
+      {content ? (
+        <Text style={styles.content} numberOfLines={4} ellipsizeMode="tail">
+          {content}
+        </Text>
+      ) : null}
 
-      {photoUrl && <Image source={{ uri: photoUrl }} style={styles.photo} />}
+      {photoUrl && (
+        <Image
+          source={{ uri: photoUrl }}
+          style={[styles.photo, { maxWidth }]}
+        />
+      )}
     </View>
   );
 };
 
-const createStyles = (screenWidth: number, maxRatio: number) =>
+const createStyles = (maxWidth: number, maxRatio: number) =>
   StyleSheet.create({
     title: {
       fontFamily: 'Poppins_500Medium',
@@ -45,7 +59,6 @@ const createStyles = (screenWidth: number, maxRatio: number) =>
       marginBottom: 4,
       color: '#2B2B2B',
     },
-
     content: {
       fontFamily: 'Poppins_400Regular',
       fontSize: 11,
@@ -53,13 +66,12 @@ const createStyles = (screenWidth: number, maxRatio: number) =>
       color: '#2B2B2B',
       marginBottom: 8,
     },
-
     photo: {
       width: '100%',
-      maxHeight: screenWidth * maxRatio,
       aspectRatio: 16 / 9,
+      maxHeight: maxWidth * maxRatio, 
       borderRadius: 10,
       marginTop: 8,
-      resizeMode: 'cover', // melhor visual em feed
+      resizeMode: 'cover',
     },
   });

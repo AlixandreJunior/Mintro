@@ -19,11 +19,12 @@ const LoginScreen = () => {
 
   const { handleLogin, error } = useAuthForm();
 
+  console.log(error);
   return (
     <AuthFormCard
       welcomeText={welcomeText}
       subtitleText={subtitleText}
-      error={error}
+      error={error?.detail}
     >
       <AuthLoginForm
         email={email}
@@ -32,6 +33,7 @@ const LoginScreen = () => {
         setEmail={setEmail}
         setPassword={setPassword}
         setShowPassword={setShowPassword}
+        errors={error}
       />
 
       <AuthSubmitButton

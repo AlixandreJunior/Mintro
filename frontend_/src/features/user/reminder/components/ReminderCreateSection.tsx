@@ -1,60 +1,36 @@
-// components/CreateNotificationScreen.tsx
 import React, { useState, useEffect } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  TextInput,
-  Button,
-  Platform,
-  Switch,
-} from 'react-native';
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
+import { Modal, View, StyleSheet } from 'react-native';
+import ReminderModalForm from './ReminderModalForm';
 
 export type NotificationType =
   | 'diario'
-  | 'objetivo'
   | 'hidratacao'
   | 'exercicio'
   | 'mindfulness'
   | 'outro';
 
-export interface NotificationRecord {
-  id: string;
-  title: string;
-  body: string;
-  date: string; // ISO string
-  hour: number;
-  minute: number;
-  isDaily: boolean;
-  type: NotificationType;
-}
-
 interface Props {
   visible: boolean;
   onClose: () => void;
-  onSave: (
-    title: string,
-    body: string,
-    hour: number,
-    minute: number,
-    daily: boolean,
-    type: NotificationType
-  ) => void;
-  notification?: NotificationRecord;
+  onSave: (data: {
+    title: string;
+    content: string;
+    date: string;
+    time: string;
+    is_daily: boolean;
+    type: string;
+    deadline?: string | null;
+  }) => void;
+  notification?: any;
 }
 
-const NOTIFICATION_TYPES: { value: NotificationType; label: string }[] = [
-  { value: 'diario', label: 'Diário' },
-  { value: 'objetivo', label: 'Objetivo' },
-  { value: 'hidratacao', label: 'Hidratação' },
-  { value: 'exercicio', label: 'Exercício' },
-  { value: 'mindfulness', label: 'Mindfulness' },
-  { value: 'outro', label: 'Outro' },
-];
+const TYPE_MAP: Record<NotificationType, string> = {
+  diario: 'DR',
+  hidratacao: 'HD',
+  exercicio: 'EX',
+  mindfulness: 'MD',
+  outro: 'OT',
+};
 
 const CreateNotificationModal: React.FC<Props> = ({
   visible,
@@ -63,211 +39,93 @@ const CreateNotificationModal: React.FC<Props> = ({
   notification,
 }) => {
   const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
+  const [content, setContent] = useState('');
+  const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
-  const [daily, setDaily] = useState(true);
-  const [showPicker, setShowPicker] = useState(Platform.OS === 'ios');
+  const [isDaily, setIsDaily] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [type, setType] = useState<NotificationType>('hidratacao');
-  const [errors, setErrors] = useState<{ title?: string; body?: string }>({});
 
   useEffect(() => {
     if (!visible) return;
 
-    setErrors({});
-
     if (notification) {
       setTitle(notification.title);
-      setBody(notification.body);
-      setTime(new Date(notification.date));
-      setDaily(notification.isDaily);
-      setType(notification.type);
+      setContent(notification.content);
+      setDate(new Date(notification.date));
+      setTime(
+        notification.time
+          ? new Date('1970-01-01T' + notification.time)
+          : new Date()
+      );
+      setIsDaily(notification.is_daily);
+
+      const found = Object.entries(TYPE_MAP).find(
+        ([, v]) => v === notification.type
+      );
+      setType(found ? (found[0] as NotificationType) : 'hidratacao');
     } else {
       setTitle('');
-      setBody('');
+      setContent('');
+      setDate(new Date());
       setTime(new Date());
-      setDaily(true);
+      setIsDaily(false);
       setType('hidratacao');
     }
 
-    setShowPicker(Platform.OS === 'ios');
+    setShowDatePicker(false);
+    setShowTimePicker(false);
   }, [visible, notification]);
 
-  const handleTimeChange = (
-    event: DateTimePickerEvent,
-    selectedTime?: Date
-  ) => {
-    if (Platform.OS === 'android') setShowPicker(false);
-    if (event.type === 'set' && selectedTime) {
-      setTime(selectedTime);
-    }
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: { title?: string; body?: string } = {};
-
-    if (!title.trim()) {
-      newErrors.title = 'Título é obrigatório';
-    }
-
-    if (!body.trim()) {
-      newErrors.body = 'Mensagem é obrigatória';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSave = () => {
-    if (!validateForm()) return;
+    const payload = {
+      title: title.trim(),
+      content: content.trim(),
+      date: date.toISOString().split('T')[0],
+      time: time.toTimeString().split(' ')[0],
+      is_daily: isDaily,
+      type: TYPE_MAP[type],
+    };
 
-    onSave(
-      title.trim(),
-      body.trim(),
-      time.getHours(),
-      time.getMinutes(),
-      daily,
-      type
-    );
+    onSave(payload);
   };
 
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          backgroundColor: 'rgba(0,0,0,0.5)',
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: '#fff',
-            padding: 20,
-            borderRadius: 12,
-            margin: 20,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: 'bold',
-              marginBottom: 20,
-              textAlign: 'center',
-            }}
-          >
-            {notification ? 'Editar Notificação' : 'Nova Notificação'}
-          </Text>
-
-          {/* Título */}
-          <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>Título *</Text>
-          <TextInput
-            value={title}
-            onChangeText={(text) => {
-              setTitle(text);
-              if (errors.title) setErrors({ ...errors, title: undefined });
-            }}
-            placeholder="Digite o título"
-            style={{
-              borderWidth: 1,
-              borderColor: errors.title ? 'red' : '#ccc',
-              borderRadius: 6,
-              marginBottom: 4,
-              paddingHorizontal: 8,
-              height: 40,
-            }}
-          />
-          {errors.title && (
-            <Text style={{ color: 'red', fontSize: 12, marginBottom: 8 }}>
-              {errors.title}
-            </Text>
-          )}
-
-          {/* Mensagem */}
-          <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>
-            Mensagem *
-          </Text>
-          <TextInput
-            value={body}
-            onChangeText={(text) => {
-              setBody(text);
-              if (errors.body) setErrors({ ...errors, body: undefined });
-            }}
-            placeholder="Digite a mensagem"
-            style={{
-              borderWidth: 1,
-              borderColor: errors.body ? 'red' : '#ccc',
-              borderRadius: 6,
-              marginBottom: 4,
-              paddingHorizontal: 8,
-              height: 40,
-            }}
-          />
-          {errors.body && (
-            <Text style={{ color: 'red', fontSize: 12, marginBottom: 8 }}>
-              {errors.body}
-            </Text>
-          )}
-
-          {/* Horário */}
-          <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>Horário</Text>
-          {Platform.OS === 'android' && !showPicker && (
-            <Button
-              title={`Selecionar horário: ${time
-                .getHours()
-                .toString()
-                .padStart(2, '0')}:${time
-                .getMinutes()
-                .toString()
-                .padStart(2, '0')}`}
-              onPress={() => setShowPicker(true)}
-            />
-          )}
-
-          {showPicker && (
-            <DateTimePicker
-              value={time}
-              mode="time"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={handleTimeChange}
-              style={{ marginBottom: 20 }}
-            />
-          )}
-
-          {/* Diário */}
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: 20,
-            }}
-          >
-            <Text style={{ marginRight: 8 }}>Repetir diariamente</Text>
-            <Switch value={daily} onValueChange={setDaily} />
-          </View>
-
-          {/* Tipo */}
-          <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>Tipo</Text>
-          <Picker
-            selectedValue={type}
-            onValueChange={(value) => setType(value as NotificationType)}
-            style={{ marginBottom: 20 }}
-          >
-            {NOTIFICATION_TYPES.map((t) => (
-              <Picker.Item key={t.value} label={t.label} value={t.value} />
-            ))}
-          </Picker>
-
-          {/* Botões */}
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-          >
-            <Button title="Cancelar" onPress={onClose} color="#888" />
-            <Button title="Salvar" onPress={handleSave} />
-          </View>
-        </View>
+      <View style={styles.overlay}>
+        <ReminderModalForm
+          title={title}
+          setTitle={setTitle}
+          content={content}
+          setContent={setContent}
+          date={date}
+          setDate={setDate}
+          isDaily={isDaily}
+          setIsDaily={setIsDaily}
+          time={time}
+          setTime={setTime}
+          type={type}
+          setType={setType}
+          showTimePicker={showTimePicker}
+          showDatePicker={showDatePicker}
+          setShowDatePicker={setShowDatePicker}
+          setShowTimePicker={setShowTimePicker}
+          onClose={onClose}
+          onSave={handleSave}
+        />
       </View>
     </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+});
 
 export default CreateNotificationModal;

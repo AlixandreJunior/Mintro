@@ -1,5 +1,6 @@
 import { getPeriodRange } from '@/share/utils/getPeriodRange';
 import { Service } from '../../../share/service';
+import { StepWrite } from '@/share/types/health/steps';
 
 export class StepsService extends Service {
   static async list(
@@ -14,7 +15,7 @@ export class StepsService extends Service {
     );
   }
 
-  static async create(data: any): Promise<any> {
+  static async create(data: StepWrite): Promise<any> {
     return this.apiPost('health/step/register/', data);
   }
 }

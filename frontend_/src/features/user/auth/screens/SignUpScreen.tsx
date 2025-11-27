@@ -22,7 +22,7 @@ const SignUpScreen = () => {
     <AuthFormCard
       welcomeText="Criar nova conta!"
       subtitleText="Preencha os dados para começar"
-      error={error}
+      error={error?.detail}
     >
       <AuthSignUpForm
         email={email}
@@ -33,6 +33,7 @@ const SignUpScreen = () => {
         setName={setName}
         setPassword={setPassword}
         setShowPassword={setShowPassword}
+        errors={error}
       />
 
       <AuthSubmitButton

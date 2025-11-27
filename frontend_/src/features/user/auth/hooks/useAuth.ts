@@ -5,28 +5,34 @@ import { useHandleRequest } from '@/share/hooks/useHandleRequest';
 
 export function useAuthForm() {
   const { error, handleRequest, loading } = useHandleRequest();
-  const { login, logout } = useAuth();
+  const { login } = useAuth();
   const router = useRouter();
 
-  const handleLogin = async (
-    email: string,
-    password: string
-  ): Promise<{ access: string; refresh: string }> => {
-    const data = await handleRequest(() => AuthService.login(email, password));
-    login(data.access, data.refresh);
-    return data;
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      const data = await handleRequest(() =>
+        AuthService.login(email, password)
+      );
+      login(data.access, data.refresh);
+      return data;
+    } catch (err: any) {
+      console.log('Erros de login:', err);
+      throw err;
+    }
   };
 
   const handleSignUp = async (
     username: string,
     email: string,
     password: string
-  ): Promise<any> => {
-    const data = await handleRequest(() =>
-      AuthService.signUp(username, email, password)
-    );
-    router.push('/(app)/(tabs)/mental');
-    return data;
+  ) => {
+    try {
+      await handleRequest(() => AuthService.signUp(username, email, password));
+      router.push('/(auth)/login');
+    } catch (err: any) {
+      console.log('Erros de signup:', err);
+      throw err;
+    }
   };
 
   return { handleLogin, handleSignUp, error, loading };

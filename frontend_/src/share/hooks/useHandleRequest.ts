@@ -1,8 +1,11 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { AxiosError } from 'axios';
+
+export type BackendErrors = { [key: string]: string[] };
 
 export const useHandleRequest = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<BackendErrors | null>(null);
 
   const mountedRef = useRef(true);
 
@@ -28,11 +31,10 @@ export const useHandleRequest = () => {
         const result = await fn();
         if (setter) safeSetState(setter, result);
         return result;
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Erro desconhecido.';
-        safeSetState(setError, message);
-        throw err;
+      } catch (err: any) {
+        const backendErrors = err as BackendErrors;
+        safeSetState(setError, backendErrors);
+        throw backendErrors;
       } finally {
         safeSetState(setLoading, false);
       }
@@ -40,9 +42,5 @@ export const useHandleRequest = () => {
     [safeSetState]
   );
 
-  return {
-    handleRequest,
-    loading,
-    error,
-  };
+  return { handleRequest, loading, error };
 };
