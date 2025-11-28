@@ -43,7 +43,6 @@ class MindfulnessLogSerializer(serializers.ModelSerializer):
             "mindfulness",
             "mindfulness_id",
             "duration",
-            "description",
             "datetime",
         )
         read_only_fields = (

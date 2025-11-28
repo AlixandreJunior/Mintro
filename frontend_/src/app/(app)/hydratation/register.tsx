@@ -1,4 +1,4 @@
-import RegisterHydrationScreen from '@/screens/subpages/RegisterHydratationScreen';
+import RegisterHydrationScreen from '@/features/health/hydration/screens/RegisterHydratationScreen';
 
 const RegisterHydration = () => {
   return <RegisterHydrationScreen />;

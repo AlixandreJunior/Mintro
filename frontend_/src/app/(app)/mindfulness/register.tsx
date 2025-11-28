@@ -1,18 +1,6 @@
 import React from 'react';
-import { router } from 'expo-router';
-import { getMindfulnessList } from '@/services/mindfulness/listMindfulness';
-import { registerMindfulnessLog } from '@/services/mindfulness/registerMindfulnessLog';
-import RegisterScreenTemplate from '@/components/RegisterScreenTemplate';
+import RegisterMindfulnessScreen from '@/features/health/mindfulness/screens/RegisterMindfulnessScreen';
 
-export default function RegisterMindfulnessScreen() {
-  return (
-    <RegisterScreenTemplate
-      title="Registrar Mindfulness"
-      labelSelect="Mindfulness"
-      fetchItemList={getMindfulnessList}
-      registerLog={registerMindfulnessLog}
-      initialDuration="15"
-      onSuccessRedirect={() => router.back()}
-    />
-  );
+export default function RegisterMindfulness() {
+  return <RegisterMindfulnessScreen />;
 }

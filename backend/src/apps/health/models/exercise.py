@@ -1,4 +1,5 @@
 from django.db import models
+from django.dispatch import receiver
 from django.utils import timezone
 
 from apps.user.models import User
@@ -39,9 +40,46 @@ class ExerciseLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     duration = models.PositiveIntegerField()
-    distance = models.PositiveIntegerField(blank=True, null=True)
-    description = models.TextField(max_length=200, blank=True)
     datetime = models.DateTimeField(default=timezone.now)
 
     def __str__(self) -> str:
         return f"Registro de Exercircio de {self.user.username}"
+
+
+@receiver(models.signals.post_migrate)
+def create_default_exercises(sender: type[models.Model], **kwargs: object) -> None:
+    """Cria exercícios padrão após a execução das migrações.
+
+    Args:
+        sender (type[models.Model]): Modelo que enviou o sinal.
+        **kwargs (object): Argumentos adicionais do sinal.
+
+    Returns:
+        None: Esta função não retorna nada. Apenas garante
+        que os registros básicos de `Exercise` existam.
+    """
+    default_exercises: list[dict[str, object]] = [
+        {"name": "Corrida", "type": ExerciseTypeChoices.AEROBICO, "is_distance": True},
+        {
+            "name": "Caminhada",
+            "type": ExerciseTypeChoices.AEROBICO,
+            "is_distance": True,
+        },
+        {"name": "Treino", "type": ExerciseTypeChoices.FORCA, "is_distance": False},
+        {"name": "Natação", "type": ExerciseTypeChoices.AEROBICO, "is_distance": True},
+        {
+            "name": "Bicicleta",
+            "type": ExerciseTypeChoices.AEROBICO,
+            "is_distance": True,
+        },
+        {"name": "Esporte", "type": ExerciseTypeChoices.AEROBICO, "is_distance": False},
+    ]
+
+    for exercise_data in default_exercises:
+        Exercise.objects.get_or_create(
+            name=exercise_data["name"],
+            defaults={
+                "type": exercise_data["type"],
+                "is_distance": exercise_data["is_distance"],
+            },
+        )

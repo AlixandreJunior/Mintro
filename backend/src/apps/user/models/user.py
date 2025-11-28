@@ -37,6 +37,10 @@ class User(AbstractUser):
 
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    email = models.EmailField(unique=True)
+
+    steps_goal = models.PositiveIntegerField(default=10000)
+    hydration_goal = models.PositiveIntegerField(default=2000)
 
     diary_set: "Manager[Diary]"
     mindfulnesslog_set: "Manager[MindfulnessLog]"

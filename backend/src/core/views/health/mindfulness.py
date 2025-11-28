@@ -34,8 +34,8 @@ class BaseMindfulnessLogView(BaseView):
     serializer_class = MindfulnessLogSerializer
     permission_classes = (IsAuthenticated,)
     create_message = "Registro de Mindfulness criado com sucesso."
-    update_message = "..."
-    achivement_check = staticmethod(check_zen_total)
+    update_message = "Registro de Mindfulness atualizado com sucesso."
+    achievement_check = staticmethod(check_zen_total)
 
     @override
     def get_queryset(self) -> QuerySet[MindfulnessLog]:
@@ -52,6 +52,16 @@ class BaseMindfulnessLogView(BaseView):
             message = "Registros de mindfulness não encontrados."
             raise NotFound(message)
         return queryset
+
+    @override
+    def get_object(self) -> MindfulnessLog:
+        mindfulness_log_id = self.kwargs.get("id")
+
+        try:
+            return self.model.objects.get(id=mindfulness_log_id, user=self.request.user)
+        except self.model.DoesNotExist as e:
+            msg = "Registro não encontrado."
+            raise NotFound(msg) from e
 
     def perform_create(self, serializer: BaseSerializer) -> None:
         serializer.save(user=self.request.user)

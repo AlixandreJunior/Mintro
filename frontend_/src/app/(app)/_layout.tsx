@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { Slot } from 'expo-router';
-import Header from '@/components/layout/Header';
+import Header from '@/share/components/layout/Header';
 
 export default function Layout() {
   return (

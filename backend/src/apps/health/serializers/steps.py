@@ -19,3 +19,7 @@ class StepLogSerializer(serializers.ModelSerializer):
         model = StepLog
         fields = ("id", "user", "date", "steps")
         read_only_fields = ("id", "user", "date")
+
+
+class StepGoalSerializer(serializers.Serializer):
+    goal = serializers.IntegerField(source="user.steps_goal", read_only=True)

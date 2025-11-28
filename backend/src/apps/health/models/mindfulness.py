@@ -1,4 +1,5 @@
 from django.db import models
+from django.dispatch import receiver
 from django.utils import timezone
 
 from apps.user.models.user import User
@@ -40,8 +41,31 @@ class MindfulnessLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mindfulness = models.ForeignKey(Mindfulness, on_delete=models.CASCADE)
     duration = models.PositiveIntegerField()
-    description = models.TextField(max_length=200)
     datetime = models.DateTimeField(default=timezone.now)
 
     def __str__(self) -> str:
         return f"Registro de Mindfulness de {self.user.username} em {self.datetime}"
+
+
+@receiver(models.signals.post_migrate)
+def create_default_mindfulness(sender: type[models.Model], **kwargs: object) -> None:
+    """Cria práticas de mindfulness padrão após migrações do banco.
+
+    Args:
+        sender (type[models.Model]): Modelo que enviou o sinal.
+        **kwargs (object): Argumentos adicionais do sinal.
+
+    Returns:
+        None: Apenas garante que os registros padrão de `Mindfulness`
+        existam no banco de dados.
+    """
+    default_mindfulness: list[dict[str, str]] = [
+        {"name": "Meditação Guiada"},
+        {"name": "Respiração Consciente"},
+        {"name": "Body Scan"},
+        {"name": "Atenção Plena"},
+        {"name": "Relaxamento Muscular"},
+    ]
+
+    for item in default_mindfulness:
+        Mindfulness.objects.get_or_create(name=item["name"])

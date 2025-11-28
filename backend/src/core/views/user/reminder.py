@@ -19,9 +19,7 @@ class BaseReminderView(BaseView):
 
     @override
     def get_queryset(self) -> QuerySet[Reminder]:
-        return self.model.objects.filter(user=self.request.user).order_by(
-            "deadline", "time"
-        )
+        return self.model.objects.filter(user=self.request.user).order_by("-pk")
 
     @override
     def perform_create(self, serializer: BaseSerializer) -> None:

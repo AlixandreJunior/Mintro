@@ -1,7 +1,7 @@
 from typing import override
 
 from django.db.models.query import QuerySet
-from django.forms import ValidationError
+from django.utils.dateparse import parse_date
 from rest_framework import permissions
 from rest_framework.exceptions import NotFound
 from rest_framework.serializers import BaseSerializer
@@ -30,7 +30,7 @@ class BaseDiaryView(BaseView):
     model = Diary
     serializer_class = DiarySerializer
     permission_classes = (permissions.IsAuthenticated,)
-    achivement_check = staticmethod(check_narrador_da_propria_historia)
+    achievement_check = staticmethod(check_narrador_da_propria_historia)
     create_message = "Diário criado com sucesso."
     update_message = "Diário atualizado com sucesso."
 
@@ -39,36 +39,18 @@ class BaseDiaryView(BaseView):
 
     @override
     def get_queryset(self) -> QuerySet[Diary]:
-        user = self.request.user
-        search = self.request.query_params.get("search")
-        month = self.request.query_params.get("month")
-        year = self.request.query_params.get("year")
+        queryset = self.model.objects.filter(user=self.request.user).order_by("-date")
+        start_date = self.request.GET.get("start_date")
+        end_date = self.request.GET.get("end_date")
 
-        queryset = (
-            self.model.objects.filter(user=user)
-            .select_related("user")
-            .prefetch_related("activities")
-            .order_by("-created_at")
-        )
+        if start_date and (parsed := parse_date(start_date)):
+            queryset = queryset.filter(date__gte=parsed)
+        if end_date and (parsed := parse_date(end_date)):
+            queryset = queryset.filter(date__lte=parsed)
 
-        if search:
-            queryset = queryset.filter(title__icontains=search)
-
-        try:
-            if month:
-                queryset = queryset.filter(created_at__month=int(month))
-            if year:
-                queryset = queryset.filter(created_at__year=int(year))
-
-            if not queryset:
-                msg = "Diários não encontrados."
-                raise NotFound(msg)
-
-        except ValueError as e:
-            msg = "Os parâmetros de mês e ano devem ser números inteiros."
-
-            raise ValidationError(msg) from e
-
+        if not queryset.exists():
+            message = "Diários não encontrados."
+            raise NotFound(message)
         return queryset
 
     @override

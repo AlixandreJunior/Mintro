@@ -12,7 +12,12 @@ Classes:
     MindfulnessLogRegisterView: Cria novos registros e verifica conquistas associadas.
 """
 
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import (
+    CreateAPIView,
+    DestroyAPIView,
+    ListAPIView,
+    UpdateAPIView,
+)
 
 from core.views.health.mindfulness import BaseMindfulnessLogView, BaseMindfulnessView
 
@@ -53,6 +58,28 @@ class MindfulnessLogRegisterView(BaseMindfulnessLogView, CreateAPIView):
     Methods:
         create(request, *args, **kwargs): Cria o registro e retorna conquistas
         desbloqueadas.
+    """
+
+    pass
+
+
+class MindfulnessLogDeleteView(BaseMindfulnessLogView, DestroyAPIView):
+    """Cria novos registros de exercícios e verifica conquistas desbloqueadas.
+
+    Após criar o registro de exercício, esta view executa a função
+    `check_foco_total()` para identificar se o usuário atingiu critérios
+    de conquistas relacionados ao foco total.
+    """
+
+    pass
+
+
+class MindfulnessLogUpdateView(BaseMindfulnessLogView, UpdateAPIView):
+    """Cria novos registros de exercícios e verifica conquistas desbloqueadas.
+
+    Após criar o registro de exercício, esta view executa a função
+    `check_foco_total()` para identificar se o usuário atingiu critérios
+    de conquistas relacionados ao foco total.
     """
 
     pass

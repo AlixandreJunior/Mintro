@@ -31,7 +31,6 @@ class Reminder(models.Model):
     title = models.CharField(max_length=56)
     content = models.CharField(max_length=256)
     date = models.DateField(default=timezone.now)
-    deadline = models.DateField()
     time = models.TimeField(auto_now_add=True)
     type = models.CharField(max_length=2, choices=ReminderTypeChoices.choices)
     is_daily = models.BooleanField(default=False)

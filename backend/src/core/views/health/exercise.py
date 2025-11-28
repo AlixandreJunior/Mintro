@@ -32,7 +32,7 @@ class BaseExerciseLogView(BaseView):
     serializer_class = ExerciseLogSerializer
     update_message = "Registro Atualizado com sucesso!!"
     create_message = "Registro Criado com sucesso."
-    achivement_check = staticmethod(check_foco_total)
+    achievement_check = staticmethod(check_foco_total)
 
     @override
     def get_queryset(self) -> QuerySet[ExerciseLog]:
@@ -49,6 +49,16 @@ class BaseExerciseLogView(BaseView):
             message = "Registros de Exercícios não encontrados."
             raise NotFound(message)
         return queryset
+
+    @override
+    def get_object(self) -> ExerciseLog:
+        exercise_log_id = self.kwargs.get("id")
+
+        try:
+            return self.model.objects.get(id=exercise_log_id, user=self.request.user)
+        except self.model.DoesNotExist as e:
+            msg = "Registro não encontrado."
+            raise NotFound(msg) from e
 
     def perform_create(self, serializer: BaseSerializer) -> None:
         serializer.save(user=self.request.user)

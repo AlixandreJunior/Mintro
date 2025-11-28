@@ -9,63 +9,39 @@ Classes:
     HydratationLogRegisterView: Cria novos registros e verifica conquistas associadas.
 """
 
-from typing import TYPE_CHECKING, cast
+from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
+from rest_framework import permissions
+from rest_framework.generics import (
+    CreateAPIView,
+    DestroyAPIView,
+    ListAPIView,
+    RetrieveAPIView,
+    UpdateAPIView,
+)
 
-from rest_framework.generics import CreateAPIView, ListAPIView
-from rest_framework.request import Request
-from rest_framework.response import Response
-
+from apps.health.serializers.hydration import GoalHydration
 from core.views.health.hydration import BaseHydrationView
-from core.check_achievement import check_gole_a_gole
-
-if TYPE_CHECKING:
-    from apps.user.models.user import User
 
 
 class HydratationLogListView(BaseHydrationView, ListAPIView):
-    """Lista os registros de hidratação do usuário autenticado.
-
-    Esta view retorna todos os registros (`HydrationLog`) associados
-    ao usuário logado, herdando a lógica base de `BaseHydrationView`.
-
-    Methods:
-        get_queryset(): Retorna os registros de hidratação do usuário atual.
-    """
-
     pass
 
 
 class HydratationLogRegisterView(BaseHydrationView, CreateAPIView):
-    """Cria novos registros de hidratação e verifica conquistas desbloqueadas.
+    pass
 
-    Após a criação de um novo registro, esta view executa a função
-    `check_gole_a_gole()` para verificar se o usuário atingiu critérios
-    que concedem conquistas relacionadas à hidratação consistente.
 
-    Methods:
-        create(request, *args, **kwargs): Cria o registro e retorna conquistas
-        desbloqueadas.
-    """
+class HydrationLogDeleteView(BaseHydrationView, DestroyAPIView):
+    pass
 
-    def create(self, request: Request, *args: object, **kwargs: object) -> Response:
-        """Cria um novo log de hidratação e verifica conquistas desbloqueadas.
 
-        Args:
-            request (Request): Objeto da requisição contendo os dados do registro.
-            *args (object): Argumentos adicionais passados à superclasse.
-            **kwargs (object): Parâmetros de rota adicionais.
+class HydrationLogUpdateView(BaseHydrationView, UpdateAPIView):
+    pass
 
-        Returns:
-            Response: Resposta contendo uma mensagem de sucesso e,
-                se aplicável, uma lista de conquistas desbloqueadas.
-        """
-        response = super().create(request, *args, **kwargs)
-        user = cast("User", request.user)
 
-        unlocked_achievements = check_gole_a_gole(user)
-        response.data = {
-            "detail": "Registro de hidratação criado com sucesso.",
-            "unlocked_achievements": unlocked_achievements,
-        }
+class HydrationGoalView(RetrieveAPIView):
+    serializer_class = GoalHydration
+    permission_classes = (permissions.IsAuthenticated,)
 
-        return response
+    def get_object(self) -> AbstractBaseUser | AnonymousUser:
+        return self.request.user
