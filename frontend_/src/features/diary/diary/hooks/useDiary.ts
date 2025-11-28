@@ -23,10 +23,9 @@ export const useDiary = () => {
 
   const handleDiaryUpdate = async (
     id: number,
-    data: Partial<DiaryWrite>
+    data: FormData
   ): Promise<ResponseSuccess> => {
-    const formData = objectToFormData(data);
-    return await handleRequest(() => DiaryService.update(id, formData));
+    return await handleRequest(() => DiaryService.update(id, data));
   };
 
   const handleDiaryDelete = async (id: number): Promise<ResponseSuccess> => {

@@ -1,4 +1,6 @@
-import { Modal, View, Text, Button, Switch, StyleSheet } from 'react-native';
+import { MainButton } from '@/share/components/ui/button/MainButton';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
 
 interface ReminderModalButtonsProps {
   onClose: () => void;
@@ -11,8 +13,9 @@ const ReminderModalButtons: React.FC<ReminderModalButtonsProps> = ({
 }) => {
   return (
     <View style={styles.actions}>
-      <Button title="Cancelar" onPress={onClose} color="#888" />
-      <Button title="Salvar" onPress={onSave} />
+      <MainButton label="Cancelar" onPress={onClose} color={'#DB2020'} />
+
+      <MainButton label="Salvar" onPress={onSave} color={'#12C95B'} />
     </View>
   );
 };
@@ -21,6 +24,7 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 12,
     marginTop: 16,
   },
 });

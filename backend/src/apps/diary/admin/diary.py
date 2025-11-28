@@ -37,8 +37,8 @@ class DiaryAdmin(admin.ModelAdmin):  # type: ignore
         date_hierarchy (str): Campo usado para navegação hierárquica por data.
     """
 
-    list_display = ("id", "user", "title", "mood", "created_at")
-    list_filter = ("mood", "created_at")
+    list_display = ("id", "user", "title", "mood", "date", "time")
+    list_filter = ("mood", "date", "time")
     search_fields = ("title", "content", "user__username")
     autocomplete_fields = ("user", "activities")
-    date_hierarchy = "created_at"
+    date_hierarchy = "date"

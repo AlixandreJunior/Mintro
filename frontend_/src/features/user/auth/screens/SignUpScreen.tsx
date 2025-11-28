@@ -5,9 +5,11 @@ import { AuthBackContainer } from '../components/AuthBackContainter';
 import { useAuthForm } from '../hooks/useAuth';
 import AuthSignUpForm from '../components/AuthSignUpForm';
 import { AuthFormCard } from '../components/AuthFormCard';
+import { useToast } from '@/share/providers/ToastProvider';
 
 const SignUpScreen = () => {
   const { handleSignUp, error } = useAuthForm();
+  const { showToast } = useToast();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -17,6 +19,16 @@ const SignUpScreen = () => {
   const textSubmit = 'Criar conta';
   const backText = 'Já tem uma conta?';
   const backLink = 'Entrar';
+
+  const handleSubmit = async () => {
+    try {
+      await handleSignUp(name, email, password);
+      showToast('Conta criada com sucesso!', 'success');
+      router.push('/(auth)/login');
+    } catch (err) {
+      showToast('Erro ao criar conta!', 'error');
+    }
+  };
 
   return (
     <AuthFormCard
@@ -36,10 +48,8 @@ const SignUpScreen = () => {
         errors={error}
       />
 
-      <AuthSubmitButton
-        handleSubmit={() => handleSignUp(name, email, password)}
-        textSubmit={textSubmit}
-      />
+      <AuthSubmitButton handleSubmit={handleSubmit} textSubmit={textSubmit} />
+
       <AuthBackContainer
         backLink={backLink}
         backText={backText}

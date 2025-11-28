@@ -30,7 +30,7 @@ class BaseDiaryView(BaseView):
     model = Diary
     serializer_class = DiarySerializer
     permission_classes = (permissions.IsAuthenticated,)
-    achivement_check = staticmethod(check_narrador_da_propria_historia)
+    achievement_check = staticmethod(check_narrador_da_propria_historia)
     create_message = "Diário criado com sucesso."
     update_message = "Diário atualizado com sucesso."
 
@@ -39,14 +39,14 @@ class BaseDiaryView(BaseView):
 
     @override
     def get_queryset(self) -> QuerySet[Diary]:
-        queryset = self.model.objects.filter(user=self.request.user)
+        queryset = self.model.objects.filter(user=self.request.user).order_by("-date")
         start_date = self.request.GET.get("start_date")
         end_date = self.request.GET.get("end_date")
 
         if start_date and (parsed := parse_date(start_date)):
-            queryset = queryset.filter(created_at__date__gte=parsed)
+            queryset = queryset.filter(date__gte=parsed)
         if end_date and (parsed := parse_date(end_date)):
-            queryset = queryset.filter(created_at__date__lte=parsed)
+            queryset = queryset.filter(date__lte=parsed)
 
         if not queryset.exists():
             message = "Diários não encontrados."

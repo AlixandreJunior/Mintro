@@ -10,7 +10,8 @@ export interface Diary {
   user: number;
   title: string;
   content: string;
-  created_at: string;
+  date: string;
+  time: string;
   mood: MoodType;
   activities: Activity[];
   photo?: string;
@@ -19,7 +20,8 @@ export interface Diary {
 export interface DiaryWrite {
   title: string;
   content: string;
-  created_at: string;
+  date: string;
+  time: string;
   mood: MoodType;
   activities_ids: string[];
   photo?: string;

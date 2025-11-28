@@ -32,7 +32,7 @@ class BaseExerciseLogView(BaseView):
     serializer_class = ExerciseLogSerializer
     update_message = "Registro Atualizado com sucesso!!"
     create_message = "Registro Criado com sucesso."
-    achivement_check = staticmethod(check_foco_total)
+    achievement_check = staticmethod(check_foco_total)
 
     @override
     def get_queryset(self) -> QuerySet[ExerciseLog]:

@@ -31,4 +31,8 @@ export class HydrationService extends Service {
   static async delete(id: number): Promise<ResponseSuccess> {
     return this.apiDelete(`health/hydration/delete/${id}/`);
   }
+
+  static async goal(): Promise<any> {
+    return this.apiGet('health/hydration/goal/');
+  }
 }

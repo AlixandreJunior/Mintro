@@ -6,9 +6,12 @@ import FormHeader from '@/share/components/layout/FormHeader';
 import { useDiary } from '../hooks/useDiary';
 import DiaryForm from '../components/DiaryForm';
 import { MoodType } from '@/share/types/mental/diary';
-import { formatDatetimeToISO } from '@/share/utils/formatDatetimeToISO';
-import { combineDateAndTime } from '../utils/datetime';
+import {
+  formatDatetimeToISO,
+  formatTimeToISO,
+} from '@/share/utils/formatDatetimeToISO';
 import { appendImageToFormData } from '@/share/utils/appendImageToFormData';
+import { useToast } from '@/share/providers/ToastProvider'; // 🔹 import Toast
 
 const CreateDiaryScreen = () => {
   const [title, setTitle] = useState('');
@@ -21,26 +24,36 @@ const CreateDiaryScreen = () => {
   const [photo, setPhoto] = useState<string>();
   const [mood, setMood] = useState<MoodType>('Neutro');
 
-  const { handleDiaryCreate } = useDiary();
+  const { handleDiaryCreate, error } = useDiary();
+  const { showToast } = useToast(); // 🔹 hook do Toast
 
   const onSave = async () => {
-    const created_at = formatDatetimeToISO(
-      combineDateAndTime(selectedDate, selectedTime)
-    );
+    try {
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('content', content);
+      formData.append('date', formatDatetimeToISO(selectedDate));
+      formData.append('time', formatTimeToISO(selectedTime));
+      formData.append('mood', mood);
 
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('content', content);
-    formData.append('created_at', created_at);
-    formData.append('mood', mood);
+      activities_ids.forEach((id) =>
+        formData.append('activities_ids', String(id))
+      );
 
-    activities_ids.forEach((id) =>
-      formData.append('activities_ids', String(id))
-    );
+      await appendImageToFormData(formData, photo);
 
-    await appendImageToFormData(formData, photo);
+      await handleDiaryCreate(formData);
 
-    handleDiaryCreate(formData);
+      // 🔹 exibe toast de sucesso
+      showToast('Diário criado com sucesso!', 'success');
+
+      // redireciona após 1.5s para o usuário perceber o toast
+      setTimeout(() => {
+        router.push('/(app)/(tabs)/mental');
+      }, 1500);
+    } catch (err) {
+      showToast('Erro ao criar diário!', 'error');
+    }
   };
 
   return (
@@ -70,6 +83,7 @@ const CreateDiaryScreen = () => {
         onChangeContent={setContent}
         photo={photo}
         onImageSelected={setPhoto}
+        errors={error}
       />
     </View>
   );

@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from apps.user.models import User
 from utils.choices import DiaryMoodChoices
-from utils.signals_callable import create_achievements
+from utils.signals_callable import create_activities
 from utils.validate_type_img import validate_image_type
 
 
@@ -52,6 +52,8 @@ class Diary(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     created_at = models.DateTimeField(default=timezone.now, db_index=True)
+    date = models.DateField(default=timezone.now)
+    time = models.TimeField(auto_now_add=True)
     mood = models.CharField(max_length=20, choices=DiaryMoodChoices.choices)
     activities = models.ManyToManyField(Activity, blank=True)  # type: ignore
     photo = models.ImageField(
@@ -83,7 +85,7 @@ def create_default_activities(
         app_config (object): Configuração do aplicativo.
         **kwargs (object): Argumentos adicionais.
     """
-    create_achievements(sender, **kwargs)
+    create_activities(sender=sender, app_config=app_config, kwargs=kwargs)
 
 
 @receiver(models.signals.post_delete, sender=Diary)

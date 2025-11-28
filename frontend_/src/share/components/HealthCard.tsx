@@ -1,6 +1,8 @@
 import BaseCard from '@/share/components/ui/card/BaseCard';
 import React from 'react';
-import { StyleSheet, ViewStyle, StyleProp } from 'react-native';
+import { StyleSheet, ViewStyle, StyleProp, Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 interface HealthCardProps {
   style?: StyleProp<ViewStyle>;
@@ -17,12 +19,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    borderRadius: 12,
+    borderRadius: width * 0.03,
     shadowColor: '#000',
     shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowRadius: width * 0.005,
     elevation: 2,
-    padding: 16,
+    padding: width * 0.04,
   },
 });
 

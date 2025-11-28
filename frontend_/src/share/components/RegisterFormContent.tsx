@@ -20,8 +20,8 @@ interface RegisterFormContentProps {
   setShowDatePicker: (show: boolean) => void;
   showTimePicker: boolean;
   setShowTimePicker: (show: boolean) => void;
-  duration: number;
-  setDuration: (value: number) => void;
+  duration: string;
+  setDuration: (value: string) => void;
 }
 
 export default function RegisterFormContent({
@@ -74,6 +74,7 @@ export default function RegisterFormContent({
         onChange={updateDate}
         onPress={() => setShowDatePicker(true)}
         showPicker={showDatePicker}
+        maximumDate={new Date()}
       />
 
       <DateTimeInput
@@ -83,6 +84,7 @@ export default function RegisterFormContent({
         onChange={updateTime}
         onPress={() => setShowTimePicker(true)}
         showPicker={showTimePicker}
+        maximumDate={new Date()}
       />
 
       <MainInput
@@ -90,7 +92,7 @@ export default function RegisterFormContent({
         //@ts-ignore
         onChangeText={setDuration}
         keyboardType="numeric"
-        value={duration.toString()}
+        value={duration}
       />
     </View>
   );

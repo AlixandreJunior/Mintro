@@ -33,6 +33,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const saveTokensAndUpdateState = async (access: string, refresh: string) => {
+    await storeTokens(access, refresh);
+
+    setAccessToken(access);
+    setRefreshToken(refresh);
+    setIsAuthenticated(true);
+  };
+
   const fetchTokens = async () => {
     const access = isWeb
       ? await AsyncStorage.getItem('accessToken')

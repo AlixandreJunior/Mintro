@@ -2,6 +2,11 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { DateTimeInput } from '@/share/components/ui/inputs/DateTimeInput';
 
+interface DiaryDateTimeRowErrors {
+  date?: string[];
+  time?: string[];
+}
+
 interface DiaryDateTimeRowProps {
   selectedDate: Date;
   onChangeDate: (date: Date) => void;
@@ -12,6 +17,8 @@ interface DiaryDateTimeRowProps {
   onChangeTime: (date: Date) => void;
   showTimePicker: boolean;
   setShowTimePicker: (show: boolean) => void;
+
+  errors?: DiaryDateTimeRowErrors;
 }
 
 export const DiaryDateTimeRow: React.FC<DiaryDateTimeRowProps> = ({
@@ -24,7 +31,11 @@ export const DiaryDateTimeRow: React.FC<DiaryDateTimeRowProps> = ({
   onChangeTime,
   showTimePicker,
   setShowTimePicker,
+
+  errors = {},
 }) => {
+  const now = new Date();
+
   return (
     <View style={styles.dateTimeContainer}>
       <View style={styles.dateInputWrapper}>
@@ -38,6 +49,8 @@ export const DiaryDateTimeRow: React.FC<DiaryDateTimeRowProps> = ({
             setShowDatePicker(false);
             if (date) onChangeDate(date);
           }}
+          errors={errors.date}
+          maximumDate={now}
         />
       </View>
 
@@ -52,6 +65,8 @@ export const DiaryDateTimeRow: React.FC<DiaryDateTimeRowProps> = ({
             setShowTimePicker(false);
             if (time) onChangeTime(time);
           }}
+          errors={errors.time}
+          maximumDate={now}
         />
       </View>
     </View>

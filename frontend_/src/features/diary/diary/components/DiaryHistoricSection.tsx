@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+// DiaryHistoricSection.tsx
+import { useWindowDimensions, StyleSheet, Text, View } from 'react-native';
 import DiaryDayHistory from './DiaryDayHistory';
 import DiaryEmptyState from './DiaryEmptyState';
-import DiaryErrorState from './DiaryErrorState';
 import { useDiary } from '../hooks/useDiary';
-import { Diary } from '@/share/types/mental/diary';
 import { useLoadList } from '@/share/hooks/useLoadList';
+import { Diary } from '@/share/types/mental/diary';
 
 interface DiaryHistoricSectionProps {
   initialDate: Date;
@@ -14,20 +13,19 @@ interface DiaryHistoricSectionProps {
 const DiaryHistoricSection: React.FC<DiaryHistoricSectionProps> = ({
   initialDate,
 }) => {
-  const { handleDiaryList, error } = useDiary();
+  const { handleDiaryList } = useDiary();
   const { width } = useWindowDimensions();
-
-  const styles = createStyles(width);
 
   const { data: diaries } = useLoadList<Diary>({
     loader: () => handleDiaryList(initialDate),
     deps: [initialDate],
   });
 
+  const styles = createStyles(width);
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Histórico</Text>
-
       {diaries.length === 0 ? (
         <DiaryEmptyState />
       ) : (
@@ -40,14 +38,14 @@ const DiaryHistoricSection: React.FC<DiaryHistoricSectionProps> = ({
 const createStyles = (width: number) =>
   StyleSheet.create({
     section: {
-      marginBottom: 8,
+      marginBottom: width * 0.05,
       paddingHorizontal: width * 0.05,
     },
     sectionTitle: {
-      fontSize: 16,
+      fontSize: width * 0.045,
       fontFamily: 'Poppins_400Regular',
       color: '#111827',
-      marginBottom: 8,
+      marginBottom: width * 0.03,
     },
   });
 

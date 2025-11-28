@@ -15,7 +15,7 @@ export const groupEntriesByDay = (entries: Diary[]): GroupedDiaryEntries => {
   const groups: GroupedDiaryEntries = {};
 
   entries.forEach((entry) => {
-    const day = new Date(entry.created_at).toISOString().split('T')[0];
+    const day = new Date(entry.date).toISOString().split('T')[0];
 
     const enrichedEntry = {
       ...entry,

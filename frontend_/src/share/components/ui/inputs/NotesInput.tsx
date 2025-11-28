@@ -5,9 +5,14 @@ import { TextInput } from 'react-native-paper';
 interface NotesInputProps {
   notes: string;
   onChangeNotes: (text: string) => void;
+  errors?: string[]; // ✅ adicionando suporte a erros
 }
 
-const NotesInput: React.FC<NotesInputProps> = ({ notes, onChangeNotes }) => {
+const NotesInput: React.FC<NotesInputProps> = ({
+  notes,
+  onChangeNotes,
+  errors,
+}) => {
   return (
     <View style={styles.inputSection}>
       <Text style={styles.inputLabel}>Anotação</Text>
@@ -18,10 +23,21 @@ const NotesInput: React.FC<NotesInputProps> = ({ notes, onChangeNotes }) => {
         onChangeText={onChangeNotes}
         multiline
         numberOfLines={4}
-        style={[styles.textInput, styles.notesInput]}
+        style={[
+          styles.textInput,
+          styles.notesInput,
+          errors ? { borderColor: '#EF4444' } : null, // ✅ borda vermelha se houver erro
+        ]}
         outlineStyle={styles.textInputOutline as ViewStyle}
         theme={{ fonts: { regular: { fontFamily: 'Poppins_400Regular' } } }}
       />
+
+      {errors &&
+        errors.map((errMsg, index) => (
+          <Text key={index} style={styles.errorText}>
+            {errMsg}
+          </Text>
+        ))}
     </View>
   );
 };
@@ -45,6 +61,11 @@ const styles = StyleSheet.create({
   notesInput: {
     minHeight: 100,
     textAlignVertical: 'top',
+  },
+  errorText: {
+    color: '#EF4444',
+    fontSize: 12,
+    marginTop: 4,
   },
 });
 

@@ -40,7 +40,6 @@ class ExerciseLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     duration = models.PositiveIntegerField()
-    description = models.TextField(max_length=200, blank=True)
     datetime = models.DateTimeField(default=timezone.now)
 
     def __str__(self) -> str:

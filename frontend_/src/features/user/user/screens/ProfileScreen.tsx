@@ -6,22 +6,33 @@ import { useUser } from '../hooks/useUser';
 import { User } from '@/share/types/user/user';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/share/context/AuthContext';
+import { useToast } from '@/share/providers/ToastProvider'; // 🔹 import do toast provider
 
 const { width } = Dimensions.get('window');
 
 const ProfileScreen = () => {
   const [user, setUser] = useState<User | null>(null);
+  const { handleUserRetrieve, error, loading } = useUser();
+  const { logout } = useAuth();
+  const { showToast } = useToast(); // 🔹 hook do toast
 
   useEffect(() => {
     const load = async () => {
-      const data = await handleUserRetrieve();
-      setUser(data);
+      try {
+        const data = await handleUserRetrieve();
+        setUser(data);
+
+        showToast(`Bem-vindo(a), ${data?.name || 'usuário'}!`, 'success');
+      } catch (e) {
+        showToast(
+          e instanceof Error ? e.message : 'Erro ao carregar perfil',
+          'error'
+        );
+      }
     };
     load();
   }, []);
 
-  const { handleUserRetrieve, error, loading } = useUser();
-  const { logout } = useAuth();
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>

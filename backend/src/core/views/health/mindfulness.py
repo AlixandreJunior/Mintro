@@ -34,8 +34,8 @@ class BaseMindfulnessLogView(BaseView):
     serializer_class = MindfulnessLogSerializer
     permission_classes = (IsAuthenticated,)
     create_message = "Registro de Mindfulness criado com sucesso."
-    update_message = "..."
-    achivement_check = staticmethod(check_zen_total)
+    update_message = "Registro de Mindfulness atualizado com sucesso."
+    achievement_check = staticmethod(check_zen_total)
 
     @override
     def get_queryset(self) -> QuerySet[MindfulnessLog]:

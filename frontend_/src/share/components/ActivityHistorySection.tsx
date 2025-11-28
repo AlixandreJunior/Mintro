@@ -81,7 +81,7 @@ export const ActivityHistorySection: React.FC<Props> = ({
       )}
 
       {sortedDays.map((dayKey) => (
-        <View key={dayKey} style={{ marginBottom: 24 }}>
+        <View key={dayKey}>
           <Text style={styles.date}>{dayLabel(new Date(dayKey))}</Text>
           {grouped[dayKey].map(renderCard)}
         </View>

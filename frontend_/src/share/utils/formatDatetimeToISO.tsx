@@ -15,12 +15,25 @@ export function formatDateToISO(date: Date): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-const getCombinedDateTime = (date: Date, time: Date) =>
-  new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-    time.getHours(),
-    time.getMinutes(),
-    time.getSeconds()
-  );
+export function formatTimeToISO(time: Date): string {
+  const hh = String(time.getHours()).padStart(2, '0');
+  const mm = String(time.getMinutes()).padStart(2, '0');
+  const ss = String(time.getSeconds()).padStart(2, '0');
+  return `${hh}:${mm}:${ss}`;
+}
+
+export function formatTimeToHoursMinutes(time: string | Date): string {
+  let dateObj: Date;
+
+  if (typeof time === 'string') {
+    const [hh, mm] = time.split(':').map(Number);
+    dateObj = new Date();
+    dateObj.setHours(hh, mm, 0, 0);
+  } else {
+    dateObj = time;
+  }
+
+  const hh = String(dateObj.getHours()).padStart(2, '0');
+  const mm = String(dateObj.getMinutes()).padStart(2, '0');
+  return `${hh}:${mm}`;
+}

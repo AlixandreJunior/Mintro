@@ -15,6 +15,10 @@ export function useHydration() {
     return await handleRequest(() => HydrationService.list(date, period));
   };
 
+  const handleHydrationGoal = async (): Promise<any> => {
+    return await handleRequest(() => HydrationService.goal());
+  };
+
   const handleHydrationCreate = async (
     data: HydrationWrite
   ): Promise<ResponseSuccess> => {
@@ -42,5 +46,6 @@ export function useHydration() {
     handleHydrationCreate,
     handleHydrationDelete,
     handleHydrationUpdate,
+    handleHydrationGoal,
   };
 }

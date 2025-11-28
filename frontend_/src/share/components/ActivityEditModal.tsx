@@ -11,7 +11,6 @@ interface ActivityEditModalProps {
   type: 'exercise' | 'mindfulness';
   onSubmit: (data: any) => void;
 
-  /** LISTA DE EXERCÍCIOS OU PRÁTICAS */
   items: Array<{ id: number; name: string }>;
 }
 
@@ -27,7 +26,7 @@ const ActivityEditModal: React.FC<ActivityEditModalProps> = ({
 
   const [date, setDate] = useState<Date>(new Date());
   const [time, setTime] = useState<Date>(new Date());
-  const [notes, setNotes] = useState('');
+  const [duration, setDuration] = useState<string>('');
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -44,7 +43,7 @@ const ActivityEditModal: React.FC<ActivityEditModalProps> = ({
       setTime(parsed);
     }
 
-    setNotes(item.notes || '');
+    setDuration(item.duration?.toString() || '');
     setSelectedItemId(item?.exercise_id || item?.mindfulness_id || null);
   }, [item]);
 
@@ -59,7 +58,7 @@ const ActivityEditModal: React.FC<ActivityEditModalProps> = ({
     onSubmit({
       id: item.id,
       datetime: finalDate.toISOString(),
-      notes,
+      duration: Number(duration),
       [`${type}_id`]: selectedItemId,
     });
 
@@ -84,7 +83,6 @@ const ActivityEditModal: React.FC<ActivityEditModalProps> = ({
             }))}
           />
 
-          {/* ------------ DATA ------------ */}
           <DateTimeInput
             labelText="Data"
             mode="date"
@@ -97,7 +95,6 @@ const ActivityEditModal: React.FC<ActivityEditModalProps> = ({
             }}
           />
 
-          {/* ------------ HORA ------------ */}
           <DateTimeInput
             labelText="Hora"
             mode="time"
@@ -110,10 +107,13 @@ const ActivityEditModal: React.FC<ActivityEditModalProps> = ({
             }}
           />
 
-          {/* ------------ NOTAS ------------ */}
-          <MainInput labelText="Notas" value={notes} onChangeText={setNotes} />
+          <MainInput
+            labelText="Duração (min)"
+            value={duration}
+            onChangeText={setDuration}
+            keyboardType="numeric"
+          />
 
-          {/* ------------ ACTIONS ------------ */}
           <View style={styles.actions}>
             <TouchableOpacity onPress={onClose} style={styles.button}>
               <Text style={styles.cancelText}>Cancelar</Text>

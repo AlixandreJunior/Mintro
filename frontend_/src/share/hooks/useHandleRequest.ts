@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { AxiosError } from 'axios';
 
 export type BackendErrors = { [key: string]: string[] };
 

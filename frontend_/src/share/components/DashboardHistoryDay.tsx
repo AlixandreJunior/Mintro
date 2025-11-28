@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import HealthCard from './HealthCard';
-import EditDeleteModal from './EditDeleteModal';
 import { getValue } from '../utils/dashboardHistory';
 import { DashboardHistoryContainer } from './DashboardHistoryContainer';
-import { useHydration } from '@/features/health/hydration/hooks/useHydration';
 import { ResponseSuccess } from '../types/response';
 import CardActions from './CardActions';
+
+const { width } = Dimensions.get('window');
 
 interface DashboardHistoryDayProps<T extends Record<string, any>> {
   logs: T[];
@@ -42,21 +42,39 @@ export function DashboardHistoryDay<T extends Record<string, any>>({
 }
 
 const styles = StyleSheet.create({
-  container: { paddingHorizontal: 16, marginBottom: 100 },
+  container: { paddingHorizontal: width * 0.05, marginBottom: 100 },
   title: {
-    fontSize: 16,
+    fontSize: width * 0.04, // ajusta de acordo com a largura da tela
     fontFamily: 'Poppins_500Medium',
     color: '#333',
-    marginBottom: 8,
+    marginBottom: width * 0.02,
   },
-  groupLabel: { fontSize: 14, fontFamily: 'Poppins_500Medium' },
-  historyCard: { padding: 16, marginBottom: 8 },
+  groupLabel: {
+    fontSize: width * 0.035,
+    fontFamily: 'Poppins_500Medium',
+    flexShrink: 1, // evita que quebre a linha
+  },
+  historyCard: {
+    padding: width * 0.03,
+    marginBottom: width * 0.015,
+  },
   rowBetween: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap',
   },
-  cardValue: { fontSize: 14, fontFamily: 'Poppins_500Medium', color: '#111' },
-  dotsButton: { paddingHorizontal: 8, paddingVertical: 2 },
-  dotsText: { fontSize: 24, fontWeight: 'bold' },
+  cardValue: {
+    fontSize: width * 0.035,
+    fontFamily: 'Poppins_500Medium',
+    color: '#111',
+  },
+  dotsButton: {
+    paddingHorizontal: width * 0.02,
+    paddingVertical: width * 0.005,
+  },
+  dotsText: {
+    fontSize: width * 0.07,
+    fontWeight: 'bold',
+  },
 });

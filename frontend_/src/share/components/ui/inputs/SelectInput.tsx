@@ -1,71 +1,186 @@
-import React from 'react';
-import { View, StyleSheet, Dimensions, Text } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, { useState } from 'react';
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 interface SelectInputProps {
-  label: string
+  label: string;
   selectedValue: string;
   onValueChange: (value: string) => void;
-  options: {label: string, value: string}[];
+  options: { label: string; value: string }[];
+  errors?: string[];
 }
 
-export default function SelectInput({
+export default function SelectInputStyled({
   label,
   selectedValue,
   onValueChange,
   options,
+  errors,
 }: SelectInputProps) {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const selectedLabel =
+    options.find((o) => o.value === selectedValue)?.label || 'Selecionar';
+
   return (
-    <SafeAreaView>
-    <Text style={styles.label}>{label}</Text>
-    <View style={styles.pickerContainer}>
-      <Picker
-        selectedValue={selectedValue}
-        onValueChange={(itemValue) => onValueChange(String(itemValue))}
-        style={styles.picker}
-        itemStyle={styles.pickerItem}
+    <View style={styles.inputSection}>
+      <Text style={styles.inputLabel}>{label}</Text>
+
+      <TouchableOpacity
+        onPress={() => setModalVisible(true)}
+        style={[
+          styles.selectButton,
+          errors ? { borderColor: '#EF4444' } : null,
+        ]}
       >
-        {options.map((option) => (
-          <Picker.Item key={option.value} label={option.label} value={option.value} />
+        <Text style={styles.selectButtonText}>{selectedLabel}</Text>
+        <MaterialCommunityIcons
+          name="chevron-down"
+          size={24}
+          color="#555"
+          style={styles.selectIcon}
+        />
+      </TouchableOpacity>
+
+      <Modal
+        visible={modalVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => setModalVisible(false)}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.dropdownContainer}>
+            <ScrollView style={styles.scrollArea}>
+              {options.map((opt) => (
+                <TouchableOpacity
+                  key={opt.value}
+                  onPress={() => {
+                    onValueChange(opt.value);
+                    setModalVisible(false);
+                  }}
+                  style={[
+                    styles.optionItem,
+                    opt.value === selectedValue && styles.optionItemSelected,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.optionText,
+                      opt.value === selectedValue && styles.optionTextSelected,
+                    ]}
+                  >
+                    {opt.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {errors &&
+        errors.map((errMsg, index) => (
+          <Text key={index} style={styles.errorText}>
+            {errMsg}
+          </Text>
         ))}
-      </Picker>
     </View>
-    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  label: {
-        fontSize: 14,
-        fontFamily: 'Poppins_400Regular',
-        color: '#4B5563',
-        marginBottom: 2
-    },
-  pickerContainer: {
+  inputSection: {
+    marginBottom: 10,
+  },
+
+  inputLabel: {
+    fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
+    color: '#000',
+    marginBottom: 4,
+  },
+
+  selectButton: {
+    height: 56,
     backgroundColor: '#fff',
-    borderRadius: 8,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    borderWidth: 1,
-    borderColor: '#eee',
+    borderRadius: 12,
+    borderWidth: 1.4,
+    borderColor: '#D1D5DB',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingRight: width * 0.03,
+    paddingHorizontal: 14,
+    justifyContent: 'space-between',
   },
-  picker: {
-    flex: 1,
-    height: height * 0.065,
+
+  selectButtonText: {
+    fontSize: 16,
+    fontFamily: 'Poppins_400Regular',
     color: '#333',
   },
-  pickerItem: {
-    fontSize: width * 0.04,
+
+  selectIcon: {
+    marginLeft: 8,
   },
-  pickerIcon: {},
+
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+
+  dropdownContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    maxHeight: height * 0.45,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    elevation: 8,
+  },
+
+  scrollArea: {
+    maxHeight: height * 0.4,
+  },
+
+  /* OPTION ITEM */
+  optionItem: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+
+  optionItemSelected: {
+    backgroundColor: '#F3F4F6',
+  },
+
+  optionText: {
+    fontSize: 16,
+    fontFamily: 'Poppins_400Regular',
+    color: '#333',
+  },
+
+  optionTextSelected: {
+    fontFamily: 'Poppins_600SemiBold',
+    color: '#111',
+  },
+
+  errorText: {
+    color: '#EF4444',
+    fontSize: 12,
+    marginTop: 4,
+  },
 });

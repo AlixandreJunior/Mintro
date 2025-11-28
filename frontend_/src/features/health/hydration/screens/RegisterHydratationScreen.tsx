@@ -5,6 +5,7 @@ import RegisterHydrationMainContent from '@/features/health/hydration/components
 import { useHydration } from '../hooks/useHydration';
 import { formatDateToISO } from '@/share/utils/formatDatetimeToISO';
 import { router } from 'expo-router';
+import { useToast } from '@/share/providers/ToastProvider'; // 🔹 import do toast
 
 const VOLUMES = [250, 500, 750, 1000];
 
@@ -16,7 +17,8 @@ const RegisterHydrationScreen = () => {
     Object.fromEntries(VOLUMES.map((v) => [v, 0]))
   );
 
-  const { handleHydrationCreate } = useHydration();
+  const { handleHydrationCreate, error } = useHydration();
+  const { showToast } = useToast(); // 🔹 hook do toast
 
   const handleQuantityChange = (volume: number, amount: number) =>
     setQuantities((prev) => ({ ...prev, [volume]: amount }));
@@ -36,12 +38,18 @@ const RegisterHydrationScreen = () => {
     const quantity = calculateTotal();
     if (!quantity) return;
 
-    await handleHydrationCreate({
-      quantity,
-      date: formatDateToISO(selectedDate),
-    });
+    try {
+      await handleHydrationCreate({
+        quantity,
+        date: formatDateToISO(selectedDate),
+      });
 
-    router.replace('/hydratation');
+      showToast('Hidratação registrada com sucesso!', 'success'); // 🔹 toast de sucesso
+      router.replace('/hydratation'); // 🔹 navegação após sucesso
+    } catch (err) {
+      console.error(err);
+      showToast('Erro ao registrar hidratação', 'error'); // 🔹 toast de erro
+    }
   };
 
   const handleDateChange = (_event: any, date?: Date) => {
@@ -51,7 +59,11 @@ const RegisterHydrationScreen = () => {
 
   return (
     <>
-      <FormHeader title="Registrar Hidratação" onSavePress={handleSave} />
+      <FormHeader
+        title="Registrar Hidratação"
+        onSavePress={handleSave}
+        onBackPress={() => router.push('/(app)/hydratation')}
+      />
 
       <View style={styles.container}>
         <RegisterHydrationMainContent

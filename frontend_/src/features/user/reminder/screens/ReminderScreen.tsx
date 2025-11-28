@@ -11,6 +11,8 @@ import {
   closeModal,
 } from '@/features/user/reminder/utils/helpers';
 import ReminderCard from '../components/ReminderCard';
+import { router } from 'expo-router';
+import { useToast } from '@/share/providers/ToastProvider'; // 🔹 import do toast
 
 const ReminderScreen = () => {
   const { scheduleOnce, scheduleDaily, cancel } = useNotification();
@@ -19,7 +21,10 @@ const ReminderScreen = () => {
     handleReminderCreate,
     handleReminderUpdate,
     handleReminderDelete,
+    error,
   } = useReminder();
+
+  const { showToast } = useToast(); // 🔹 hook do toast
 
   const [modalVisible, setModalVisible] = useState(false);
   const [reminders, setReminders] = useState<any[]>([]);
@@ -36,8 +41,10 @@ const ReminderScreen = () => {
       if (item.local_notification_id) await cancel(item.local_notification_id);
       await handleReminderDelete(item.id);
       loadReminders(setReminders);
+      showToast('Lembrete deletado com sucesso!', 'success'); // 🔹 toast
     } catch (e) {
       console.error('Erro ao excluir lembrete:', e);
+      showToast('Erro ao deletar lembrete!', 'error'); // 🔹 toast de erro
     }
   };
 
@@ -67,8 +74,10 @@ const ReminderScreen = () => {
       let reminder;
       if (!editingReminder) {
         reminder = await handleReminderCreate(payload);
+        showToast('Lembrete criado com sucesso!', 'success'); // 🔹 toast de criação
       } else {
         reminder = await handleReminderUpdate(editingReminder.id, payload);
+        showToast('Lembrete atualizado com sucesso!', 'success'); // 🔹 toast de atualização
         if (editingReminder.local_notification_id)
           await cancel(editingReminder.local_notification_id);
       }
@@ -80,9 +89,10 @@ const ReminderScreen = () => {
       (reminder as any).local_notification_id = localId;
 
       loadReminders(setReminders);
-      closeModal(setEditingReminder, setModalVisible);
+      closeModal(setEditingReminder, setModalVisible); // 🔹 fecha o modal
     } catch (e) {
       console.error('Erro ao salvar notificação:', e);
+      showToast('Erro ao salvar lembrete!', 'error'); // 🔹 toast de erro
     }
   };
 
@@ -91,6 +101,7 @@ const ReminderScreen = () => {
       <ReminderCard
         title={item.title}
         date={item.date}
+        content={item.content}
         time={item.time}
         isDaily={item.is_daily}
         type={item.type}
@@ -110,6 +121,7 @@ const ReminderScreen = () => {
             onPress: () => openModal(setEditingReminder, setModalVisible),
           },
         ]}
+        onBackPress={() => router.push('/(app)/(tabs)/mental')}
       />
       <FlatList
         data={reminders}

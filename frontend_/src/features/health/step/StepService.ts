@@ -16,6 +16,10 @@ export class StepsService extends Service {
   }
 
   static async create(data: StepWrite): Promise<any> {
-    return this.apiPost('health/step/register/', data);
+    return this.apiPost('health/step/register/', { steps: data });
+  }
+
+  static async goal(): Promise<number> {
+    return this.apiGet('health/step/goal/');
   }
 }

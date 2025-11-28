@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosError, AxiosInstance } from 'axios';
 
-const apiUrl = 'http://127.0.0.1:8000/';
+const apiUrl = 'http://192.168.1.7:8000/';
 
 const api: AxiosInstance = axios.create({
   baseURL: apiUrl,
@@ -8,6 +8,11 @@ const api: AxiosInstance = axios.create({
 });
 
 console.log('API URL:', apiUrl);
+
+/* ============================================================
+ * 🔹 HANDLERS DE AUTENTICAÇÃO
+ * ============================================================
+ */
 
 let onLogout: (() => void) | null = null;
 let getTokens:
@@ -26,6 +31,11 @@ export const setAuthHandlers = (handlers: {
   saveTokens = handlers.saveTokens || null;
 };
 
+/* ============================================================
+ * 🔹 HANDLER DE CONQUISTAS
+ * ============================================================
+ */
+
 let showAchievements: ((achievements: string[]) => void) | null = null;
 
 export const registerAchievementHandler = (
@@ -33,6 +43,11 @@ export const registerAchievementHandler = (
 ) => {
   showAchievements = fn;
 };
+
+/* ============================================================
+ * 🔹 INTERCEPTOR DE REQUEST → INJETAR TOKEN AUTOMATICAMENTE
+ * ============================================================
+ */
 
 api.interceptors.request.use(async (config) => {
   if (getTokens && config.headers) {
@@ -70,11 +85,9 @@ const refreshToken = async () => {
 
   const { refresh } = await getTokens();
   if (!refresh) throw new Error('No refresh token available');
-
   const res = await axios.post(`${apiUrl}user/auth/refresh/`, { refresh });
-  const { access: newAccess, refresh: newRefresh } = res.data;
-
-  if (saveTokens) await saveTokens(newAccess, newRefresh);
+  const { access: newAccess } = res.data;
+  if (saveTokens) await saveTokens(newAccess, refresh);
 
   return newAccess;
 };

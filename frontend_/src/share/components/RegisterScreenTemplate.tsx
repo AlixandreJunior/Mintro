@@ -16,6 +16,7 @@ interface RegisterScreenHookProps<T extends Item, TPayload> {
   handleSaveItem: (data: TPayload) => Promise<any>;
   labelSelect: string;
   onSuccessRedirect?: () => void;
+  onBackPress?: () => void;
 }
 
 export default function RegisterScreenTemplate<T extends Item, TPayload>({
@@ -24,11 +25,12 @@ export default function RegisterScreenTemplate<T extends Item, TPayload>({
   handleSaveItem,
   labelSelect,
   onSuccessRedirect,
+  onBackPress
 }: RegisterScreenHookProps<T, TPayload>) {
   const defaultItemId = useMemo(() => items?.[0]?.id ?? null, [items]);
 
   const [itemId, setItemId] = useState<number | null>(defaultItemId);
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState<string>('');
   const [datetime, setDatetime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -57,7 +59,11 @@ export default function RegisterScreenTemplate<T extends Item, TPayload>({
 
   return (
     <View style={styles.container}>
-      <FormHeader title={title} onSavePress={handleSave} />
+      <FormHeader
+        title={title}
+        onSavePress={handleSave}
+        onBackPress={onBackPress}
+      />
 
       <RegisterFormContent
         items={items}

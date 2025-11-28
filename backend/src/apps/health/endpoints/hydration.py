@@ -10,6 +10,7 @@ from django.urls import path
 from apps.health.views.hydration import (
     HydratationLogListView,
     HydratationLogRegisterView,
+    HydrationGoalView,
     HydrationLogDeleteView,
     HydrationLogUpdateView,
 )
@@ -21,4 +22,5 @@ urlpatterns = [
     path("register/", HydratationLogRegisterView.as_view(), name="register"),
     path("delete/<int:id>/", HydrationLogDeleteView.as_view(), name="delete"),
     path("update/<int:id>/", HydrationLogUpdateView.as_view(), name="update"),
+    path("goal/", HydrationGoalView.as_view(), name="goal"),
 ]

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ViewStyle,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -13,11 +14,13 @@ import * as ImagePicker from 'expo-image-picker';
 interface PhotoPickerProps {
   selectedImageUri?: string | null;
   onImageSelected: React.Dispatch<React.SetStateAction<string | undefined>>;
+  errors?: string[]; // ✅ adicionando suporte a erros
 }
 
 const PhotoPicker: React.FC<PhotoPickerProps> = ({
   selectedImageUri,
   onImageSelected,
+  errors,
 }) => {
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -30,7 +33,7 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'], // CORRETO
+      mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
@@ -39,7 +42,6 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
 
     if (!result.canceled && result.assets.length > 0) {
       const uri = result.assets[0].uri;
-      console.log('URI correta:', uri);
       onImageSelected(uri);
     } else {
       onImageSelected(undefined);
@@ -49,7 +51,13 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Foto</Text>
-      <TouchableOpacity style={styles.photoContainer} onPress={pickImage}>
+      <TouchableOpacity
+        style={[
+          styles.photoContainer,
+          errors ? { borderColor: '#EF4444' } : null, // ✅ borda vermelha se houver erro
+        ]}
+        onPress={pickImage}
+      >
         {selectedImageUri ? (
           <Image
             source={{ uri: selectedImageUri }}
@@ -69,6 +77,13 @@ const PhotoPicker: React.FC<PhotoPickerProps> = ({
           </>
         )}
       </TouchableOpacity>
+
+      {errors &&
+        errors.map((errMsg, index) => (
+          <Text key={index} style={styles.errorText}>
+            {errMsg}
+          </Text>
+        ))}
     </View>
   );
 };
@@ -87,8 +102,8 @@ const styles = StyleSheet.create({
   photoContainer: {
     backgroundColor: 'white',
     borderRadius: 12,
-    borderWidth: 2, // borda mais espessa
-    borderColor: '#989898', // verde suave, mais visível que o cinza claro
+    borderWidth: 2,
+    borderColor: '#989898',
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
@@ -104,18 +119,23 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     resizeMode: 'cover',
-    borderRadius: 10, // suavizado para combinar com o container
+    borderRadius: 10,
   },
   photoChooseText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#6DA544', // tom de verde mais consistente com a borda
+    color: '#6DA544',
     marginTop: 12,
   },
   photoHintText: {
     fontSize: 13,
-    color: '#6B7280', // cinza médio para boa leitura
+    color: '#6B7280',
     marginTop: 6,
+  },
+  errorText: {
+    color: '#EF4444',
+    fontSize: 12,
+    marginTop: 4,
   },
 });
 

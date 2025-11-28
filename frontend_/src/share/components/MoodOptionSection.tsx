@@ -17,6 +17,7 @@ const GAP = 8;
 interface MoodOptionProps {
   handleMoodSelect: React.Dispatch<React.SetStateAction<MoodType>>;
   selectedMoodId: string | null;
+  errors?: string[];
 }
 
 interface MoodOption {
@@ -26,7 +27,10 @@ interface MoodOption {
   isSelected: boolean;
 }
 
-const MoodOptionSection: React.FC<MoodOptionProps> = ({ handleMoodSelect }) => {
+const MoodOptionSection: React.FC<MoodOptionProps> = ({
+  handleMoodSelect,
+  errors,
+}) => {
   const [moods, setMoods] = useState<MoodOption[]>([
     {
       id: 'Excelente',
@@ -61,12 +65,7 @@ const MoodOptionSection: React.FC<MoodOptionProps> = ({ handleMoodSelect }) => {
   ]);
 
   const onSelectMood = (id: string) => {
-    setMoods((prev) =>
-      prev.map((m) => ({
-        ...m,
-        isSelected: m.id === id,
-      }))
-    );
+    setMoods((prev) => prev.map((m) => ({ ...m, isSelected: m.id === id })));
     handleMoodSelect(id);
   };
 
@@ -97,7 +96,19 @@ const MoodOptionSection: React.FC<MoodOptionProps> = ({ handleMoodSelect }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Como você está se sentindo?</Text>
-        <View style={styles.moodGrid}>
+        <View
+          style={[
+            styles.moodGrid,
+            errors
+              ? {
+                  borderColor: '#EF4444',
+                  borderWidth: 1,
+                  borderRadius: 8,
+                  padding: 4,
+                }
+              : null,
+          ]}
+        >
           {moods.map((mood, index) => (
             <View
               key={mood.id}
@@ -110,6 +121,12 @@ const MoodOptionSection: React.FC<MoodOptionProps> = ({ handleMoodSelect }) => {
             </View>
           ))}
         </View>
+        {errors &&
+          errors.map((errMsg, i) => (
+            <Text key={i} style={styles.errorText}>
+              {errMsg}
+            </Text>
+          ))}
       </View>
     </SafeAreaView>
   );
@@ -151,9 +168,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.05,
         shadowRadius: 3,
       },
-      android: {
-        elevation: 1,
-      },
+      android: { elevation: 1 },
     }),
   },
   moodOptionSelected: {
@@ -173,6 +188,11 @@ const styles = StyleSheet.create({
   moodLabelSelected: {
     color: '#79D457',
     fontWeight: '600',
+  },
+  errorText: {
+    color: '#EF4444',
+    fontSize: 12,
+    marginTop: 4,
   },
 });
 

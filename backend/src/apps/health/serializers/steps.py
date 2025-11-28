@@ -15,9 +15,11 @@ class StepLogSerializer(serializers.ModelSerializer):
     automaticamente pelo sistema.
     """
 
-    goal = serializers.IntegerField(source="user.steps_goal", read_only=True)
-
     class Meta:  # type: ignore
         model = StepLog
-        fields = ("id", "user", "date", "steps", "goal")
-        read_only_fields = ("id", "user", "date", "goal")
+        fields = ("id", "user", "date", "steps")
+        read_only_fields = ("id", "user", "date")
+
+
+class StepGoalSerializer(serializers.Serializer):
+    goal = serializers.IntegerField(source="user.steps_goal", read_only=True)

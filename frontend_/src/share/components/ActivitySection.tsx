@@ -10,8 +10,9 @@ interface Activity {
 interface ActivitiesSectionProps {
   title: string;
   selected: string[] | string | null;
-  setSelected: React.Dispatch<React.SetStateAction<string[] | string | null>>;
+  setSelected: React.Dispatch<React.SetStateAction<string[]>>;
   multiple?: boolean;
+  errors?: string[]; // <-- mensagens de erro
 }
 
 const STATIC_ACTIVITIES: Activity[] = [
@@ -35,6 +36,7 @@ export const ActivitiesSection = ({
   selected,
   setSelected,
   multiple = false,
+  errors,
 }: ActivitiesSectionProps) => {
   return (
     <View style={styles.section}>
@@ -42,7 +44,19 @@ export const ActivitiesSection = ({
       {STATIC_ACTIVITIES.length === 0 ? (
         <Text>Nenhuma atividade encontrada.</Text>
       ) : (
-        <View style={styles.activityGrid}>
+        <View
+          style={[
+            styles.activityGrid,
+            errors
+              ? {
+                  borderColor: '#EF4444',
+                  borderWidth: 1,
+                  borderRadius: 8,
+                  padding: 4,
+                }
+              : null,
+          ]}
+        >
           <ActivityGrid
             activities={STATIC_ACTIVITIES}
             //@ts-ignore
@@ -53,6 +67,12 @@ export const ActivitiesSection = ({
           />
         </View>
       )}
+      {errors &&
+        errors.map((errMsg, i) => (
+          <Text key={i} style={styles.errorText}>
+            {errMsg}
+          </Text>
+        ))}
     </View>
   );
 };
@@ -72,5 +92,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
+  },
+  errorText: {
+    color: '#EF4444',
+    fontSize: 12,
+    marginTop: 4,
   },
 });

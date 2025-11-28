@@ -1,7 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, Switch, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Switch,
+  Dimensions,
+  ViewStyle,
+} from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 interface SwitchItem<T extends string> {
   key: T;
@@ -13,60 +20,91 @@ interface Props<T extends string> {
   containerLabel: string;
   items: SwitchItem<T>[];
   onToggle: (key: T) => void;
+  errors?: string[];
 }
 
 export default function SwitchInputGroup<T extends string>({
-    containerLabel,
-    items,
-    onToggle,
+  containerLabel,
+  items,
+  onToggle,
+  errors,
 }: Props<T>) {
   return (
-    <>
-    <Text style={styles.label}>{containerLabel}</Text>
-    <View style={styles.container}>      
-      {items.map((item) => (
-        <View key={item.key} style={styles.itemItem}>
-          <Text style={styles.itemText}>{item.label}</Text>
-          <Switch
-            trackColor={{ false: '#767577', true: '#81b0ff' }}
-            thumbColor={item.value ? '#4CAF50' : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={() => onToggle(item.key)}
-            value={item.value}
-          />
-        </View>
-      ))}
+    <View style={{ marginBottom: 16 }}>
+      <Text style={styles.label}>{containerLabel}</Text>
+
+      <View style={[styles.container, errors && styles.containerError]}>
+        {items.map((item, index) => (
+          <View key={item.key}>
+            <View style={styles.row}>
+              <Text style={styles.itemText}>{item.label}</Text>
+
+              <Switch
+                value={item.value}
+                onValueChange={() => onToggle(item.key)}
+                trackColor={{ false: '#E5E7EB', true: '#A7C6FF' }}
+                thumbColor={item.value ? '#3B82F6' : '#FFFFFF'}
+              />
+            </View>
+
+            {index < items.length - 1 && <View style={styles.separator} />}
+          </View>
+        ))}
+      </View>
+
+      {errors &&
+        errors.map((errMsg, index) => (
+          <Text key={index} style={styles.errorText}>
+            {errMsg}
+          </Text>
+        ))}
     </View>
-        </>
   );
 }
 
 const styles = StyleSheet.create({
-    label: {
-        fontSize: 14,
-        fontFamily: 'Poppins_400Regular',
-        color: '#4B5563',
-        marginBottom: 2
-    },
-  container: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    marginTop: height * 0.01,
-    paddingHorizontal: width * 0.04,
+  label: {
+    fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
+    color: '#000000ff',
+    marginBottom: 2,
   },
-  itemItem: {
+
+  container: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  } as ViewStyle,
+
+  containerError: {
+    borderColor: '#EF4444',
+  },
+
+  row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: height * 0.015,
+    paddingVertical: 12,
   },
+
+  separator: {
+    height: 1,
+    backgroundColor: '#F3F4F6',
+    opacity: 0.7,
+  },
+
   itemText: {
-    fontSize: width * 0.04,
-    color: '#333',
+    fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
+    color: '#1F2937',
+  },
+
+  errorText: {
+    color: '#EF4444',
+    fontSize: 12,
+    marginTop: 4,
+    fontFamily: 'Poppins_400Regular',
   },
 });

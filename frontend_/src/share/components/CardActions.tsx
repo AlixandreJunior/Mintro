@@ -1,33 +1,52 @@
+// CardActions.tsx
 import React, { useState } from 'react';
-import { Modal, Pressable, Text, View, StyleSheet } from 'react-native';
+import {
+  Modal,
+  Pressable,
+  Text,
+  View,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 
 interface Props {
-  onEdit?: (...args: any[]) => void;
-  onDelete?: (...args: any[]) => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 const CardActions: React.FC<Props> = ({ onEdit, onDelete }) => {
   const [open, setOpen] = useState(false);
+  const { width } = useWindowDimensions();
+
+  const iconSize = width * 0.05; // ícone proporcional à tela
+  const paddingBox = width * 0.05; // padding do modal
+  const fontSize = width * 0.04; // fonte proporcional
+  const verticalPadding = width * 0.04; // padding vertical dos botões
 
   return (
     <>
-      <View style={styles.wrapper}>
-        <Pressable onPress={() => setOpen(true)}>
-          <Entypo name="dots-three-vertical" size={20} color="#666" />
-        </Pressable>
-      </View>
+      <Pressable onPress={() => setOpen(true)} style={styles.wrapper}>
+        <Entypo name="dots-three-vertical" size={iconSize} color="#666" />
+      </Pressable>
 
       <Modal visible={open} transparent animationType="fade">
         <Pressable style={styles.overlay} onPress={() => setOpen(false)}>
-          <View style={styles.box}>
+          <View style={[styles.box, { padding: paddingBox }]}>
             <Pressable
               onPress={() => {
                 setOpen(false);
                 onEdit?.();
               }}
             >
-              <Text style={styles.action}>Editar</Text>
+              <Text
+                style={[
+                  styles.action,
+                  { fontSize, paddingVertical: verticalPadding },
+                ]}
+              >
+                Editar
+              </Text>
             </Pressable>
 
             <Pressable
@@ -36,7 +55,14 @@ const CardActions: React.FC<Props> = ({ onEdit, onDelete }) => {
                 onDelete?.();
               }}
             >
-              <Text style={[styles.action, { color: 'red' }]}>Excluir</Text>
+              <Text
+                style={[
+                  styles.action,
+                  { fontSize, paddingVertical: verticalPadding, color: 'red' },
+                ]}
+              >
+                Excluir
+              </Text>
             </Pressable>
           </View>
         </Pressable>
@@ -49,10 +75,9 @@ const styles = StyleSheet.create({
   wrapper: {
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%',
+    alignSelf: 'flex-start', // evita ocupar toda altura
     paddingLeft: 8,
   },
-
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.3)',
@@ -60,13 +85,10 @@ const styles = StyleSheet.create({
   },
   box: {
     backgroundColor: '#fff',
-    padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
   action: {
-    fontSize: 16,
-    paddingVertical: 16,
     textAlign: 'center',
     fontFamily: 'Poppins_500Medium',
   },

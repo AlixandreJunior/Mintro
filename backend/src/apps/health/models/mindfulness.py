@@ -41,7 +41,6 @@ class MindfulnessLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mindfulness = models.ForeignKey(Mindfulness, on_delete=models.CASCADE)
     duration = models.PositiveIntegerField()
-    description = models.TextField(max_length=200)
     datetime = models.DateTimeField(default=timezone.now)
 
     def __str__(self) -> str:

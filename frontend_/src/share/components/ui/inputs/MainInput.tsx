@@ -8,6 +8,7 @@ interface MainInputProps {
   keyboardType?: KeyboardType;
   onChangeText: (text: string) => void;
   placeholder?: string;
+  errors?: string[]; // ✅ adicionando suporte a erros
 }
 
 export const MainInput: React.FC<MainInputProps> = ({
@@ -16,6 +17,7 @@ export const MainInput: React.FC<MainInputProps> = ({
   keyboardType,
   onChangeText,
   placeholder,
+  errors,
 }) => {
   return (
     <View style={styles.inputSection}>
@@ -25,15 +27,25 @@ export const MainInput: React.FC<MainInputProps> = ({
         value={String(value)}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
-        style={styles.textInput}
-        placeholder={placeholder ? placeholder : 'Opcional'}
+        style={[
+          styles.textInput,
+          errors ? { borderColor: '#EF4444' } : null, // ✅ borda vermelha se houver erro
+        ]}
         outlineStyle={styles.textInputOutline as ViewStyle}
+        placeholder={placeholder ? placeholder : 'Opcional'}
         theme={{
           fonts: {
             regular: { fontFamily: 'Poppins_400Regular' },
           },
         }}
       />
+
+      {errors &&
+        errors.map((errMsg, index) => (
+          <Text key={index} style={styles.errorText}>
+            {errMsg}
+          </Text>
+        ))}
     </View>
   );
 };
@@ -56,14 +68,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: '#E5E7EB',
   } as ViewStyle,
-
-  textInputStyle: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#000000ff',
-    minHeight: 56,
-    justifyContent: 'center',
-    paddingHorizontal: 12,
+  errorText: {
+    color: '#EF4444',
+    fontSize: 12,
+    marginTop: 4,
   },
 });

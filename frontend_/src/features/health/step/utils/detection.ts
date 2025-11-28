@@ -1,4 +1,3 @@
-// utils/detection.ts
 import {
   BASELINE_ALPHA,
   DYNAMIC_SMOOTH_ALPHA,
@@ -28,9 +27,7 @@ export const handleMovement = (
   }
 
   baselineRef.current = smooth(baselineRef.current, mag, BASELINE_ALPHA);
-
   const diff = mag - baselineRef.current;
-
   dynamicRef.current = smooth(dynamicRef.current, diff, DYNAMIC_SMOOTH_ALPHA);
 
   if (now - (startTimeRef.current ?? now) < WARMUP_MS) return;
@@ -44,7 +41,6 @@ export const handleMovement = (
 
 export const detectStep = (diff: number, now: number, refs: any) => {
   const { armedRef, lastStepTimeRef } = refs;
-
   const canStep = now - lastStepTimeRef.current >= MIN_STEP_INTERVAL_MS;
 
   if (armedRef.current) {
@@ -60,17 +56,12 @@ export const detectStep = (diff: number, now: number, refs: any) => {
   return false;
 };
 
-export const shouldSendSteps = (now: number, refs: any) => {
-  const { lastSendTimeRef } = refs;
-
-  return (
-    !lastSendTimeRef.current ||
-    now - lastSendTimeRef.current >= SEND_INTERVAL_MS
-  );
-};
-
+// 🔹 DEBUG na contagem de passos
 export const processStepDetected = (refs: any) => {
   refs.localStepsRef.current += 1;
+  console.log(
+    `[DEBUG] Passo contado! totalSteps=${refs.localStepsRef.current}`
+  );
 };
 
 export const sendStepsIfNeeded = (now: number, fn: Function, refs: any) => {
@@ -83,5 +74,14 @@ export const sendStepsIfNeeded = (now: number, fn: Function, refs: any) => {
   localStepsRef.current = 0;
   lastSendTimeRef.current = now;
 
+  console.log(`[DEBUG] Enviando passos: ${steps} para backend`);
   fn(steps);
+};
+
+export const shouldSendSteps = (now: number, refs: any) => {
+  const { lastSendTimeRef } = refs;
+  return (
+    !lastSendTimeRef.current ||
+    now - lastSendTimeRef.current >= SEND_INTERVAL_MS
+  );
 };

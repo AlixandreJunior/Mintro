@@ -1,9 +1,14 @@
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.dispatch import receiver
 
 from apps.user.models.user import User
 from utils.choices import AchievementLevelChoices
+from utils.signals_callable import (
+    create_initial_achievements,
+    grant_welcome_achievement,
+)
 
 if TYPE_CHECKING:
     from django.db.models.manager import Manager
@@ -92,3 +97,15 @@ class AchievementLog(models.Model):
     def __str__(self) -> str:
         """Retorna a representação textual do log (usuário e conquista)."""
         return f"{self.user.username} - {self.achievement_level}"
+
+
+@receiver(models.signals.post_migrate)
+def create_achievements(sender: object, **kwargs: object) -> None:
+    create_initial_achievements(sender, **kwargs)
+
+
+@receiver(models.signals.post_save, sender=User)
+def welcome_achievement(
+    sender: object, instance: object, *, created: bool, **kwargs: object
+) -> None:
+    grant_welcome_achievement(sender, instance, created, **kwargs)

@@ -1,5 +1,6 @@
+// DiaryEntryCard.tsx
 import React from 'react';
-import { View, Pressable, StyleSheet, Dimensions } from 'react-native';
+import { View, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { DiaryActivities } from './DiaryActivities';
 import { DiaryEntryContent } from './DiaryEntryContent';
 import DiaryCard from './DiaryCard';
@@ -7,29 +8,33 @@ import { DiaryEntryHeader } from './DiaryEntryHeader';
 import { Diary } from '@/share/types/mental/diary';
 import { useDiary } from '../hooks/useDiary';
 import { router } from 'expo-router';
+import { formatTimeToHoursMinutes } from '@/share/utils/formatDatetimeToISO';
+import { useToast } from '@/share/providers/ToastProvider';
 
 interface DiaryEntryCardProps {
-  diary: Diary & {
-    iconSource: React.ReactNode;
-  };
+  diary: Diary & { iconSource: React.ReactNode };
 }
 
 const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary }) => {
-  const timeObj = new Date(diary.created_at);
-  const time =
-    timeObj.getHours().toString().padStart(2, '0') +
-    ':' +
-    timeObj.getMinutes().toString().padStart(2, '0');
-
   const { handleDiaryDelete } = useDiary();
+  const { showToast } = useToast();
+  const { width } = useWindowDimensions();
 
   const onDelete = async () => {
-    await handleDiaryDelete(diary.id);
+    try {
+      await handleDiaryDelete(diary.id);
+      showToast('Diário deletado com sucesso!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Erro ao deletar diário!', 'error');
+    }
   };
 
   const onEdit = () => {
     router.replace(`/(app)/diary/${diary.id}`);
   };
+
+  const styles = createStyles(width);
 
   return (
     <Pressable>
@@ -38,45 +43,46 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary }) => {
         <DiaryCard style={styles.card}>
           <DiaryEntryHeader
             mood={diary.mood}
-            time={time}
+            time={formatTimeToHoursMinutes(diary.time)}
             onDelete={onDelete}
             onEdit={onEdit}
           />
           {diary.activities?.length > 0 && (
             <DiaryActivities activities={diary.activities} />
           )}
-          {diary.title || diary.content || diary.photo ? (
+          {(diary.title || diary.content || diary.photo) && (
             <DiaryEntryContent
               title={diary.title}
               content={diary.content}
               photoUrl={diary.photo}
             />
-          ) : null}
+          )}
         </DiaryCard>
       </View>
     </Pressable>
   );
 };
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-    width: '100%',
-  },
-  icon: {
-    width: 40,
-    height: 40,
-    marginRight: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  card: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-  },
-});
+const createStyles = (width: number) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      marginBottom: width * 0.03,
+      width: '100%',
+    },
+    icon: {
+      width: width * 0.1,
+      height: width * 0.1,
+      marginRight: width * 0.03,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    card: {
+      flex: 1,
+      paddingVertical: width * 0.03,
+      paddingHorizontal: width * 0.035,
+    },
+  });
 
 export default DiaryEntryCard;

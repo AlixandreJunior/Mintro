@@ -16,13 +16,14 @@ export const useSteps = () => {
 
   const handleStepsCreate = useCallback(
     async (data: StepWrite): Promise<ResponseSuccess | null> => {
-      if (!data.steps || data.steps <= 0) {
-        return null;
-      }
-
+      console.log(data);
       return await handleRequest(() => StepsService.create(data));
     },
     []
   );
-  return { error, loading, handleStepsList, handleStepsCreate };
+
+  const handleStepGoal = async (): Promise<any> => {
+    return await handleRequest(() => StepsService.goal());
+  };
+  return { error, loading, handleStepsList, handleStepsCreate, handleStepGoal };
 };

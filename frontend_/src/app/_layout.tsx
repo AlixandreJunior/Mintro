@@ -1,4 +1,3 @@
-// RootLayout.tsx
 import React, { useEffect } from 'react';
 import { Slot } from 'expo-router';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
@@ -15,6 +14,7 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import AppProviders from '../share/providers/AppProviders';
 import AuthGuard from '../features/user/auth/components/AuthGuard';
 import { useStepCounter } from '@/features/health/step/hooks/useStepsCounter';
+import { ToastProvider } from '@/share/providers/ToastProvider';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -44,13 +44,15 @@ export default function RootLayout() {
   }
 
   return (
-    <AppProviders>
-      <AuthGuard>
-        <PaperProvider>
-          <Slot />
-        </PaperProvider>
-      </AuthGuard>
-    </AppProviders>
+    <ToastProvider>
+      <AppProviders>
+        <AuthGuard>
+          <PaperProvider>
+            <Slot />
+          </PaperProvider>
+        </AuthGuard>
+      </AppProviders>
+    </ToastProvider>
   );
 }
 

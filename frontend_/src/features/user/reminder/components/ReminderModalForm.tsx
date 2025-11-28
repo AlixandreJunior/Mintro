@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, Switch, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { DateTimeInput } from '@/share/components/ui/inputs/DateTimeInput';
 import SelectInput from '@/share/components/ui/inputs/SelectInput';
 import { MainInput } from '@/share/components/ui/inputs/MainInput';
 import { NotificationType } from './ReminderCreateSection';
 import ReminderModalButtons from './ReminderModalButtons';
+import SwitchInputGroup from '@/share/components/ui/inputs/SwitchInputGroup';
 
 interface Props {
   title: string;
@@ -26,9 +27,11 @@ interface Props {
 
   onClose: () => void;
   onSave: () => void;
+
+  errors?: Record<string, string[]>; // 🔥 ADICIONADO
 }
 
-const NOTIFICATION_TYPES: { value: NotificationType; label: string }[] = [
+const NOTIFICATION_TYPES = [
   { value: 'diario', label: 'Diário' },
   { value: 'hidratacao', label: 'Hidratação' },
   { value: 'exercicio', label: 'Exercício' },
@@ -55,14 +58,22 @@ const ReminderModalForm: React.FC<Props> = ({
   setShowTimePicker,
   onClose,
   onSave,
+  errors = {},
 }) => {
   return (
     <View style={styles.container}>
-      <MainInput labelText="Título" value={title} onChangeText={setTitle} />
+      <MainInput
+        labelText="Título"
+        value={title}
+        onChangeText={setTitle}
+        errors={errors.title}
+      />
+
       <MainInput
         labelText="Mensagem"
         value={content}
         onChangeText={setContent}
+        errors={errors.content}
       />
 
       <DateTimeInput
@@ -75,6 +86,7 @@ const ReminderModalForm: React.FC<Props> = ({
           if (selected) setDate(selected);
         }}
         mode="date"
+        errors={errors.date}
       />
 
       <DateTimeInput
@@ -87,23 +99,27 @@ const ReminderModalForm: React.FC<Props> = ({
           if (selected) setTime(selected);
         }}
         mode="time"
+        errors={errors.time}
       />
 
-      <View
-        style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}
-      >
-        <Text style={{ marginRight: 8 }}>Repetir diariamente</Text>
-        <Switch value={isDaily} onValueChange={setIsDaily} />
-      </View>
+      <SwitchInputGroup
+        containerLabel="Repetição"
+        items={[
+          {
+            key: 'daily',
+            label: 'Repetir diariamente',
+            value: isDaily,
+          },
+        ]}
+        onToggle={() => setIsDaily(!isDaily)}
+      />
 
       <SelectInput
         label="Tipo"
         selectedValue={type}
         onValueChange={(v) => setType(v as NotificationType)}
-        options={NOTIFICATION_TYPES.map((t) => ({
-          label: t.label,
-          value: t.value,
-        }))}
+        options={NOTIFICATION_TYPES}
+        errors={errors.type}
       />
 
       <ReminderModalButtons onClose={onClose} onSave={onSave} />

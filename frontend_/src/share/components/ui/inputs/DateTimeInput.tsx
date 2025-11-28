@@ -3,9 +3,9 @@ import {
   GestureResponderEvent,
   StyleSheet,
   TouchableOpacity,
-  ViewStyle,
+  View,
+  Text,
 } from 'react-native';
-import { Text, View } from 'react-native';
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
@@ -17,6 +17,9 @@ interface DateTimeInputProps {
   showPicker: boolean;
   onChange: (event: DateTimePickerEvent, date?: Date) => void;
   mode: 'time' | 'date';
+  errors?: string[];
+  maximumDate?: Date; // opcional
+  minimumDate?: Date; // opcional
 }
 
 export const DateTimeInput: React.FC<DateTimeInputProps> = ({
@@ -26,13 +29,20 @@ export const DateTimeInput: React.FC<DateTimeInputProps> = ({
   showPicker,
   onChange,
   mode,
+  errors,
+  maximumDate,
+  minimumDate,
 }) => {
   return (
-    <View>
+    <View style={{ marginBottom: 16 }}>
       <Text style={styles.inputLabel}>{labelText}</Text>
       <TouchableOpacity
         onPress={onPress}
-        style={[styles.textInputStyle, styles.pickerButton]}
+        style={[
+          styles.textInputStyle,
+          styles.pickerButton,
+          errors ? { borderColor: '#EF4444' } : null,
+        ]}
       >
         <Text style={styles.pickerButtonText}>
           {mode === 'time'
@@ -50,9 +60,17 @@ export const DateTimeInput: React.FC<DateTimeInputProps> = ({
           mode={mode}
           display="default"
           onChange={onChange}
-          maximumDate={new Date()}
+          {...(maximumDate && { maximumDate })}
+          {...(minimumDate && { minimumDate })}
         />
       )}
+
+      {errors &&
+        errors.map((errMsg, index) => (
+          <Text key={index} style={styles.errorText}>
+            {errMsg}
+          </Text>
+        ))}
     </View>
   );
 };
@@ -60,37 +78,33 @@ export const DateTimeInput: React.FC<DateTimeInputProps> = ({
 const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
-    fontFamily: 'Poppins_400Regular', // Poppins SemiBold para labels
+    fontFamily: 'Poppins_400Regular',
     color: '#4B5563',
     marginBottom: 2,
   },
-  textInput: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-  },
-  textInputOutline: {
-    borderRadius: 8,
-    borderColor: '#E5E7EB',
-  } as ViewStyle, // Casting para ViewStyle para compatibilidade
-
   textInputStyle: {
     backgroundColor: 'white',
     borderRadius: 8,
-    borderWidth: 1, // Para ter a borda como outlined
-    borderColor: '#E5E7EB', // Cor da borda
-    minHeight: 56, // Altura padrão para TextInput do Paper
-    justifyContent: 'center', // Centraliza o conteúdo verticalmente
-    paddingHorizontal: 12, // Padding horizontal consistente
-    fontFamily: 'Poppins_400Regular', // Fonte para o texto dentro do picker
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    minHeight: 56,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    fontFamily: 'Poppins_400Regular',
   },
   pickerButton: {
-    flexDirection: 'row', // Para alinhar texto e possível ícone
-    alignItems: 'center', // Alinha verticalmente
+    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
   },
   pickerButtonText: {
     fontSize: 16,
     fontFamily: 'Poppins_400Regular',
-    color: '#333', // Cor do texto
+    color: '#333',
+  },
+  errorText: {
+    color: '#EF4444',
+    fontSize: 12,
+    marginTop: 4,
   },
 });

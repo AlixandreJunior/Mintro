@@ -9,6 +9,16 @@ import { MainInput } from '@/share/components/ui/inputs/MainInput';
 import { DiaryDateTimeRow } from './DiaryDateTimeRow';
 import { MoodType } from '@/share/types/mental/diary';
 
+interface DiaryFormErrors {
+  title?: string[];
+  date?: string[];
+  time?: string[];
+  mood?: string[];
+  activities?: string[];
+  content?: string[];
+  photo?: string[];
+}
+
 interface DiaryFormProps {
   title: string;
   onChangeTitle: (text: string) => void;
@@ -34,6 +44,8 @@ interface DiaryFormProps {
 
   photo?: string | null;
   onImageSelected: React.Dispatch<React.SetStateAction<string | undefined>>;
+
+  errors: DiaryFormErrors | null;
 }
 
 const DiaryForm: React.FC<DiaryFormProps> = ({
@@ -61,11 +73,12 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
 
   photo,
   onImageSelected,
+
+  errors = {},
 }) => {
   const screen = useWindowDimensions();
 
   const styles = useMemo(() => createStyles(screen.width), []);
-
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
       <MainInput
@@ -73,6 +86,7 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
         value={title}
         onChangeText={onChangeTitle}
         placeholder="Título"
+        errors={errors?.title}
       />
 
       <DiaryDateTimeRow
@@ -84,11 +98,13 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
         onChangeTime={onChangeTime}
         showTimePicker={showTimePicker}
         setShowTimePicker={setShowTimePicker}
+        errors={{ date: errors?.date, time: errors?.time }}
       />
 
       <MoodOptionSection
         selectedMoodId={mood}
         handleMoodSelect={onSelectMood}
+        errors={errors?.mood}
       />
 
       <ActivitiesSection
@@ -96,11 +112,20 @@ const DiaryForm: React.FC<DiaryFormProps> = ({
         selected={activities}
         setSelected={onSelectActivities}
         multiple
+        errors={errors?.activities}
       />
 
-      <NotesInput notes={content} onChangeNotes={onChangeContent} />
+      <NotesInput
+        notes={content}
+        onChangeNotes={onChangeContent}
+        errors={errors?.content}
+      />
 
-      <PhotoPicker selectedImageUri={photo} onImageSelected={onImageSelected} />
+      <PhotoPicker
+        selectedImageUri={photo}
+        onImageSelected={onImageSelected}
+        errors={errors?.photo}
+      />
     </ScrollView>
   );
 };

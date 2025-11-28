@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useExercise } from '../hooks/useExercise';
 import ActivityEditModal from '@/share/components/ActivityEditModal';
 import { Exercise } from '@/share/types/health/exercise';
+import { useToast } from '@/share/providers/ToastProvider';
 
 const ExerciseScreen = () => {
   const title = 'Atividade';
@@ -15,16 +16,24 @@ const ExerciseScreen = () => {
     handleExerciseLogUpdate,
   } = useExercise();
 
+  const { showToast } = useToast();
+
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<number | null>(null);
 
-  useEffect(() => {
-    const load = async () => {
+  const loadExercises = async () => {
+    try {
       const data = await handleExerciseList();
       setExercises(data);
-    };
-    load();
+    } catch (err) {
+      console.error(err);
+      showToast('Erro ao carregar exercícios', 'error');
+    }
+  };
+
+  useEffect(() => {
+    loadExercises();
   }, []);
 
   const handlePress = () => {
@@ -37,10 +46,27 @@ const ExerciseScreen = () => {
   };
 
   const handleSave = async (updatedData: any) => {
-    await handleExerciseLogUpdate(updatedData.id, updatedData);
+    try {
+      await handleExerciseLogUpdate(updatedData.id, updatedData);
+      showToast('Exercício atualizado com sucesso!', 'success');
+      setModalVisible(false);
+      setEditingItem(null);
+      loadExercises(); // 🔹 recarrega lista
+    } catch (err) {
+      console.error(err);
+      showToast('Erro ao atualizar exercício', 'error');
+    }
+  };
 
-    setModalVisible(false);
-    setEditingItem(null);
+  const handleDelete = async (id: number) => {
+    try {
+      await handleExerciseLogDelete(id);
+      showToast('Exercício deletado com sucesso!', 'success');
+      loadExercises();
+    } catch (err) {
+      console.error(err);
+      showToast('Erro ao deletar exercício', 'error');
+    }
   };
 
   return (
@@ -49,7 +75,7 @@ const ExerciseScreen = () => {
         title={title}
         type={type}
         onAddPress={handlePress}
-        onDelete={handleExerciseLogDelete}
+        onDelete={handleDelete}
         onEdit={handleEdit}
       />
 
@@ -58,7 +84,7 @@ const ExerciseScreen = () => {
         onClose={() => setModalVisible(false)}
         type="exercise"
         item={editingItem}
-        items={exercises} // ← AQUI VAI LISTA DO BACKEND ✔
+        items={exercises}
         onSubmit={handleSave}
       />
     </>

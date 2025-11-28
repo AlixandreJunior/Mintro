@@ -7,6 +7,7 @@ from rest_framework.serializers import BaseSerializer
 
 from apps.health.models.hydration import HydrationLog
 from apps.health.serializers.hydration import HydrationLogSerializer
+from core.check_achievement import check_gole_a_gole
 from core.views.base import BaseView
 
 
@@ -14,6 +15,8 @@ class BaseHydrationView(BaseView):
     model = HydrationLog
     serializer_class = HydrationLogSerializer
     update_message = "Hidratação atualizada com sucesso!"
+    create_message = "Registro de hidratação criado com sucesso."
+    achievement_check = staticmethod(check_gole_a_gole)
 
     def perform_create(self, serializer: BaseSerializer) -> None:
         serializer.save(user=self.request.user)

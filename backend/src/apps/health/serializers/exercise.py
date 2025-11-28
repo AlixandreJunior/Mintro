@@ -37,7 +37,6 @@ class ExerciseLogSerializer(serializers.ModelSerializer):
             "exercise",  # exibido nos GET
             "exercise_id",  # usado nos POST/PUT
             "duration",
-            "description",
             "datetime",
         )
         read_only_fields = ("id", "user", "datetime")

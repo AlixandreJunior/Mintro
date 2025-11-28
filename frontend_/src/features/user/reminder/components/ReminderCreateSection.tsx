@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, View, StyleSheet } from 'react-native';
 import ReminderModalForm from './ReminderModalForm';
+import { useToast } from '@/share/providers/ToastProvider';
 
 export type NotificationType =
   | 'diario'
@@ -20,7 +21,7 @@ interface Props {
     is_daily: boolean;
     type: string;
     deadline?: string | null;
-  }) => void;
+  }) => Promise<void>;
   notification?: any;
 }
 
@@ -46,6 +47,9 @@ const CreateNotificationModal: React.FC<Props> = ({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [type, setType] = useState<NotificationType>('hidratacao');
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
+
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (!visible) return;
@@ -74,11 +78,12 @@ const CreateNotificationModal: React.FC<Props> = ({
       setType('hidratacao');
     }
 
+    setErrors({});
     setShowDatePicker(false);
     setShowTimePicker(false);
   }, [visible, notification]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const payload = {
       title: title.trim(),
       content: content.trim(),
@@ -88,7 +93,19 @@ const CreateNotificationModal: React.FC<Props> = ({
       type: TYPE_MAP[type],
     };
 
-    onSave(payload);
+    try {
+      await onSave(payload);
+      showToast(
+        notification
+          ? 'Lembrete atualizado com sucesso!'
+          : 'Lembrete criado com sucesso!',
+        'success'
+      );
+      onClose();
+    } catch (e) {
+      console.error('Erro ao salvar lembrete:', e);
+      showToast('Erro ao salvar lembrete!', 'error');
+    }
   };
 
   return (
@@ -113,6 +130,7 @@ const CreateNotificationModal: React.FC<Props> = ({
           setShowTimePicker={setShowTimePicker}
           onClose={onClose}
           onSave={handleSave}
+          errors={errors}
         />
       </View>
     </Modal>

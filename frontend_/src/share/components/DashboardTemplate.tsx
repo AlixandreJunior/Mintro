@@ -35,7 +35,7 @@ interface DashboardMainContentProps<
   un: string;
 
   onEdit?: (log: T) => void;
-  onDelete?: (id: number) => Promise<ResponseSuccess>;
+  onDelete?: (id: number) => Promise<any>;
 }
 
 export function DashboardMainContent<

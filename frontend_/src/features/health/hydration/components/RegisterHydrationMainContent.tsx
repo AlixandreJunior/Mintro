@@ -13,6 +13,7 @@ interface RegisterHydrationProps {
   handleDateChange: (event: any, date?: Date | undefined) => void;
   customAmount: string;
   setCustomAmount: React.Dispatch<React.SetStateAction<string>>;
+  errors?: string[] | null;
 }
 
 const RegisterHydrationMainContent: React.FC<RegisterHydrationProps> = ({
@@ -25,6 +26,8 @@ const RegisterHydrationMainContent: React.FC<RegisterHydrationProps> = ({
   customAmount,
   setCustomAmount,
 }) => {
+  const now = new Date();
+
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
       <DateTimeInput
@@ -34,6 +37,7 @@ const RegisterHydrationMainContent: React.FC<RegisterHydrationProps> = ({
         onChange={handleDateChange}
         onPress={() => setShowDatePicker(true)}
         showPicker={showDatePicker}
+        maximumDate={now}
       />
       <QuantitySelector
         quantities={quantities}

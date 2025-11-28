@@ -5,6 +5,7 @@ import { AuthBackContainer } from '../components/AuthBackContainter';
 import { useAuthForm } from '../hooks/useAuth';
 import AuthLoginForm from '../components/AuthLoginForm';
 import { AuthFormCard } from '../components/AuthFormCard';
+import { useToast } from '@/share/providers/ToastProvider'; // 🔹 import Toast
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -18,8 +19,18 @@ const LoginScreen = () => {
   const backLink = 'Criar conta';
 
   const { handleLogin, error } = useAuthForm();
+  const { showToast } = useToast(); // 🔹 hook do Toast
 
-  console.log(error);
+  const handleSubmit = async () => {
+    try {
+      const result = await handleLogin(email, password);
+      showToast('Login realizado com sucesso!', 'success');
+      router.push('/(app)/(tabs)/activity');
+    } catch (err) {
+      showToast('Falha ao fazer login!', 'error');
+    }
+  };
+
   return (
     <AuthFormCard
       welcomeText={welcomeText}
@@ -36,10 +47,8 @@ const LoginScreen = () => {
         errors={error}
       />
 
-      <AuthSubmitButton
-        handleSubmit={() => handleLogin(email, password)}
-        textSubmit={textSubmit}
-      />
+      <AuthSubmitButton handleSubmit={handleSubmit} textSubmit={textSubmit} />
+
       <AuthBackContainer
         backLink={backLink}
         backText={backText}
@@ -48,4 +57,5 @@ const LoginScreen = () => {
     </AuthFormCard>
   );
 };
+
 export default LoginScreen;
