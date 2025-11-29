@@ -49,9 +49,11 @@ const ExerciseScreen = () => {
     try {
       await handleExerciseLogUpdate(updatedData.id, updatedData);
       showToast('Exercício atualizado com sucesso!', 'success');
+
       setModalVisible(false);
       setEditingItem(null);
-      loadExercises(); // 🔹 recarrega lista
+
+      await loadExercises(); // ← 🔥 recarrega a página de forma tradicional
     } catch (err) {
       console.error(err);
       showToast('Erro ao atualizar exercício', 'error');
@@ -62,7 +64,8 @@ const ExerciseScreen = () => {
     try {
       await handleExerciseLogDelete(id);
       showToast('Exercício deletado com sucesso!', 'success');
-      loadExercises();
+
+      await loadExercises(); // ← 🔥 recarrega ao deletar
     } catch (err) {
       console.error(err);
       showToast('Erro ao deletar exercício', 'error');

@@ -10,6 +10,14 @@ interface Item {
   name: string;
 }
 
+export interface Errors {
+  exercise_id?: string[];
+  mindfulness_id?: string[];
+  date?: string[];
+  time?: string[];
+  duration?: string[];
+}
+
 interface RegisterScreenHookProps<T extends Item, TPayload> {
   title: string;
   items: T[];
@@ -17,6 +25,7 @@ interface RegisterScreenHookProps<T extends Item, TPayload> {
   labelSelect: string;
   onSuccessRedirect?: () => void;
   onBackPress?: () => void;
+  error?: Errors | null;
 }
 
 export default function RegisterScreenTemplate<T extends Item, TPayload>({
@@ -25,7 +34,8 @@ export default function RegisterScreenTemplate<T extends Item, TPayload>({
   handleSaveItem,
   labelSelect,
   onSuccessRedirect,
-  onBackPress
+  onBackPress,
+  error,
 }: RegisterScreenHookProps<T, TPayload>) {
   const defaultItemId = useMemo(() => items?.[0]?.id ?? null, [items]);
 
@@ -36,8 +46,6 @@ export default function RegisterScreenTemplate<T extends Item, TPayload>({
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   const handleSave = useCallback(async () => {
-    console.log({ itemId, duration, datetime });
-
     const payload = {
       [labelSelect.toLowerCase()]: itemId,
       duration,
@@ -45,9 +53,6 @@ export default function RegisterScreenTemplate<T extends Item, TPayload>({
     } as TPayload;
 
     await handleSaveItem(payload);
-
-    Alert.alert('Sucesso', `${labelSelect} registrado com sucesso!`);
-    onSuccessRedirect?.();
   }, [
     itemId,
     duration,
@@ -77,6 +82,7 @@ export default function RegisterScreenTemplate<T extends Item, TPayload>({
         setShowDatePicker={setShowDatePicker}
         showTimePicker={showTimePicker}
         setShowTimePicker={setShowTimePicker}
+        error={error}
       />
     </View>
   );

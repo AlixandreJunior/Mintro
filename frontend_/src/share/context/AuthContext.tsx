@@ -5,6 +5,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { setAuthHandlers } from '@/share/api';
 import { AuthService } from '@/features/user/auth/AuthService';
+import * as Notifications from 'expo-notifications';
+import { useReminder } from '@/features/user/reminder/hooks/useReminder';
+import { useToast } from '@/share/providers/ToastProvider';
+import { useNotification } from '@/features/user/reminder/hooks/useNotification';
 
 const isWeb = Platform.OS === 'web';
 
@@ -23,6 +27,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
+  const { scheduleOnce, scheduleDaily } = useNotification();
+  const { handleReminderList } = useReminder();
+  const { showToast } = useToast();
+
   const storeTokens = async (access: string, refresh: string) => {
     if (isWeb) {
       await AsyncStorage.setItem('accessToken', access);
@@ -31,14 +39,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await SecureStore.setItemAsync('accessToken', access);
       await SecureStore.setItemAsync('refreshToken', refresh);
     }
-  };
-
-  const saveTokensAndUpdateState = async (access: string, refresh: string) => {
-    await storeTokens(access, refresh);
-
-    setAccessToken(access);
-    setRefreshToken(refresh);
-    setIsAuthenticated(true);
   };
 
   const fetchTokens = async () => {
@@ -55,7 +55,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const loadTokens = async () => {
     const tokens = await fetchTokens();
-
     setAccessToken(tokens.access);
     setRefreshToken(tokens.refresh);
     setIsAuthenticated(!!tokens.access);
@@ -72,26 +71,71 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const login = async (access: string, refresh: string) => {
-    await storeTokens(access, refresh);
+    try {
+      await storeTokens(access, refresh);
 
-    setAccessToken(access);
-    setRefreshToken(refresh);
-    setIsAuthenticated(true);
+      setAccessToken(access);
+      setRefreshToken(refresh);
+      setIsAuthenticated(true);
 
-    router.replace('/(app)/(tabs)/mental');
+      // 🔹 sincronizar reminders locais
+      try {
+        const reminders = await handleReminderList();
+        for (const r of reminders) {
+          const [hour, minute] = r.time.split(':').map(Number);
+          const dateObj = new Date(`${r.date}T${r.time}`);
+
+          if (r.is_daily) {
+            const localId = await scheduleDaily(
+              r.title,
+              r.content,
+              hour,
+              minute,
+              r.type
+            );
+            r.local_notification_id = localId;
+          } else {
+            const localId = await scheduleOnce(
+              r.title,
+              r.content,
+              dateObj,
+              r.type
+            );
+            r.local_notification_id = localId;
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao sincronizar lembretes locais:', err);
+        showToast('Não foi possível sincronizar lembretes locais.', 'error');
+      }
+
+      router.replace('/(app)/(tabs)/mental');
+    } catch (err) {
+      console.error('Erro no login:', err);
+      showToast('Erro ao fazer login.', 'error');
+    }
   };
 
   const logout = async () => {
-    if (refreshToken) {
-      await AuthService.logout(refreshToken);
+    try {
+      // 🔹 cancelar todas as notificações locais
+      await Notifications.cancelAllScheduledNotificationsAsync();
+
+      if (refreshToken) {
+        await AuthService.logout(refreshToken);
+      }
+
+      await clearTokens();
+
+      setAccessToken(null);
+      setRefreshToken(null);
+      setIsAuthenticated(false);
+
+      router.replace('/(auth)/login');
+    } catch (err) {
+      console.error('Erro ao fazer logout:', err);
+      showToast('Erro ao fazer logout.', 'error');
     }
-    await clearTokens();
-
-    setAccessToken(null);
-    setRefreshToken(null);
-    setIsAuthenticated(false);
-
-    router.replace('/(auth)/login');
   };
 
   useEffect(() => {
@@ -103,19 +147,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         saveTokens: storeTokens,
       });
     };
-
     initializeAuth();
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{
-        isAuthenticated,
-        login,
-        logout,
-        accessToken,
-        refreshToken,
-      }}
+      value={{ isAuthenticated, login, logout, accessToken, refreshToken }}
     >
       {children}
     </AuthContext.Provider>

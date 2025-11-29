@@ -20,10 +20,6 @@ export function useExercise() {
   const handleExerciseLogCreate = async (
     data: ExerciseLogWrite
   ): Promise<ResponseSuccess> => {
-    if (!data.exercise_id || data.duration <= 0 || !data.datetime) {
-      throw new Error('Preencha todos os campos corretamente.');
-    }
-
     return await handleRequest(() => ExerciseService.createLog(data));
   };
 

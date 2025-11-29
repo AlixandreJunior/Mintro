@@ -5,7 +5,6 @@ import PeriodDateHeader from '@/share/components/PeriodDateHeader';
 import { DashboardSummary } from './DashboardSummary';
 import { DashboardHistory } from './DashboardHistory';
 import DashboardChart from './DashboardChart';
-import { ResponseSuccess } from '../types/response';
 
 const { height } = Dimensions.get('window');
 
@@ -13,6 +12,7 @@ interface DashboardMainContentProps<
   T extends Record<string, any>,
   P extends string = 'day' | 'week' | 'month' | 'year'
 > {
+  logs: T[];
   periods: { key: P; label: string }[];
   selectedPeriod: P;
   selectedDate: Date;
@@ -42,6 +42,7 @@ export function DashboardMainContent<
   T extends Record<string, any>,
   P extends string = 'day' | 'week' | 'month' | 'year'
 >({
+  logs,
   periods,
   selectedPeriod,
   selectedDate,
@@ -59,11 +60,6 @@ export function DashboardMainContent<
   onDelete,
   onEdit,
 }: DashboardMainContentProps<T, P>) {
-  const { data: logs } = useLoadList({
-    loader: () => loader(selectedDate, selectedPeriod),
-    deps: [selectedDate, selectedPeriod],
-  });
-
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
       <PeriodDateHeader

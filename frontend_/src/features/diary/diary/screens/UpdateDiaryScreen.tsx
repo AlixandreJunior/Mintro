@@ -39,7 +39,12 @@ const UpdateDiaryScreen = () => {
   const [mood, setMood] = useState<MoodType>('Neutro');
 
   const { handleDiaryRetrieve, handleDiaryUpdate, error } = useDiary();
-  const { showToast } = useToast(); // 🔹 hook do Toast
+  const { showToast } = useToast();
+
+  const parseLocalDate = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
 
   useEffect(() => {
     const fetchDiary = async () => {
@@ -48,7 +53,7 @@ const UpdateDiaryScreen = () => {
 
         setTitle(diary.title);
         setContent(diary.content);
-        setSelectedDate(new Date(diary.date));
+        setSelectedDate(parseLocalDate(diary.date));
         setSelectedTime(parseBackendTimeToDate(diary.time));
         setMood(diary.mood);
         setActivities(diary.activities.map((a) => a.id));
@@ -78,7 +83,7 @@ const UpdateDiaryScreen = () => {
 
       await handleDiaryUpdate(Number(id), formData);
 
-      showToast('Diário atualizado com sucesso!', 'success'); // 🔹 toast de sucesso
+      showToast('Diário atualizado com sucesso!', 'success');
 
       setTimeout(() => {
         router.push('/(app)/(tabs)/mental');

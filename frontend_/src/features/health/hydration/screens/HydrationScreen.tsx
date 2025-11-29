@@ -9,6 +9,7 @@ import { FloatingActionButton } from '@/share/components/FloatingButtonAction';
 import HydrationModal from '../components/HydrationModal';
 import { router } from 'expo-router';
 import { useToast } from '@/share/providers/ToastProvider';
+import { useLoadList } from '@/share/hooks/useLoadList';
 
 const PERIODS = [
   { key: 'day', label: 'Dia' },
@@ -29,6 +30,11 @@ const HydrationScreen = () => {
     handleHydrationUpdate,
     handleHydrationGoal,
   } = useHydration();
+
+  const { data: logs, reload } = useLoadList({
+    loader: () => handleHydrationList(selectedDate, selectedPeriod),
+    deps: [selectedDate, selectedPeriod],
+  });
 
   const { showToast } = useToast();
 
@@ -52,6 +58,7 @@ const HydrationScreen = () => {
     loadGoal();
   }, []);
 
+  // --- EDIT ---
   const handleEdit = useCallback((log: Hydration) => {
     setSelectedLog(log);
     setModalVisible(true);
@@ -67,6 +74,8 @@ const HydrationScreen = () => {
           date: date.toISOString(),
         });
 
+        reload();
+
         setModalVisible(false);
         setSelectedLog(null);
         showToast('Hidratação atualizada com sucesso!', 'success');
@@ -81,6 +90,9 @@ const HydrationScreen = () => {
   const handleDelete = async (id: number): Promise<void> => {
     try {
       await handleHydrationDelete(id);
+
+      reload();
+
       showToast('Hidratação deletada com sucesso!', 'success');
     } catch (error) {
       console.error(error);
@@ -97,6 +109,7 @@ const HydrationScreen = () => {
       />
 
       <DashboardMainContent<Hydration>
+        logs={logs}
         periods={PERIODS as any}
         selectedPeriod={selectedPeriod}
         selectedDate={selectedDate}
@@ -125,7 +138,7 @@ const HydrationScreen = () => {
           onClose={() => setModalVisible(false)}
           initialDate={new Date(selectedLog.date)}
           initialQuantity={selectedLog.quantity}
-          onSave={handleSaveModal} // 🔹 toast no update
+          onSave={handleSaveModal}
         />
       )}
     </SafeAreaView>

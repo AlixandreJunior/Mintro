@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   wrapper: {
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'flex-start', // evita ocupar toda altura
+    alignSelf: 'center',
     paddingLeft: 8,
   },
   overlay: {

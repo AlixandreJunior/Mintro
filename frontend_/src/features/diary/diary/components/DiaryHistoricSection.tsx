@@ -16,7 +16,7 @@ const DiaryHistoricSection: React.FC<DiaryHistoricSectionProps> = ({
   const { handleDiaryList } = useDiary();
   const { width } = useWindowDimensions();
 
-  const { data: diaries } = useLoadList<Diary>({
+  const { data: diaries, reload } = useLoadList<Diary>({
     loader: () => handleDiaryList(initialDate),
     deps: [initialDate],
   });
@@ -29,7 +29,7 @@ const DiaryHistoricSection: React.FC<DiaryHistoricSectionProps> = ({
       {diaries.length === 0 ? (
         <DiaryEmptyState />
       ) : (
-        <DiaryDayHistory entries={diaries} />
+        <DiaryDayHistory entries={diaries} reload={reload} />
       )}
     </View>
   );

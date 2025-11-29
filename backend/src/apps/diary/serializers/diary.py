@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from apps.diary.models.diary import Activity, Diary
+from utils.choices import DiaryMoodChoices
 
 
 class ActivitySerializer(serializers.ModelSerializer):
@@ -21,9 +22,9 @@ class DiarySerializer(serializers.ModelSerializer):
 
     Attributes:
         activities (ActivitySerializer): Representação detalhada das atividades
-        (somente leitura).
+            (somente leitura).
         activities_ids (PrimaryKeyRelatedField): IDs das atividades associadas
-        (somente escrita).
+            (somente escrita).
     """
 
     activities = ActivitySerializer(many=True, read_only=True)
@@ -34,6 +35,8 @@ class DiarySerializer(serializers.ModelSerializer):
         source="activities",
         required=False,
     )
+
+    mood = serializers.ChoiceField(choices=DiaryMoodChoices.choices, required=True)
 
     class Meta:  # type: ignore
         model = Diary
