@@ -5,36 +5,39 @@ import { TextInput } from 'react-native-paper';
 interface NotesInputProps {
   notes: string;
   onChangeNotes: (text: string) => void;
-  errors?: string[]; // ✅ adicionando suporte a erros
+  errors?: string[];
+  placeholder?: string;
 }
 
 const NotesInput: React.FC<NotesInputProps> = ({
   notes,
   onChangeNotes,
   errors,
+  placeholder = 'Escreva suas anotações aqui...',
 }) => {
   return (
     <View style={styles.inputSection}>
-      <Text style={styles.inputLabel}>Anotação</Text>
+      <Text style={styles.label}>Anotação</Text>
       <TextInput
         mode="outlined"
-        placeholder="Escreva suas anotações aqui..."
         value={notes}
         onChangeText={onChangeNotes}
+        placeholder={placeholder}
+        placeholderTextColor="#6B7280"
         multiline
         numberOfLines={4}
         style={[
-          styles.textInput,
+          styles.input,
           styles.notesInput,
-          errors ? { borderColor: '#EF4444' } : null, // ✅ borda vermelha se houver erro
+          errors && errors.length > 0 ? { borderColor: '#EF4444' } : null,
         ]}
-        outlineStyle={styles.textInputOutline as ViewStyle}
+        outlineStyle={styles.inputOutline as ViewStyle}
         theme={{ fonts: { regular: { fontFamily: 'Poppins_400Regular' } } }}
       />
 
       {errors &&
-        errors.map((errMsg, index) => (
-          <Text key={index} style={styles.errorText}>
+        errors.map((errMsg, idx) => (
+          <Text key={idx} style={styles.errorText}>
             {errMsg}
           </Text>
         ))}
@@ -43,18 +46,22 @@ const NotesInput: React.FC<NotesInputProps> = ({
 };
 
 const styles = StyleSheet.create({
-  inputSection: {},
-  inputLabel: {
+  inputSection: {
+    marginBottom: 16,
+  },
+  label: {
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
-    color: '#4B5563',
+    color: '#1F2937',
     marginBottom: 4,
   },
-  textInput: {
-    backgroundColor: 'white',
+  input: {
+    backgroundColor: '#FFFFFF',
     borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
-  textInputOutline: {
+  inputOutline: {
     borderRadius: 8,
     borderColor: '#E5E7EB',
   } as ViewStyle,

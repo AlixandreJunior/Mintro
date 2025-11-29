@@ -57,80 +57,85 @@ const ObjectiveModals: React.FC<ObjectiveModalsProps> = ({
     onClose();
   };
 
+  const renderRepeatModal = () => (
+    <View style={styles.container}>
+      <Text style={styles.title}>Repetir objetivo</Text>
+      {[1, 3, 5].map((times) => {
+        const isSelected = repeat === times.toString();
+        return (
+          <Pressable
+            key={times}
+            style={[styles.optionButton, isSelected && styles.selectedOption]}
+            onPress={() => handleRepeatSelect(times)}
+            disabled={updating}
+          >
+            <Text style={styles.optionText}>{times} vez(es)</Text>
+          </Pressable>
+        );
+      })}
+      {updating && (
+        <ActivityIndicator
+          size="small"
+          color="#000"
+          style={{ marginTop: 15 }}
+        />
+      )}
+    </View>
+  );
+
+  const renderReminderModal = () => (
+    <View style={styles.container}>
+      <Text style={styles.title}>Escolha o horário do lembrete</Text>
+
+      <Pressable
+        style={[styles.optionButton, { backgroundColor: '#DDEFFF' }]}
+        onPress={() => setShowTimePicker(true)}
+      >
+        <Text style={styles.optionText}>
+          {selectedDate.toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+          })}
+        </Text>
+      </Pressable>
+
+      {showTimePicker && (
+        <DateTimePicker
+          mode="time"
+          value={selectedDate}
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={onTimeChange}
+          is24Hour
+        />
+      )}
+
+      <Pressable
+        style={[styles.optionButton, { backgroundColor: '#A6E1AF' }]}
+        onPress={handleReminderSave}
+        disabled={updating}
+      >
+        <Text style={styles.optionText}>Salvar Lembrete</Text>
+      </Pressable>
+
+      {updating && (
+        <ActivityIndicator
+          size="small"
+          color="#000"
+          style={{ marginTop: 10 }}
+        />
+      )}
+    </View>
+  );
+
   return (
     <>
       <BaseModal visible={visibleModal === 'repeat'} onClose={onClose}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Repetir objetivo</Text>
-          {[1, 3, 5].map((times) => {
-            const isSelected = repeat === times.toString();
-            return (
-              <Pressable
-                key={times}
-                style={[
-                  styles.optionButton,
-                  isSelected && { backgroundColor: '#A6E1AF' },
-                ]}
-                onPress={() => handleRepeatSelect(times)}
-                disabled={updating}
-              >
-                <Text style={styles.optionText}>{times} vez(es)</Text>
-              </Pressable>
-            );
-          })}
-          {updating && (
-            <ActivityIndicator
-              size="small"
-              color="#000"
-              style={{ marginTop: 15 }}
-            />
-          )}
-        </View>
+        {renderRepeatModal()}
       </BaseModal>
 
       <BaseModal visible={visibleModal === 'reminder'} onClose={onClose}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Escolha o horário do lembrete</Text>
-
-          <Pressable
-            style={[styles.optionButton, { backgroundColor: '#DDEFFF' }]}
-            onPress={() => setShowTimePicker(true)}
-          >
-            <Text style={styles.optionText}>
-              {selectedDate.toLocaleTimeString('pt-BR', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-              })}
-            </Text>
-          </Pressable>
-
-          {showTimePicker && (
-            <DateTimePicker
-              mode="time"
-              value={selectedDate}
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={onTimeChange}
-              is24Hour
-            />
-          )}
-
-          <Pressable
-            style={[styles.optionButton, { backgroundColor: '#A6E1AF' }]}
-            onPress={handleReminderSave}
-            disabled={updating}
-          >
-            <Text style={styles.optionText}>Salvar Lembrete</Text>
-          </Pressable>
-
-          {updating && (
-            <ActivityIndicator
-              size="small"
-              color="#000"
-              style={{ marginTop: 10 }}
-            />
-          )}
-        </View>
+        {renderReminderModal()}
       </BaseModal>
     </>
   );
@@ -139,25 +144,38 @@ const ObjectiveModals: React.FC<ObjectiveModalsProps> = ({
 export default ObjectiveModals;
 
 const styles = StyleSheet.create({
-  modalContent: {
-    padding: 20,
-    gap: 16,
+  container: {
+    width: '90%',
+    backgroundColor: '#fff',
+    padding: 24,
+    borderRadius: 16,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+    gap: 16,
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 10,
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
+    textAlign: 'center',
+    marginBottom: 16,
   },
   optionButton: {
-    padding: 12,
+    width: '100%',
+    paddingVertical: 12,
     borderRadius: 10,
     backgroundColor: '#E8E8E8',
-    width: '100%',
     alignItems: 'center',
+  },
+  selectedOption: {
+    backgroundColor: '#A6E1AF',
   },
   optionText: {
     fontSize: 16,
-    color: '#333',
+    color: '#111827',
   },
 });

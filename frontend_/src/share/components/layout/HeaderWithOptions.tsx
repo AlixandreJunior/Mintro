@@ -14,7 +14,7 @@ interface OptionItem {
 interface HeaderWithOptionsProps {
   title: string;
   onBackPress?: () => void;
-  options?: OptionItem[]; // Array de opções do menu
+  options?: OptionItem[];
 }
 
 const HeaderWithOptions: React.FC<HeaderWithOptionsProps> = ({
@@ -38,17 +38,18 @@ const HeaderWithOptions: React.FC<HeaderWithOptionsProps> = ({
   return (
     <SafeAreaView>
       <View style={styles.appbar}>
-        <Appbar.BackAction onPress={handleBack} />
+        <Appbar.BackAction color="#000000" onPress={handleBack} />
         <Appbar.Content title={title} titleStyle={styles.appbarTitle} />
-
         <Menu
           visible={menuVisible}
           onDismiss={closeMenu}
           anchor={
-            <Appbar.Action
-              icon={() => <VerticalDotsIcon size={width * 0.045} />}
-              onPress={openMenu}
-            />
+            options.length > 0 ? (
+              <Appbar.Action
+                icon={() => <VerticalDotsIcon size={width * 0.045} />}
+                onPress={openMenu}
+              />
+            ) : null
           }
         >
           {options.map((option, index) => (
@@ -69,7 +70,7 @@ const HeaderWithOptions: React.FC<HeaderWithOptionsProps> = ({
 
 const styles = StyleSheet.create({
   appbar: {
-    backgroundColor: '#FFFF',
+    backgroundColor: '#FFFFFF',
     marginHorizontal: width * 0.01,
     marginVertical: height * 0.002,
     flexDirection: 'row',
@@ -81,6 +82,7 @@ const styles = StyleSheet.create({
   appbarTitle: {
     fontSize: width * 0.045,
     fontFamily: 'Poppins_400Regular',
+    color: '#000000',
   },
 });
 

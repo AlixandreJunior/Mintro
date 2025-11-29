@@ -31,7 +31,7 @@ function ActivityScreenTemplate({
   }, [onAddPress]);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
+    <SafeAreaView style={styles.container} edges={['right', 'left']}>
       <HeaderWithOptions title={title} onBackPress={handleBack} />
 
       <ActivityMainContent type={type} onDelete={onDelete} onEdit={onEdit} />

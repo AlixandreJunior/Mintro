@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dimensions, StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet, ScrollView, View } from 'react-native';
 import { Text } from 'react-native';
 import { ErrorContainer } from '@/share/components/ErrorContainer';
 import { AuthCard } from './AuthCard';
@@ -21,15 +21,26 @@ export const AuthFormCard: React.FC<AuthFormCardProps> = ({
 }) => {
   return (
     <AuthCard>
-      <Text style={styles.welcomeText}>{welcomeText}</Text>
-      <Text style={styles.subtitleText}>{subtitleText}</Text>
-      <ErrorContainer error={error} />
-      {children}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.welcomeText}>{welcomeText}</Text>
+        <Text style={styles.subtitleText}>{subtitleText}</Text>
+        <ErrorContainer error={error} />
+        {children}
+      </ScrollView>
     </AuthCard>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
   welcomeText: {
     fontSize: width * 0.065,
     fontWeight: '600',

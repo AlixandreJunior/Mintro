@@ -21,8 +21,6 @@ const ProfileScreen = () => {
       try {
         const data = await handleUserRetrieve();
         setUser(data);
-
-        showToast(`Bem-vindo(a), ${data?.name || 'usuário'}!`, 'success');
       } catch (e) {
         showToast(
           e instanceof Error ? e.message : 'Erro ao carregar perfil',

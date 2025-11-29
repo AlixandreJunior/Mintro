@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { Modal, View, Text, StyleSheet } from 'react-native';
+import { MainInput } from '@/share/components/ui/inputs/MainInput';
 import { useToast } from '@/share/providers/ToastProvider';
+import ReminderModalButtons from '@/features/user/reminder/components/ReminderModalButtons';
 
 interface HydrationGoalModalProps {
   visible: boolean;
   currentGoal: number | null;
   onClose: () => void;
   onSave: (goal: number) => void;
+  errors?: string[];
 }
 
 const HydrationGoalModal: React.FC<HydrationGoalModalProps> = ({
@@ -14,6 +17,7 @@ const HydrationGoalModal: React.FC<HydrationGoalModalProps> = ({
   currentGoal,
   onClose,
   onSave,
+  errors = [],
 }) => {
   const { showToast } = useToast();
   const [goal, setGoal] = useState<string>(currentGoal?.toString() ?? '');
@@ -34,19 +38,19 @@ const HydrationGoalModal: React.FC<HydrationGoalModalProps> = ({
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.overlay}>
-        <View style={styles.modal}>
-          <Text style={styles.title}>Alterar Meta de Hidratação (ml)</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
+        <View style={styles.container}>
+          <Text style={styles.title}>Defina sua meta diária de hidratação</Text>
+
+          <MainInput
+            labelText="Meta de Hidratação (ml)"
             value={goal}
             onChangeText={setGoal}
+            keyboardType="numeric"
             placeholder="Ex: 2000"
+            errors={errors}
           />
-          <View style={styles.buttons}>
-            <Button title="Cancelar" onPress={onClose} />
-            <Button title="Salvar" onPress={handleSave} />
-          </View>
+
+          <ReminderModalButtons onClose={onClose} onSave={handleSave} />
         </View>
       </View>
     </Modal>
@@ -62,28 +66,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modal: {
-    width: '80%',
+  container: {
+    width: '90%',
     backgroundColor: '#fff',
     borderRadius: 16,
-    padding: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 16,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
+    textAlign: 'center',
     marginBottom: 20,
-    fontSize: 16,
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
 });

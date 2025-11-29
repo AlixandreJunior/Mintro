@@ -8,7 +8,7 @@ interface MainInputProps {
   keyboardType?: KeyboardType;
   onChangeText: (text: string) => void;
   placeholder?: string;
-  errors?: string[]; // ✅ adicionando suporte a erros
+  errors?: string[];
 }
 
 export const MainInput: React.FC<MainInputProps> = ({
@@ -27,13 +27,15 @@ export const MainInput: React.FC<MainInputProps> = ({
         value={String(value)}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
-        style={[
-          styles.textInput,
-          errors ? { borderColor: '#EF4444' } : null, // ✅ borda vermelha se houver erro
-        ]}
+        style={[styles.textInput, errors ? { borderColor: '#EF4444' } : null]}
         outlineStyle={styles.textInputOutline as ViewStyle}
         placeholder={placeholder ? placeholder : ''}
+        placeholderTextColor="#6B7280"
         theme={{
+          colors: {
+            text: '#000000',
+            primary: '#3B82F6',
+          },
           fonts: {
             regular: { fontFamily: 'Poppins_400Regular' },
           },
@@ -61,6 +63,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   textInput: {
+    color: '#0000',
     backgroundColor: 'white',
     borderRadius: 8,
   },

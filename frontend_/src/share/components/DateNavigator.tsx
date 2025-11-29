@@ -48,30 +48,32 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
     today.getDate()
   );
 
-  // --- Desabilita botão "próximo" se a próxima data ultrapassa HOJE ---
   const isNextDisabled = (() => {
+    const today = new Date();
+    const todayStart = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+
     switch (mode) {
-      case 'day': {
-        const next = addDays(currentDate, 1);
-        return next.getTime() > todayStart.getTime();
-      }
-
+      case 'day':
+        return currentDate.getTime() >= todayStart.getTime();
       case 'week': {
-        const next = addWeeks(currentDate, 1);
-        const nextStart = startOfWeek(next, { weekStartsOn: 0 });
-        return nextStart.getTime() > todayStart.getTime();
+        const weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
+        return weekEnd.getTime() >= todayStart.getTime();
       }
-
       case 'month': {
-        const next = addMonths(currentDate, 1);
-        const monthStart = new Date(next.getFullYear(), next.getMonth(), 1);
-        return monthStart.getTime() > todayStart.getTime();
+        const monthEnd = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth() + 1,
+          0
+        );
+        return monthEnd.getTime() >= todayStart.getTime();
       }
-
       case 'year': {
-        const next = addYears(currentDate, 1);
-        const yearStart = new Date(next.getFullYear(), 0, 1);
-        return yearStart.getTime() > todayStart.getTime();
+        const yearEnd = new Date(currentDate.getFullYear(), 11, 31);
+        return yearEnd.getTime() >= todayStart.getTime();
       }
     }
   })();

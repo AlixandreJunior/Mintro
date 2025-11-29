@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Modal, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Modal, StyleSheet } from 'react-native';
 import { DateTimeInput } from '@/share/components/ui/inputs/DateTimeInput';
 import { MainInput } from '@/share/components/ui/inputs/MainInput';
 import SelectInput from './ui/inputs/SelectInput';
+import ReminderModalButtons from '@/features/user/reminder/components/ReminderModalButtons';
 
 interface ActivityEditModalProps {
   visible: boolean;
@@ -10,7 +11,6 @@ interface ActivityEditModalProps {
   item: any | null;
   type: 'exercise' | 'mindfulness';
   onSubmit: (data: any) => void;
-
   items: Array<{ id: number; name: string }>;
 }
 
@@ -23,11 +23,9 @@ const ActivityEditModal: React.FC<ActivityEditModalProps> = ({
   items,
 }) => {
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-
   const [date, setDate] = useState<Date>(new Date());
   const [time, setTime] = useState<Date>(new Date());
   const [duration, setDuration] = useState<string>('');
-
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -85,9 +83,9 @@ const ActivityEditModal: React.FC<ActivityEditModalProps> = ({
             label="Selecionar item"
             selectedValue={selectedItemId?.toString() || ''}
             onValueChange={(value) => setSelectedItemId(Number(value))}
-            options={items.map((item) => ({
-              label: item.name,
-              value: item.id.toString(),
+            options={items.map((i) => ({
+              label: i.name,
+              value: i.id.toString(),
             }))}
           />
 
@@ -116,21 +114,13 @@ const ActivityEditModal: React.FC<ActivityEditModalProps> = ({
           />
 
           <MainInput
-            labelText="Duração (min)"
+            labelText="Duração (minutos)"
             value={duration}
             onChangeText={setDuration}
             keyboardType="numeric"
           />
 
-          <View style={styles.actions}>
-            <TouchableOpacity onPress={onClose} style={styles.button}>
-              <Text style={styles.cancelText}>Cancelar</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={handleSave} style={styles.button}>
-              <Text style={styles.saveText}>Salvar</Text>
-            </TouchableOpacity>
-          </View>
+          <ReminderModalButtons onClose={onClose} onSave={handleSave} />
         </View>
       </View>
     </Modal>
@@ -142,37 +132,26 @@ export default ActivityEditModal;
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   container: {
     width: '90%',
-    padding: 22,
     backgroundColor: '#fff',
     borderRadius: 16,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
   },
   title: {
-    fontSize: 18,
-    fontFamily: 'Poppins_600SemiBold',
-    marginBottom: 18,
-    color: '#111',
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 26,
-  },
-  button: {
-    marginLeft: 18,
-  },
-  cancelText: {
-    fontSize: 14,
-    color: '#777',
-  },
-  saveText: {
-    fontSize: 14,
-    color: '#007AFF',
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
+    textAlign: 'center',
+    marginBottom: 20,
   },
 });

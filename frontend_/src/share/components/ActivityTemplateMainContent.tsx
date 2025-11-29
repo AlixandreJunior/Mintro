@@ -48,7 +48,7 @@ export default function ActivityMainContent({
 
   const refresh = useCallback(() => {
     loadLogs(currentDate, selectedPeriod);
-  }, [loadLogs, currentDate, selectedPeriod]);
+  }, [currentDate, selectedPeriod]);
 
   useEffect(() => {
     refresh();
@@ -110,7 +110,7 @@ export default function ActivityMainContent({
         logs={logs}
         onDelete={async (...args) => {
           await onDelete(...args);
-          refresh();
+          refresh(); // ← FORÇA RELOAD
         }}
         onEdit={async (...args) => {
           await onEdit(...args);
