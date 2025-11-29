@@ -7,7 +7,7 @@ if ! command -v uv &> /dev/null; then
 fi
 
 echo "Instalando dependências..."
-uv sync --yes
+uv sync
 
 echo "Rodando migrations..."
 uv run src/manage.py migrate
