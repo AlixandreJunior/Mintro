@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { getActivityIconName } from '@/share/utils/activityIconMapper';
 
 interface TransformedActivity {
@@ -8,22 +8,34 @@ interface TransformedActivity {
 
 interface DiaryActivitiesProps {
   activities: TransformedActivity[];
+  chipBackgroundColor?: string;
+  textColor?: string;
 }
 
 export const DiaryActivities: React.FC<DiaryActivitiesProps> = ({
   activities,
+  chipBackgroundColor = 'rgba(0,0,0,0.05)',
+  textColor = '#2B2B2B',
 }) => {
-  const screenWidth = Dimensions.get('window').width;
+  const { width: screenWidth } = useWindowDimensions();
 
   return (
-    <View style={styles.activitiesContainer}>
-      {activities.map((a, i) => (
+    <View style={styles.container}>
+      {activities.map((activity, index) => (
         <View
-          key={i}
-          style={[styles.activityChip, { maxWidth: screenWidth / 2.5 }]}
+          key={index}
+          style={[
+            styles.chip,
+            {
+              backgroundColor: chipBackgroundColor,
+              maxWidth: screenWidth / 3, // menor largura
+            },
+          ]}
         >
-          {getActivityIconName(a.name, 12)}
-          <Text style={styles.activityText}>{a.name}</Text>
+          {getActivityIconName(activity.name, 10)} {/* ícone menor */}
+          <Text style={[styles.text, { color: textColor }]} numberOfLines={1}>
+            {activity.name}
+          </Text>
         </View>
       ))}
     </View>
@@ -31,25 +43,23 @@ export const DiaryActivities: React.FC<DiaryActivitiesProps> = ({
 };
 
 const styles = StyleSheet.create({
-  activitiesContainer: {
+  container: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 4,
     marginTop: 4,
   },
-  activityChip: {
+  chip: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 3,
+    paddingHorizontal: 6,
     borderRadius: 16,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    marginBottom: 4,
-    marginRight: 6,
-    backgroundColor: 'rgba(0,0,0,0.05)',
+    flexShrink: 1,
   },
-  activityText: {
+  text: {
     fontFamily: 'Poppins_400Regular',
-    fontSize: 11,
-    marginLeft: 6,
-    color: '#2B2B2B',
+    fontSize: 10,
+    marginLeft: 4,
   },
 });

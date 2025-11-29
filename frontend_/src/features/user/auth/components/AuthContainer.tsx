@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-  View,
-  useWindowDimensions,
-} from 'react-native';
+import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import MintroLogo from '@/share/components/layout/MintroLogo';
 
 interface AuthContainerProps {
@@ -13,8 +7,6 @@ interface AuthContainerProps {
 }
 
 const AuthContainer: React.FC<AuthContainerProps> = ({ children }) => {
-  const { height, width } = useWindowDimensions();
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView

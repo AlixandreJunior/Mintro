@@ -118,8 +118,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      // 🔹 cancelar todas as notificações locais
-      await Notifications.cancelAllScheduledNotificationsAsync();
+      if (!isWeb) {
+        await Notifications.cancelAllScheduledNotificationsAsync();
+      }
 
       if (refreshToken) {
         await AuthService.logout(refreshToken);

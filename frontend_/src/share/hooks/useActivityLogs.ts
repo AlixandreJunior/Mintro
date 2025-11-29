@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export function useActivityLogs(type: 'exercise' | 'mindfulness', hook: any) {
   const [logs, setLogs] = useState<any[]>([]);
@@ -12,12 +12,15 @@ export function useActivityLogs(type: 'exercise' | 'mindfulness', hook: any) {
             : hook.handleMindfulnessLogList;
 
         const data = await handler(date, period);
+        setLogs(Array.isArray(data) ? [...data] : []);
+      } catch (err: any) {
+        const status =
+          err?.response?.status ?? err?.status ?? err?.code ?? null;
 
-        const normalizedLogs = Array.isArray(data) ? [...data] : [];
-
-        setLogs(normalizedLogs);
-      } catch (err) {
-        console.error(err);
+        if (status === 404) {
+          setLogs([]);
+          return;
+        }
 
         setLogs([]);
       }

@@ -1,33 +1,43 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet, View, Dimensions } from 'react-native';
+import {
+  Pressable,
+  Text,
+  StyleSheet,
+  View,
+  ViewStyle,
+  Dimensions,
+} from 'react-native';
 
 const { width, height } = Dimensions.get('window');
-
-// Escalas suaves proporcionais ao tamanho da tela
-const scale = width / 390; // base 390px (iPhone 12/13/14)
+const scale = width / 390;
 const verticalScale = height / 844;
 
 interface MainButtonProps {
   label: string;
   onPress: () => void;
-  color?: string; // 🔥 Agora pode mudar a cor do botão
+  color?: string;
   disabled?: boolean;
   errors?: string[];
+  flex?: number; // 🔹 proporção flexível
+  style?: ViewStyle; // 🔹 estilo customizado extra
 }
 
 export const MainButton: React.FC<MainButtonProps> = ({
   label,
   onPress,
-  color = '#3B82F6', // 🔥 Cor padrão
+  color = '#3B82F6',
   disabled = false,
   errors,
+  flex = 1,
+  style,
 }) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { flex }, style]}>
       <Pressable
-        style={[
+        style={({ pressed }) => [
           styles.button,
-          { backgroundColor: disabled ? '#9CA3AF' : color }, // 🔥 aplica cor ou cinza
+          { backgroundColor: disabled ? '#9CA3AF' : color },
+          pressed && !disabled ? styles.pressed : null,
           errors && styles.buttonError,
         ]}
         onPress={onPress}
@@ -53,27 +63,26 @@ const styles = StyleSheet.create({
 
   button: {
     paddingVertical: 14 * verticalScale,
-    paddingHorizontal: 12 * scale,
-
-    borderRadius: 10 * scale,
-
+    paddingHorizontal: 16 * scale,
+    borderRadius: 12 * scale,
     alignItems: 'center',
     justifyContent: 'center',
-
     shadowColor: '#000',
     shadowOpacity: 0.08,
-    shadowRadius: 4 * scale,
-    shadowOffset: { width: 0, height: 2 * verticalScale },
+    shadowRadius: 6 * scale,
+    shadowOffset: { width: 0, height: 3 * verticalScale },
+    elevation: 4,
+  },
 
-    elevation: 3,
+  pressed: {
+    opacity: 0.85,
   },
 
   label: {
     color: 'white',
     fontSize: 16 * scale,
-    textAlign: 'center',
-    width: '100%',
     fontFamily: 'Poppins_500Medium',
+    textAlign: 'center',
   },
 
   buttonError: {

@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import { Appbar } from 'react-native-paper'; // Certifique-se de ter react-native-paper instalado
 import { router } from 'expo-router'; // Para a ação de voltar, se usar Expo Router
 
@@ -9,7 +15,11 @@ interface FormHeaderProps {
   onSavePress: () => void;
 }
 
-const FormHeader: React.FC<FormHeaderProps> = ({ title, onBackPress, onSavePress }) => {
+const FormHeader: React.FC<FormHeaderProps> = ({
+  title,
+  onBackPress,
+  onSavePress,
+}) => {
   const handleBack = () => {
     if (onBackPress) {
       onBackPress();
@@ -20,7 +30,7 @@ const FormHeader: React.FC<FormHeaderProps> = ({ title, onBackPress, onSavePress
 
   return (
     <SafeAreaView style={styles.appbar}>
-      <Appbar.BackAction onPress={handleBack} />
+      <Appbar.BackAction color="#000000" onPress={handleBack} />
       <Appbar.Content title={title} titleStyle={styles.appbarTitle} />
       <TouchableOpacity onPress={onSavePress}>
         <Text style={styles.saveButtonText}>Salvar</Text>
@@ -35,13 +45,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    elevation: 0, 
-    shadowOpacity: 0, 
+    elevation: 0,
+    shadowOpacity: 0,
   },
   appbarTitle: {
     fontSize: 18,
     fontFamily: 'Poppins_400Regular',
-    color: '#000', // Cor do título
+    color: '#000',
   },
   saveButtonText: {
     fontSize: 16,
