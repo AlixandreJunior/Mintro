@@ -19,7 +19,7 @@ const AuthContainer: React.FC<AuthContainerProps> = ({ children }) => {
     <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={true}
       >
         <MintroLogo />
         {children}

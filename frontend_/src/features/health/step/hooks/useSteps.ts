@@ -22,8 +22,20 @@ export const useSteps = () => {
     []
   );
 
+  const handleStepUpdateGoal = async (newGoal: number): Promise<any> => {
+    return await handleRequest(() => StepsService.goalUpdate(newGoal));
+  };
+
   const handleStepGoal = async (): Promise<any> => {
     return await handleRequest(() => StepsService.goal());
   };
-  return { error, loading, handleStepsList, handleStepsCreate, handleStepGoal };
+
+  return {
+    error,
+    loading,
+    handleStepsList,
+    handleStepsCreate,
+    handleStepGoal,
+    handleStepUpdateGoal,
+  };
 };

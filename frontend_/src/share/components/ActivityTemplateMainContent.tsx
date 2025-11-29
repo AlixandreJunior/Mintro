@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 
 import DateNavigator from '@/share/components/DateNavigator';
@@ -46,8 +46,12 @@ export default function ActivityMainContent({
   const hook = type === 'exercise' ? useExercise() : useMindfulness();
   const { logs, loadLogs } = useActivityLogs(type, hook);
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
     loadLogs(currentDate, selectedPeriod);
+  }, [loadLogs, currentDate, selectedPeriod]);
+
+  useEffect(() => {
+    refresh();
   }, [currentDate, selectedPeriod]);
 
   useEffect(() => {
@@ -58,19 +62,15 @@ export default function ActivityMainContent({
     }
   }, [logs, currentDate, selectedPeriod]);
 
-  // ----------------------------------------------------------
-  // 🔥 Correção da contagem de dias completados no MÊS
-  // ----------------------------------------------------------
   const completedDays =
     selectedPeriod === 'week'
       ? weekDaysDisplay.filter((d) => d.exercised).length
       : new Set(
           logs.map((l) => {
             const d = new Date(l.datetime);
-            return d.toDateString(); // garante unicidade por dia
+            return d.toDateString();
           })
         ).size;
-  // ----------------------------------------------------------
 
   return (
     <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -108,8 +108,14 @@ export default function ActivityMainContent({
       <ActivityHistorySection
         type={type}
         logs={logs}
-        onDelete={onDelete}
-        onEdit={onEdit}
+        onDelete={async (...args) => {
+          await onDelete(...args);
+          refresh();
+        }}
+        onEdit={async (...args) => {
+          await onEdit(...args);
+          refresh();
+        }}
       />
     </ScrollView>
   );

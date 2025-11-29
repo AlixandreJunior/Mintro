@@ -14,6 +14,7 @@ const MindfulnessScreen = () => {
     handleMindfulnessList,
     handleMindfulnessLogDelete,
     handleMindfulnessLogUpdate,
+
   } = useMindfulness();
 
   const { showToast } = useToast();

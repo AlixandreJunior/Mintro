@@ -6,7 +6,7 @@ import { Mindfulness } from '@/share/types/health/mindfulness';
 import { useToast } from '@/share/providers/ToastProvider'; // 🔹 import do toast
 
 const RegisterMindfulnessScreen = () => {
-  const { handleMindfulnessLogCreate, handleMindfulnessList } =
+  const { handleMindfulnessLogCreate, handleMindfulnessList, error } =
     useMindfulness();
   const [mindfulness, setMindfulness] = useState<Mindfulness[]>([]);
   const { showToast } = useToast(); // 🔹 hook do toast
@@ -23,15 +23,14 @@ const RegisterMindfulnessScreen = () => {
     load();
   }, []);
 
-  // Função para salvar e mostrar toast
   const handleSaveItemWithToast = async (itemId: number) => {
     try {
       await handleMindfulnessLogCreate(itemId);
-      showToast('Mindfulness registrado com sucesso!', 'success'); // 🔹 toast de sucesso
-      onPressBack(); // voltar para a tela de mindfulness
+      showToast('Mindfulness registrado com sucesso!', 'success');
+      onPressBack();
     } catch (err) {
       console.error(err);
-      showToast('Erro ao registrar mindfulness', 'error'); // 🔹 toast de erro
+      showToast('Erro ao registrar mindfulness', 'error');
     }
   };
 
@@ -40,9 +39,10 @@ const RegisterMindfulnessScreen = () => {
       title="Registrar Mindfulness"
       labelSelect="Mindfulness_id"
       items={mindfulness}
-      handleSaveItem={handleSaveItemWithToast} // 🔹 substituí a função original
+      handleSaveItem={handleSaveItemWithToast}
       onSuccessRedirect={onPressBack}
       onBackPress={onPressBack}
+      error={error}
     />
   );
 };

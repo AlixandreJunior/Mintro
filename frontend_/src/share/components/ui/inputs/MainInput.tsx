@@ -32,7 +32,7 @@ export const MainInput: React.FC<MainInputProps> = ({
           errors ? { borderColor: '#EF4444' } : null, // ✅ borda vermelha se houver erro
         ]}
         outlineStyle={styles.textInputOutline as ViewStyle}
-        placeholder={placeholder ? placeholder : 'Opcional'}
+        placeholder={placeholder ? placeholder : ''}
         theme={{
           fonts: {
             regular: { fontFamily: 'Poppins_400Regular' },

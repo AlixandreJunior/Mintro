@@ -40,6 +40,8 @@ export function DashboardSummary<T extends Record<string, any>>({
     [logs, mode, goal, dateKey, valueKey, selectedDate]
   );
 
+  console.log(progress);
+
   return (
     <View style={styles.mainContent}>
       <View style={styles.leftContent}>

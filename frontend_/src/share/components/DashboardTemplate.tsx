@@ -5,7 +5,6 @@ import PeriodDateHeader from '@/share/components/PeriodDateHeader';
 import { DashboardSummary } from './DashboardSummary';
 import { DashboardHistory } from './DashboardHistory';
 import DashboardChart from './DashboardChart';
-import { ResponseSuccess } from '../types/response';
 
 const { height } = Dimensions.get('window');
 
@@ -13,14 +12,13 @@ interface DashboardMainContentProps<
   T extends Record<string, any>,
   P extends string = 'day' | 'week' | 'month' | 'year'
 > {
+  logs: T[];
   periods: { key: P; label: string }[];
   selectedPeriod: P;
   selectedDate: Date;
 
   setSelectedPeriod: React.Dispatch<React.SetStateAction<P>>;
   setSelectedDate: React.Dispatch<React.SetStateAction<Date>>;
-
-  loader: (date: Date, period: P) => Promise<T[]>;
 
   goal: number;
 
@@ -42,12 +40,12 @@ export function DashboardMainContent<
   T extends Record<string, any>,
   P extends string = 'day' | 'week' | 'month' | 'year'
 >({
+  logs,
   periods,
   selectedPeriod,
   selectedDate,
   setSelectedDate,
   setSelectedPeriod,
-  loader,
   goal,
   valueKey,
   dateKey,
@@ -59,11 +57,6 @@ export function DashboardMainContent<
   onDelete,
   onEdit,
 }: DashboardMainContentProps<T, P>) {
-  const { data: logs } = useLoadList({
-    loader: () => loader(selectedDate, selectedPeriod),
-    deps: [selectedDate, selectedPeriod],
-  });
-
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
       <PeriodDateHeader
@@ -77,7 +70,7 @@ export function DashboardMainContent<
       <DashboardSummary<T>
         logs={logs}
         selectedDate={selectedDate}
-        mode={selectedPeriod as 'day' | 'week' | 'month' | 'year'} // ✨ cast
+        mode={selectedPeriod as 'day' | 'week' | 'month' | 'year'}
         goal={goal}
         valueKey={valueKey}
         dateKey={dateKey}

@@ -44,10 +44,8 @@ const CreateDiaryScreen = () => {
 
       await handleDiaryCreate(formData);
 
-      // 🔹 exibe toast de sucesso
       showToast('Diário criado com sucesso!', 'success');
 
-      // redireciona após 1.5s para o usuário perceber o toast
       setTimeout(() => {
         router.push('/(app)/(tabs)/mental');
       }, 1500);

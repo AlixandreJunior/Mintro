@@ -9,6 +9,8 @@ import { FloatingActionButton } from '@/share/components/FloatingButtonAction';
 import HydrationModal from '../components/HydrationModal';
 import { router } from 'expo-router';
 import { useToast } from '@/share/providers/ToastProvider';
+import { useLoadList } from '@/share/hooks/useLoadList';
+import HydrationGoalModal from '../components/HydrationGoalModal';
 
 const PERIODS = [
   { key: 'day', label: 'Dia' },
@@ -28,7 +30,13 @@ const HydrationScreen = () => {
     handleHydrationDelete,
     handleHydrationUpdate,
     handleHydrationGoal,
+    handleHydrationUpdateGoal,
   } = useHydration();
+
+  const { data: logs, reload } = useLoadList({
+    loader: () => handleHydrationList(selectedDate, selectedPeriod),
+    deps: [selectedDate, selectedPeriod],
+  });
 
   const { showToast } = useToast();
 
@@ -67,6 +75,8 @@ const HydrationScreen = () => {
           date: date.toISOString(),
         });
 
+        reload();
+
         setModalVisible(false);
         setSelectedLog(null);
         showToast('Hidratação atualizada com sucesso!', 'success');
@@ -81,10 +91,27 @@ const HydrationScreen = () => {
   const handleDelete = async (id: number): Promise<void> => {
     try {
       await handleHydrationDelete(id);
+
+      reload();
+
       showToast('Hidratação deletada com sucesso!', 'success');
     } catch (error) {
       console.error(error);
       showToast('Erro ao deletar hidratação', 'error');
+    }
+  };
+
+  const [goalModalVisible, setGoalModalVisible] = useState(false);
+
+  const handleSaveGoal = async (newGoal: number) => {
+    try {
+      await handleHydrationUpdateGoal(newGoal);
+      setHydrationGoal(newGoal);
+      setGoalModalVisible(false);
+      showToast('Meta de hidratação atualizada!', 'success');
+    } catch (error) {
+      console.error(error);
+      showToast('Erro ao atualizar meta', 'error');
     }
   };
 
@@ -93,16 +120,21 @@ const HydrationScreen = () => {
       <HeaderWithOptions
         onBackPress={() => router.push('/(app)/(tabs)/activity')}
         title="Hidratação"
-        options={[]}
+        options={[
+          {
+            label: 'Meta',
+            onPress: () => setGoalModalVisible(true),
+          },
+        ]}
       />
 
       <DashboardMainContent<Hydration>
+        logs={logs}
         periods={PERIODS as any}
         selectedPeriod={selectedPeriod}
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
         setSelectedPeriod={setSelectedPeriod}
-        loader={handleHydrationList}
         goal={hydrationGoal ?? 0}
         valueKey="quantity"
         dateKey="date"
@@ -125,9 +157,16 @@ const HydrationScreen = () => {
           onClose={() => setModalVisible(false)}
           initialDate={new Date(selectedLog.date)}
           initialQuantity={selectedLog.quantity}
-          onSave={handleSaveModal} // 🔹 toast no update
+          onSave={handleSaveModal}
         />
       )}
+
+      <HydrationGoalModal
+        visible={goalModalVisible}
+        currentGoal={hydrationGoal}
+        onClose={() => setGoalModalVisible(false)}
+        onSave={handleSaveGoal}
+      />
     </SafeAreaView>
   );
 };

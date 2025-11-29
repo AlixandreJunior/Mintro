@@ -3,7 +3,7 @@ import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import SelectInput from './ui/inputs/SelectInput';
 import { DateTimeInput } from './ui/inputs/DateTimeInput';
 import { MainInput } from './ui/inputs/MainInput';
-import { formatDatetimeToISO } from '@/share/utils/formatDatetimeToISO';
+import { Errors } from './RegisterScreenTemplate';
 
 interface Item {
   id: number;
@@ -22,6 +22,7 @@ interface RegisterFormContentProps {
   setShowTimePicker: (show: boolean) => void;
   duration: string;
   setDuration: (value: string) => void;
+  error?: Errors | null;
 }
 
 export default function RegisterFormContent({
@@ -36,6 +37,7 @@ export default function RegisterFormContent({
   setShowTimePicker,
   duration,
   setDuration,
+  error,
 }: RegisterFormContentProps) {
   const updateDate = (_event: any, date?: Date) => {
     setShowDatePicker(false);
@@ -65,6 +67,7 @@ export default function RegisterFormContent({
           label: item.name,
           value: item.id.toString(),
         }))}
+        errors={error?.exercise_id || error?.mindfulness_id}
       />
 
       <DateTimeInput
@@ -75,6 +78,7 @@ export default function RegisterFormContent({
         onPress={() => setShowDatePicker(true)}
         showPicker={showDatePicker}
         maximumDate={new Date()}
+        errors={error?.date}
       />
 
       <DateTimeInput
@@ -85,14 +89,16 @@ export default function RegisterFormContent({
         onPress={() => setShowTimePicker(true)}
         showPicker={showTimePicker}
         maximumDate={new Date()}
+        errors={error?.time}
       />
 
       <MainInput
-        labelText="Duração (minutos)"
-        //@ts-ignore
+        labelText="Duração"
         onChangeText={setDuration}
+        placeholder="Duração (minutos)"
         keyboardType="numeric"
         value={duration}
+        errors={error?.duration}
       />
     </View>
   );

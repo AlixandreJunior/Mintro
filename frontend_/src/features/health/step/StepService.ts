@@ -22,4 +22,10 @@ export class StepsService extends Service {
   static async goal(): Promise<number> {
     return this.apiGet('health/step/goal/');
   }
+
+  static async goalUpdate(newGoal: number): Promise<any> {
+    return this.apiPatch('health/step/goal/update/', {
+      steps_goal: newGoal,
+    });
+  }
 }

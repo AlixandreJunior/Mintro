@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from apps.health.models.hydration import HydrationLog
+from apps.user.models.user import User
 
 
 class HydrationLogSerializer(serializers.ModelSerializer):
@@ -19,5 +20,18 @@ class HydrationLogSerializer(serializers.ModelSerializer):
         fields = ("id", "user", "quantity", "date")
 
 
-class GoalHydration(serializers.Serializer):
-    goal = serializers.IntegerField(source="user.hydration_goal", read_only=True)
+class HydrationGoalSerializer(serializers.ModelSerializer):
+    class Meta:  # type: ignore
+        model = User
+        fields = ("hydration_goal",)
+
+    def validate_hydration_goal(self, value: int) -> int:
+        if value <= 0:
+            msg = "A meta deve ser maior que zero."
+            raise serializers.ValidationError(msg)
+        return value
+
+    def to_representation(self, instance: object) -> object:
+        """Retorna a meta com a chave 'goal'."""
+        ret = super().to_representation(instance)
+        return {"goal": ret["hydration_goal"]}

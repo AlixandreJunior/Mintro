@@ -13,9 +13,10 @@ import { useToast } from '@/share/providers/ToastProvider';
 
 interface DiaryEntryCardProps {
   diary: Diary & { iconSource: React.ReactNode };
+  reload: () => Promise<void>;
 }
 
-const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary }) => {
+const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary, reload }) => {
   const { handleDiaryDelete } = useDiary();
   const { showToast } = useToast();
   const { width } = useWindowDimensions();
@@ -24,6 +25,7 @@ const DiaryEntryCard: React.FC<DiaryEntryCardProps> = ({ diary }) => {
     try {
       await handleDiaryDelete(diary.id);
       showToast('Diário deletado com sucesso!', 'success');
+      reload();
     } catch (err) {
       console.error(err);
       showToast('Erro ao deletar diário!', 'error');

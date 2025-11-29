@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 
 import { HydratationCard } from '@/features/health/hydration/components/HydratationCard';
@@ -45,6 +45,8 @@ export function HealthStats({ currentDate }: Props) {
     loader: () => handleMindfulnessLogList(currentDate, 'week'),
     deps: [currentDate],
   });
+
+  
 
   return (
     <View>

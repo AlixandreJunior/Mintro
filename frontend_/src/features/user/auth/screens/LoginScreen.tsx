@@ -19,7 +19,7 @@ const LoginScreen = () => {
   const backLink = 'Criar conta';
 
   const { handleLogin, error } = useAuthForm();
-  const { showToast } = useToast(); // 🔹 hook do Toast
+  const { showToast } = useToast();
 
   const handleSubmit = async () => {
     try {

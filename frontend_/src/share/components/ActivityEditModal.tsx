@@ -35,16 +35,24 @@ const ActivityEditModal: React.FC<ActivityEditModalProps> = ({
     if (!item) return;
 
     const iso = item.datetime ?? item.date ?? null;
-    if (!iso) return;
-
-    const parsed = new Date(iso);
-    if (!isNaN(parsed.getTime())) {
-      setDate(parsed);
-      setTime(parsed);
+    if (iso) {
+      const parsed = new Date(iso);
+      if (!isNaN(parsed.getTime())) {
+        setDate(parsed);
+        setTime(parsed);
+      }
     }
 
     setDuration(item.duration?.toString() || '');
-    setSelectedItemId(item?.exercise_id || item?.mindfulness_id || null);
+
+    const extractedId =
+      item.exercise_id ??
+      item.mindfulness_id ??
+      item.exercise?.id ??
+      item.mindfulness?.id ??
+      null;
+
+    setSelectedItemId(extractedId);
   }, [item]);
 
   const handleSave = () => {
@@ -77,9 +85,9 @@ const ActivityEditModal: React.FC<ActivityEditModalProps> = ({
             label="Selecionar item"
             selectedValue={selectedItemId?.toString() || ''}
             onValueChange={(value) => setSelectedItemId(Number(value))}
-            options={items.map((i) => ({
-              label: i.name,
-              value: i.id.toString(),
+            options={items.map((item) => ({
+              label: item.name,
+              value: item.id.toString(),
             }))}
           />
 

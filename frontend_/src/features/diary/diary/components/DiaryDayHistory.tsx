@@ -8,9 +8,13 @@ import DiaryEntryCard from './DiaryEntryCard';
 
 interface DiaryDayHistoryProps {
   entries: Diary[];
+  reload: () => Promise<void>;
 }
 
-const DiaryDayHistory: React.FC<DiaryDayHistoryProps> = ({ entries }) => {
+const DiaryDayHistory: React.FC<DiaryDayHistoryProps> = ({
+  entries,
+  reload,
+}) => {
   const grouped = groupEntriesByDay(entries);
 
   return (
@@ -21,7 +25,7 @@ const DiaryDayHistory: React.FC<DiaryDayHistoryProps> = ({ entries }) => {
 
           <DiaryTimelineLine>
             {dayEntries.map((entry: any, index) => (
-              <DiaryEntryCard key={index} diary={entry} />
+              <DiaryEntryCard key={index} diary={entry} reload={reload} />
             ))}
           </DiaryTimelineLine>
         </View>

@@ -4,12 +4,14 @@ import React from 'react';
 
 interface StepsSidePanelProps {
   value: number;
+  label: string;
   icon: 'fire' | 'map-marker';
   color?: string;
 }
 
 export const StepsSidePanel: React.FC<StepsSidePanelProps> = ({
   value,
+  label,
   icon,
   color = '#000',
 }) => {
@@ -23,7 +25,7 @@ export const StepsSidePanel: React.FC<StepsSidePanelProps> = ({
         </View>
       </View>
       <Text style={styles.sideStatValue}>{value.toFixed(2)}</Text>
-      <Text style={styles.sideStatLabel}>kcal</Text>
+      <Text style={styles.sideStatLabel}>{label}</Text>
     </View>
   );
 };
