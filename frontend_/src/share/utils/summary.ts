@@ -1,9 +1,4 @@
-import {
-  differenceInDays,
-  startOfWeek,
-  startOfMonth,
-  endOfMonth,
-} from 'date-fns';
+import { differenceInDays, startOfMonth, endOfMonth } from 'date-fns';
 
 export type PeriodMode = 'day' | 'week' | 'month' | 'year';
 
@@ -37,8 +32,6 @@ export function buildDashboardSummary<T>({
     return sum + (isNaN(v) ? 0 : v);
   }, 0);
 
-  const progress = Math.min(100, Math.round((total / goal) * 100));
-
   let daysInPeriod = 1;
 
   switch (mode) {
@@ -58,11 +51,13 @@ export function buildDashboardSummary<T>({
     }
 
     case 'year':
-      daysInPeriod = 365; // opcional: se quiser considerar ano bissexto pode ajustar dinamicamente
+      daysInPeriod = 365;
       break;
   }
 
-  const avg = Math.round(total / daysInPeriod);
+  const avg = total / daysInPeriod;
+
+  const progress = goal > 0 ? Math.min(1, avg / goal) : 0;
 
   let label = '';
   let value = avg;
@@ -76,17 +71,17 @@ export function buildDashboardSummary<T>({
       value = total;
       break;
     }
-
     case 'week':
       label = `Média diária: ${avg.toLocaleString('pt-BR')}`;
+      value = avg;
       break;
-
     case 'month':
       label = `Média diária no mês: ${avg.toLocaleString('pt-BR')}`;
+      value = avg;
       break;
-
     case 'year':
       label = `Média diária no ano: ${avg.toLocaleString('pt-BR')}`;
+      value = avg;
       break;
   }
 

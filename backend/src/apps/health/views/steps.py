@@ -1,6 +1,11 @@
 from django.contrib.auth.models import AbstractBaseUser, AnonymousUser
 from rest_framework import permissions
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import (
+    CreateAPIView,
+    ListAPIView,
+    RetrieveAPIView,
+    UpdateAPIView,
+)
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -47,6 +52,14 @@ class StepLogRegisterView(BaseStepsView, CreateAPIView):
 
 
 class StepGoalView(RetrieveAPIView):
+    serializer_class = StepGoalSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_object(self) -> AbstractBaseUser | AnonymousUser:
+        return self.request.user
+
+
+class StepGoalUpdateView(UpdateAPIView):
     serializer_class = StepGoalSerializer
     permission_classes = (permissions.IsAuthenticated,)
 

@@ -19,7 +19,7 @@ from rest_framework.generics import (
     UpdateAPIView,
 )
 
-from apps.health.serializers.hydration import GoalHydration
+from apps.health.serializers.hydration import HydrationGoalSerializer
 from core.views.health.hydration import BaseHydrationView
 
 
@@ -40,7 +40,15 @@ class HydrationLogUpdateView(BaseHydrationView, UpdateAPIView):
 
 
 class HydrationGoalView(RetrieveAPIView):
-    serializer_class = GoalHydration
+    serializer_class = HydrationGoalSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_object(self) -> AbstractBaseUser | AnonymousUser:
+        return self.request.user
+
+
+class HydrationGoalUpdateView(UpdateAPIView):
+    serializer_class = HydrationGoalSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_object(self) -> AbstractBaseUser | AnonymousUser:

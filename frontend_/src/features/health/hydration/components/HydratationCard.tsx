@@ -9,6 +9,9 @@ import { ProgressCircle } from '../../../../share/components/icons/ProgressCircl
 import WaterDropIcon from '../../../../share/components/icons/WaterDropIcon';
 import { router } from 'expo-router';
 import { Hydration } from '@/share/types/health/hydratation';
+import { useEffect, useState } from 'react';
+import { useHydration } from '../hooks/useHydration';
+import { useToast } from '@/share/providers/ToastProvider';
 
 interface HydratationCardProps {
   logs: Hydration[];
@@ -17,10 +20,32 @@ interface HydratationCardProps {
 const { width, height } = Dimensions.get('window');
 
 export const HydratationCard: React.FC<HydratationCardProps> = ({ logs }) => {
+  const { showToast } = useToast();
+  const [goal, setHydrationGoal] = useState<number | null>(null);
+
+  const { handleHydrationGoal } = useHydration();
+  useEffect(() => {
+    const loadGoal = async () => {
+      try {
+        const data = await handleHydrationGoal();
+        if (data?.goal) {
+          setHydrationGoal(data.goal);
+        }
+      } catch (error) {
+        console.log('Erro ao carregar meta de hidratação', error);
+        showToast('Erro ao carregar meta de hidratação', 'error');
+      }
+    };
+
+    loadGoal();
+  }, []);
+
   const totalHydrationToday = logs.reduce(
     (sum, { quantity = 0 }) => sum + quantity,
     0
   );
+
+  const progress = goal ? Math.min(1, totalHydrationToday / goal) : 0;
 
   return (
     <TouchableOpacity
@@ -37,9 +62,9 @@ export const HydratationCard: React.FC<HydratationCardProps> = ({ logs }) => {
           </View>
           <View style={styles.hydrationProgress}>
             <ProgressCircle
-              progress={100}
+              progress={progress}
               size={80}
-              color="#9CC9FF"
+              color="#415af7ff"
               strokeWidth={6}
             />
             <View style={styles.hydrationIcon}>

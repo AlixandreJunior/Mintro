@@ -35,4 +35,10 @@ export class HydrationService extends Service {
   static async goal(): Promise<any> {
     return this.apiGet('health/hydration/goal/');
   }
+
+  static async goalUpdate(newGoal: number): Promise<any> {
+    return this.apiPatch('health/hydration/goal/update/', {
+      hydration_goal: newGoal,
+    });
+  }
 }

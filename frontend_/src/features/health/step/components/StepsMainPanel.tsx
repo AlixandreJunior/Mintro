@@ -8,16 +8,22 @@ const { width, height } = Dimensions.get('window');
 
 interface StepsMainPanelProps {
   steps: number;
+  goal: number | null;
 }
 
-export const StepsMainPanel: React.FC<StepsMainPanelProps> = ({ steps }) => {
+export const StepsMainPanel: React.FC<StepsMainPanelProps> = ({
+  steps,
+  goal,
+}) => {
+  const progress = goal ? Math.min(1, steps / goal) : 0;
+
   return (
     <View style={styles.mainStatItem}>
       <View
         style={[styles.progressContainer, styles.mainStatProgressContainer]}
       >
         <ProgressCircle
-          progress={Math.min(steps / 100, 100)}
+          progress={progress}
           size={width * 0.25}
           color="#9CC9FF"
           strokeWidth={6}

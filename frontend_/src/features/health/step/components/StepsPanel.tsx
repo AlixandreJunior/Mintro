@@ -4,40 +4,70 @@ import { router } from 'expo-router';
 import { StepsMainPanel } from './StepsMainPanel';
 import { Step } from '@/share/types/health/steps';
 import { StepsSidePanel } from './StepsSidePanel';
+import { useToast } from '@/share/providers/ToastProvider';
+import { useSteps } from '../hooks/useSteps';
 
 const { width, height } = Dimensions.get('window');
 
 interface StepsPanelProps {
   logs: Step[];
 }
+
 export const StepsPanel: React.FC<StepsPanelProps> = ({ logs }) => {
-  const kcalPerStep = 0.05;
-  const distancePerStep = 0.78;
+  // Valores médios por passo
+  const kcalPerStep = 0.05; // kcal por passo (média)
+  const distancePerStep = 0.78 / 1000; // metros convertidos para km
 
-  const totalSteps = useMemo(() => {
-    return logs.reduce((acc, log) => acc + log.steps, 0);
-  }, [logs]);
+  const totalSteps = useMemo(
+    () => logs.reduce((acc, log) => acc + log.steps, 0),
+    [logs]
+  );
 
-  const totalDistance = useMemo(() => {
-    return logs.reduce((acc) => acc + distancePerStep, 0);
-  }, [logs]);
+  const totalDistance = useMemo(
+    () => totalSteps * distancePerStep,
+    [totalSteps]
+  );
 
-  const totalKcal = useMemo(() => {
-    return logs.reduce((acc) => acc + kcalPerStep, 0);
-  }, [logs]);
+  const totalKcal = useMemo(() => totalSteps * kcalPerStep, [totalSteps]);
+
+  const [stepGoal, setStepGoal] = useState<number | null>(null);
+  const { handleStepGoal } = useSteps();
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    const loadGoal = async () => {
+      try {
+        const data = await handleStepGoal();
+        if (data?.goal) {
+          setStepGoal(data.goal);
+        }
+      } catch (error) {
+        console.log('Erro ao carregar meta de passos', error);
+        showToast('Erro ao carregar meta de passos', 'error');
+      }
+    };
+    loadGoal();
+  }, []);
 
   return (
     <TouchableOpacity
       style={styles.mainStats}
       onPress={() => router.push('/steps')}
+      activeOpacity={0.8}
     >
       <StepsSidePanel
         value={totalDistance}
+        label="km"
         icon="map-marker"
-        color={'#5262f8ff'}
+        color="#5262f8ff"
       />
-      <StepsMainPanel steps={totalSteps} />
-      <StepsSidePanel value={totalKcal} icon="fire" color={'#F97316'} />
+      <StepsMainPanel steps={totalSteps} goal={stepGoal} />
+      <StepsSidePanel
+        value={totalKcal}
+        icon="fire"
+        color="#F97316"
+        label="kcal"
+      />
     </TouchableOpacity>
   );
 };

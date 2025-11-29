@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from apps.user.models.user import User
+
 from ..models.steps import StepLog
 
 
@@ -21,5 +23,18 @@ class StepLogSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "user", "date")
 
 
-class StepGoalSerializer(serializers.Serializer):
-    goal = serializers.IntegerField(source="user.steps_goal", read_only=True)
+class StepGoalSerializer(serializers.ModelSerializer):
+    class Meta:  # type: ignore
+        model = User
+        fields = ("steps_goal",)
+
+    def validate_steps_goal(self, value: int) -> int:
+        if value <= 0:
+            msg = "A meta deve ser maior que zero."
+            raise serializers.ValidationError(msg)
+        return value
+
+    def to_representation(self, instance: object) -> object:
+        """Retorna a meta com a chave 'goal'."""
+        ret = super().to_representation(instance)
+        return {"goal": ret["steps_goal"]}

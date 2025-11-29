@@ -19,6 +19,10 @@ export function useHydration() {
     return await handleRequest(() => HydrationService.goal());
   };
 
+  const handleHydrationUpdateGoal = async (newGoal: number): Promise<any> => {
+    return await handleRequest(() => HydrationService.goalUpdate(newGoal));
+  };
+
   const handleHydrationCreate = async (
     data: HydrationWrite
   ): Promise<ResponseSuccess> => {
@@ -47,5 +51,6 @@ export function useHydration() {
     handleHydrationDelete,
     handleHydrationUpdate,
     handleHydrationGoal,
+    handleHydrationUpdateGoal,
   };
 }

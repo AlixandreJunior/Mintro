@@ -20,8 +20,6 @@ interface DashboardMainContentProps<
   setSelectedPeriod: React.Dispatch<React.SetStateAction<P>>;
   setSelectedDate: React.Dispatch<React.SetStateAction<Date>>;
 
-  loader: (date: Date, period: P) => Promise<T[]>;
-
   goal: number;
 
   valueKey: keyof T;
@@ -48,7 +46,6 @@ export function DashboardMainContent<
   selectedDate,
   setSelectedDate,
   setSelectedPeriod,
-  loader,
   goal,
   valueKey,
   dateKey,
@@ -73,7 +70,7 @@ export function DashboardMainContent<
       <DashboardSummary<T>
         logs={logs}
         selectedDate={selectedDate}
-        mode={selectedPeriod as 'day' | 'week' | 'month' | 'year'} // ✨ cast
+        mode={selectedPeriod as 'day' | 'week' | 'month' | 'year'}
         goal={goal}
         valueKey={valueKey}
         dateKey={dateKey}
