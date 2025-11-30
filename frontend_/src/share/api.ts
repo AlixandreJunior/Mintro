@@ -1,18 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosError, AxiosInstance } from 'axios';
+import Constants from 'expo-constants';
 
-const apiUrl = 'http://192.168.1.7:8000/';
+const apiUrl = Constants.expoConfig!.extra!.apiUrl as string;
 
 const api: AxiosInstance = axios.create({
   baseURL: apiUrl,
   timeout: 10000,
 });
-
-console.log('API URL:', apiUrl);
-
-/* ============================================================
- * 🔹 HANDLERS DE AUTENTICAÇÃO
- * ============================================================
- */
 
 let onLogout: (() => void) | null = null;
 let getTokens:
