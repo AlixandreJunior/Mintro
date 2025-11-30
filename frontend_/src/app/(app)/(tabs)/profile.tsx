@@ -1,0 +1,7 @@
+import ProfileScreen from '@/features/user/user/screens/ProfileScreen';
+
+const Profile = () => {
+  return <ProfileScreen />;
+};
+
+export default Profile;

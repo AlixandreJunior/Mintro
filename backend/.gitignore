@@ -8,6 +8,7 @@ db.sqlite3
 /static/
 *.sqlite3
 media/
+.env
 
 # PyCharm
 .idea/
@@ -16,7 +17,8 @@ media/
 .vscode/
 
 # Virtual environment
-venv/
+venv
+.venv
 env/
 ENV/
 *.egg-info/
@@ -33,3 +35,5 @@ coverage.xml
 
 # Docker
 docker-compose.override.yml
+
+.pytest_cache

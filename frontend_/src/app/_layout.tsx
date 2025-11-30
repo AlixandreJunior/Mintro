@@ -1,0 +1,66 @@
+import React, { useEffect } from 'react';
+import { Slot } from 'expo-router';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import {
+  useFonts,
+  Poppins_300Light,
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+} from '@expo-google-fonts/poppins';
+import * as NavigationBar from 'expo-navigation-bar';
+import { Provider as PaperProvider } from 'react-native-paper';
+import AppProviders from '../share/providers/AppProviders';
+import AuthGuard from '../features/user/auth/components/AuthGuard';
+import { useStepCounter } from '@/features/health/step/hooks/useStepsCounter';
+import { ToastProvider } from '@/share/providers/ToastProvider';
+
+export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    Poppins_300Light,
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+  });
+
+  useStepCounter();
+
+  useEffect(() => {
+    async function setNavigationBar() {
+      await NavigationBar.setVisibilityAsync('hidden');
+      await NavigationBar.setBehaviorAsync('overlay-swipe');
+    }
+    setNavigationBar();
+  }, []);
+
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  return (
+    <ToastProvider>
+      <AppProviders>
+        <AuthGuard>
+          <PaperProvider>
+            <Slot />
+          </PaperProvider>
+        </AuthGuard>
+      </AppProviders>
+    </ToastProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+});
