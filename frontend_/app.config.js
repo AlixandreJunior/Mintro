@@ -2,16 +2,21 @@ import 'dotenv/config';
 
 export default {
   expo: {
-    name: 'VITACARE',
-    slug: 'vitacare',
+    name: 'MIntro',
+    slug: 'mintro', // slug do projeto
     version: '1.0.1',
     orientation: 'portrait',
     icon: './src/share/assets/images/icon.png',
-    scheme: 'vitacare',
+    scheme: 'mintro',
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
     ios: {
       supportsTablet: true,
+    },
+    android: {
+      package: 'com.alixandre.mintro',
+      versionCode: 1,
+      buildType: 'apk',
     },
     web: {
       bundler: 'metro',
@@ -30,8 +35,7 @@ export default {
       [
         'expo-image-picker',
         {
-          photosPermission:
-            'O aplicativo precisa acessar suas fotos para permitir que você selecione um avatar.',
+          photosPermission: 'O aplicativo precisa acessar suas fotos.',
         },
       ],
       'expo-splash-screen',
@@ -40,16 +44,10 @@ export default {
       typedRoutes: true,
     },
     extra: {
-      router: {},
+      apiUrl: process.env.EXPO_API_URL,
       eas: {
         projectId: '8314ee45-5777-4547-8a14-146edc5b7f9c',
       },
-      apiUrl: process.env.EXPO_API_URL,
-    },
-    android: {
-      package: 'com.alixandre.vitacare',
-      versionCode: 2,
-      buildType: 'apk',
     },
   },
 };
